@@ -85,33 +85,36 @@
     "jurisdiction": "portland",
     "hidden_gem": true,
     "urgency": "event_triggered",
-    "description": "Portland landlords must pay tenants $2,900-$4,500 for no-cause evictions, qualifying lease terminations, or rent increases over 10% in a 12-month period.",
+    "description": "Portland landlords must pay tenants relocation assistance for no-cause evictions, non-renewal of fixed-term leases, qualified landlord reasons for termination, rent increases of 10% or more over a 12-month period, or substantial changes to lease terms. Assistance amounts vary by unit size: $2,900 for studios/SRO, $3,300 for 1-bedroom, $4,200 for 2-bedroom, and $4,500 for 3-bedroom or larger.",
     "legal_basis": "Portland City Code 30.01.085",
     "estimated_annual_value": {
       "min": 2900,
       "max": 4500,
-      "median": 4500
+      "median": 3700
     },
     "eligibility": {
       "must_reside_in": [
         "portland"
       ],
       "must_be_renter": true,
-      "triggered_by_event": "rent_increase_10pct",
+      "triggered_by_event": true,
       "other_requirements": [
-        "Landlord owns 2+ rental units in Portland",
-        "Rent increase >10% in 12 months OR no-cause termination",
-        "Tenant must demand payment in writing within 45 days"
+        "Renter must live within Portland city limits",
+        "Renter does not live with their landlord",
+        "Tenancy is not week-to-week",
+        "Does not apply to for-cause terminations",
+        "Triggered by: no-cause eviction, non-renewal of fixed-term lease, qualified landlord reason for termination, rent increase of 10%+ over 12 months, or substantial change of lease terms",
+        "Landlord must provide written notice at least 90 days before effective date",
+        "Accepting Relocation Assistance requires tenant to move out or return the funds"
       ]
     },
     "application_url": "https://www.portland.gov/phb/rental-services/mandatory-renter-relocation-assistance",
     "application_method": "mail",
     "documents_required": [
       "Lease agreement",
-      "Rent increase notice or termination notice",
-      "Written demand letter to landlord"
+      "Rent increase notice or termination notice"
     ],
-    "processing_time": "Payment due within 45 days of demand",
+    "processing_time": "Landlord must notify PHB within 30 days of payment",
     "contact_phone": "503-823-1303",
     "contact_org": "Portland Housing Bureau Rental Services"
   },
@@ -673,37 +676,5 @@
     "processing_time": "60-90 days",
     "renewal_cycle": "One-time application",
     "contact_org": "Oregon Department of Revenue"
-  },
-  {
-    "id": "acp",
-    "name": "Affordable Connectivity Program",
-    "short_name": "ACP Internet Discount",
-    "category": "connectivity",
-    "jurisdiction": "federal",
-    "hidden_gem": false,
-    "urgency": "standard",
-    "description": "$30/month discount on home internet service for income-qualified households. Some providers (Comcast Internet Essentials, T-Mobile) offer plans that become free with ACP.",
-    "legal_basis": "Infrastructure Investment and Jobs Act § 60502",
-    "estimated_annual_value": {
-      "min": 360,
-      "max": 360,
-      "median": 360
-    },
-    "eligibility": {
-      "income_max_pct_fpl": 200,
-      "other_requirements": [
-        "OR enrolled in qualifying program (SNAP, OHP, Pell Grant, etc.)"
-      ]
-    },
-    "application_url": "https://www.affordableconnectivity.gov/",
-    "application_method": "online",
-    "documents_required": [
-      "Photo ID",
-      "Proof of income OR proof of enrollment in qualifying program"
-    ],
-    "processing_time": "7-10 days",
-    "renewal_cycle": "Annual",
-    "contact_phone": "1-877-384-2575",
-    "contact_org": "FCC"
   }
 ]

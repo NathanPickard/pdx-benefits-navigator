@@ -172,17 +172,17 @@ function parseJsonObject<T>(raw: string): T {
   throw new Error('Unterminated JSON object in model response');
 }
 
-export async function translateResults(
-  output: AnalysisOutput,
+export async function translatePayload<T>(
+  payload: T,
   targetLanguage: 'es' | 'vi' | 'ru' | 'zh'
-): Promise<AnalysisOutput> {
+): Promise<T> {
   const response = await anthropic.messages.create({
     model: MODEL,
-    max_tokens: 8000,
+    max_tokens: 16000,
     messages: [
       {
         role: 'user',
-        content: `Translate every human-readable string in this JSON to ${targetLanguage}. Keep all numbers, IDs, URLs, and structure identical. Return ONLY the translated JSON.\n\n${JSON.stringify(output)}`,
+        content: `Translate the human-readable STRING VALUES in this JSON to ${targetLanguage}. Keep all JSON keys, numbers, IDs (e.g. snake_case program_ids like "snap", "pdx-renter-relocation"), URLs, dates, and the object structure exactly as given. Do not translate proper-noun program names (SNAP, WIC, OHP, ERDC, LIHEAP, PCEF, ADVSD, SUN, PGE), but DO translate descriptive phrases. Return ONLY the translated JSON object — no markdown, no preamble, no trailing prose.\n\n${JSON.stringify(payload)}`,
       },
     ],
   });
@@ -191,5 +191,5 @@ export async function translateResults(
     .filter((b) => b.type === 'text')
     .map((b) => (b as { type: 'text'; text: string }).text)
     .join('');
-  return parseJsonObject(text);
+  return parseJsonObject<T>(text);
 }

@@ -6,9 +6,19 @@ import { ArrowRight } from 'lucide-react';
 export function ComparisonChart({
   federal,
   total,
+  title,
+  subtitle,
+  federalLabel,
+  pdxLabel,
+  missLabel,
 }: {
   federal: number;
   total: number;
+  title: string;
+  subtitle: string;
+  federalLabel: string;
+  pdxLabel: string;
+  missLabel: string;
 }) {
   const delta = total - federal;
   const max = Math.max(total, 1);
@@ -18,16 +28,14 @@ export function ComparisonChart({
     <section className="flex flex-col gap-5 rounded-lg border bg-card p-6">
       <header className="flex flex-col gap-1">
         <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-          How we compare
+          {title}
         </h2>
-        <p className="text-sm text-muted-foreground">
-          Most benefits tools only check federal &amp; state programs.
-        </p>
+        <p className="text-sm text-muted-foreground">{subtitle}</p>
       </header>
 
       <div className="flex flex-col gap-4">
         <BarRow
-          label="Federal &amp; state tools"
+          label={federalLabel}
           value={federal}
           widthPct={federalPct}
           colorClass="bg-zinc-300 dark:bg-zinc-700"
@@ -35,7 +43,7 @@ export function ComparisonChart({
           delay={0.1}
         />
         <BarRow
-          label="PDX Benefits Navigator"
+          label={pdxLabel}
           value={total}
           widthPct={100}
           colorClass="bg-emerald-500"
@@ -53,7 +61,7 @@ export function ComparisonChart({
       >
         <ArrowRight className="h-4 w-4" />
         <span className="tabular-nums">+${delta.toLocaleString()}</span>
-        <span className="text-emerald-700/80">you&rsquo;d otherwise miss</span>
+        <span className="text-emerald-700/80">{missLabel}</span>
       </motion.div>
     </section>
   );
