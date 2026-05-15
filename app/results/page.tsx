@@ -1,16 +1,27 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import type { AnalysisOutput, IntakeData } from '@/types/program';
+import { motion } from 'framer-motion';
+import { AlertTriangle } from 'lucide-react';
+
+import { MoneyCounter } from '@/components/results/MoneyCounter';
+import { BenefitCard } from '@/components/results/BenefitCard';
+import { ComparisonChart } from '@/components/results/ComparisonChart';
+import programsData from '@/data/programs.json';
+import type { AnalysisOutput, IntakeData, Program } from '@/types/program';
+
+const PROGRAMS = programsData as Program[];
+const PROGRAM_BY_ID = new Map(PROGRAMS.map((p) => [p.id, p]));
+
+type State =
+  | { kind: 'loading'; tick: number }
+  | { kind: 'ok'; data: AnalysisOutput }
+  | { kind: 'error'; message: string };
 
 export default function ResultsPage() {
   const router = useRouter();
-  const [state, setState] = useState<
-    | { kind: 'loading'; tick: number }
-    | { kind: 'ok'; data: AnalysisOutput }
-    | { kind: 'error'; message: string }
-  >({ kind: 'loading', tick: 0 });
+  const [state, setState] = useState<State>({ kind: 'loading', tick: 0 });
 
   useEffect(() => {
     const raw = sessionStorage.getItem('pdx_intake');
@@ -22,7 +33,7 @@ export default function ResultsPage() {
 
     const ticker = setInterval(() => {
       setState((s) => (s.kind === 'loading' ? { kind: 'loading', tick: s.tick + 1 } : s));
-    }, 1200);
+    }, 1400);
 
     fetch('/api/analyze', {
       method: 'POST',
@@ -40,87 +51,124 @@ export default function ResultsPage() {
     return () => clearInterval(ticker);
   }, [router]);
 
-  if (state.kind === 'loading') {
-    const messages = [
-      'Checking 20 programs…',
-      'Calculating your benefits…',
-      'Surfacing hidden Portland programs…',
-      'Running eligibility logic…',
-    ];
-    return (
-      <main className="flex flex-1 items-center justify-center p-6">
-        <div className="flex flex-col items-center gap-3 text-center">
-          <div className="h-10 w-10 animate-spin rounded-full border-2 border-foreground border-t-transparent" />
-          <p className="text-muted-foreground">{messages[state.tick % messages.length]}</p>
-        </div>
-      </main>
-    );
-  }
+  if (state.kind === 'loading') return <LoadingView tick={state.tick} />;
+  if (state.kind === 'error') return <ErrorView message={state.message} />;
+  return <ResultsView data={state.data} />;
+}
 
-  if (state.kind === 'error') {
-    return (
-      <main className="flex flex-1 items-center justify-center p-6">
-        <div className="max-w-md text-center">
-          <h1 className="text-xl font-semibold">Something went wrong</h1>
-          <p className="mt-2 text-sm text-muted-foreground">{state.message}</p>
-        </div>
-      </main>
-    );
-  }
+function LoadingView({ tick }: { tick: number }) {
+  const messages = [
+    'Checking 20 programs…',
+    'Calculating your benefits…',
+    'Surfacing hidden Portland programs…',
+    'Running eligibility logic…',
+  ];
+  return (
+    <main className="flex flex-1 items-center justify-center p-6">
+      <div className="flex flex-col items-center gap-4 text-center">
+        <div className="h-10 w-10 animate-spin rounded-full border-2 border-foreground border-t-transparent" />
+        <p className="text-muted-foreground">{messages[tick % messages.length]}</p>
+      </div>
+    </main>
+  );
+}
 
-  const { data } = state;
-  const eligible = data.matches.filter((m) => m.eligible);
+function ErrorView({ message }: { message: string }) {
+  return (
+    <main className="flex flex-1 items-center justify-center p-6">
+      <div className="max-w-md text-center">
+        <h1 className="text-xl font-semibold">Something went wrong</h1>
+        <p className="mt-2 text-sm text-muted-foreground">{message}</p>
+      </div>
+    </main>
+  );
+}
+
+function ResultsView({ data }: { data: AnalysisOutput }) {
+  const eligible = useMemo(() => {
+    return data.matches
+      .filter((m) => m.eligible)
+      .map((m) => ({ match: m, program: PROGRAM_BY_ID.get(m.program_id) }))
+      .filter((row): row is { match: typeof row.match; program: Program } => !!row.program)
+      .sort((a, b) => {
+        if (a.program.hidden_gem !== b.program.hidden_gem) return a.program.hidden_gem ? -1 : 1;
+        return b.match.estimated_annual_value - a.match.estimated_annual_value;
+      });
+  }, [data]);
 
   return (
-    <main className="mx-auto flex w-full max-w-3xl flex-col gap-8 p-6 py-12">
-      <header className="flex flex-col gap-2">
-        <p className="text-sm uppercase tracking-wide text-muted-foreground">
+    <main className="mx-auto flex w-full max-w-3xl flex-col gap-10 px-6 py-12">
+      <motion.header
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+        className="flex flex-col gap-3"
+      >
+        <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
           We found benefits you qualify for
         </p>
-        <h1 className="text-6xl font-bold tabular-nums text-emerald-600">
-          ${data.total_estimated_annual_value.toLocaleString()}
-          <span className="ml-2 text-base font-medium text-muted-foreground">/year</span>
-        </h1>
-        <p className="text-sm text-muted-foreground">
-          Federal/state tools find ${data.federal_only_value.toLocaleString()} · Portland adds $
-          {data.pdx_specific_value.toLocaleString()} in hyperlocal programs.
-        </p>
-      </header>
+        <div className="flex items-baseline gap-2">
+          <MoneyCounter value={data.total_estimated_annual_value} />
+          <span className="text-base font-medium text-muted-foreground">/ year</span>
+        </div>
+      </motion.header>
+
+      <motion.div
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, delay: 0.15 }}
+      >
+        <ComparisonChart federal={data.federal_only_value} total={data.total_estimated_annual_value} />
+      </motion.div>
 
       {data.warnings?.length > 0 && (
-        <div className="rounded-md border border-amber-300 bg-amber-50 p-4 text-sm">
-          <strong className="block">Heads up</strong>
-          <ul className="mt-2 list-disc pl-5">
-            {data.warnings.map((w, i) => (
-              <li key={i}>{w}</li>
-            ))}
-          </ul>
-        </div>
+        <motion.section
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.2 }}
+          className="rounded-lg border border-amber-200 bg-amber-50 p-4"
+        >
+          <div className="flex items-start gap-2">
+            <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-700" />
+            <div className="flex flex-col gap-1.5">
+              <h2 className="text-sm font-semibold text-amber-900">Read these first</h2>
+              <ul className="flex flex-col gap-1.5 text-sm text-amber-900/90">
+                {data.warnings.map((w, i) => (
+                  <li key={i}>{w}</li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </motion.section>
       )}
 
-      <section className="flex flex-col gap-3">
-        <h2 className="text-lg font-semibold">{eligible.length} programs</h2>
-        {eligible.map((m) => (
-          <div key={m.program_id} className="rounded-md border p-4">
-            <div className="flex items-baseline justify-between gap-4">
-              <h3 className="font-medium">{m.program_id}</h3>
-              <span className="font-semibold tabular-nums">
-                ${m.estimated_annual_value.toLocaleString()}
-              </span>
-            </div>
-            <p className="mt-1 text-sm text-muted-foreground">
-              {m.confidence} confidence — {m.reasoning}
-            </p>
-          </div>
-        ))}
+      <section className="flex flex-col gap-4">
+        <div className="flex items-baseline justify-between">
+          <h2 className="text-lg font-semibold">
+            {eligible.length} {eligible.length === 1 ? 'program' : 'programs'} you qualify for
+          </h2>
+          <p className="text-xs text-muted-foreground">Sorted by hidden gems, then value</p>
+        </div>
+        <div className="flex flex-col gap-4">
+          {eligible.map(({ match, program }, i) => (
+            <motion.div
+              key={match.program_id}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, delay: 0.05 * i }}
+            >
+              <BenefitCard match={match} program={program} />
+            </motion.div>
+          ))}
+        </div>
       </section>
 
-      <details className="text-xs">
-        <summary className="cursor-pointer text-muted-foreground">Raw response (debug)</summary>
-        <pre className="mt-2 overflow-x-auto rounded bg-muted p-3">
-          {JSON.stringify(data, null, 2)}
-        </pre>
-      </details>
+      <footer className="border-t pt-6 text-xs text-muted-foreground">
+        <p>
+          Estimates only — not legal advice. Confirm eligibility with each program. We never store
+          your answers; everything runs in this browser session.
+        </p>
+      </footer>
     </main>
   );
 }
