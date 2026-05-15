@@ -1,159 +1,876 @@
-import Link from 'next/link';
-import { ArrowRight, Sparkles, FileSearch, ListChecks } from 'lucide-react';
+import Link from "next/link";
+import { ArrowRight, Check, Heart, Play, Sparkles, Users } from "lucide-react";
 
-import { StatReveal } from '@/components/landing/StatReveal';
-import { buttonVariants } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
+import { AppBar } from "@/components/brand/AppBar";
+import { Wordmark } from "@/components/brand/Wordmark";
+import {
+  RoseStamp,
+  SoftBlobs,
+  SunBadge,
+} from "@/components/brand/RoseStamp";
+import { JurisdictionPill } from "@/components/brand/JurisdictionPill";
+import { StatReveal } from "@/components/landing/StatReveal";
 
 const HIDDEN_GEMS = [
-  { name: 'Portland Renter Relocation', value: '$2,900–$4,500' },
-  { name: 'PCEF Home Energy', value: 'up to $5,000' },
-  { name: 'SUN Service System', value: '$3,000' },
-  { name: 'Multnomah Eviction Prevention', value: '$2,000+' },
-  { name: 'Portland Water Bureau Discount', value: '80% off' },
-  { name: 'Transportation Wallet', value: '$100/yr' },
+  {
+    id: "renter",
+    name: "Portland Renter Relocation",
+    value: "$2,900 – $4,500",
+    jurisdiction: "portland" as const,
+    blurb:
+      "When your rent goes up more than 10% in a year, your landlord owes you a lump sum.",
+  },
+  {
+    id: "pcef",
+    name: "PCEF Home Energy",
+    value: "up to $15,000",
+    jurisdiction: "portland" as const,
+    blurb:
+      "Free heat pumps, weatherization, and AC — funded by Portland's tax on large retailers.",
+  },
+  {
+    id: "sun",
+    name: "SUN Service System",
+    value: "$1,000 – $6,000",
+    jurisdiction: "multnomah" as const,
+    blurb:
+      "After-school, family meals, mental health, and basic-needs case management.",
+  },
+  {
+    id: "evict",
+    name: "Multnomah Eviction Prevention",
+    value: "up to $5,000",
+    jurisdiction: "multnomah" as const,
+    blurb: "Emergency rent paid directly to landlords — within days.",
+  },
+  {
+    id: "water",
+    name: "Water Bureau Discount",
+    value: "80% off bill",
+    jurisdiction: "portland" as const,
+    blurb:
+      "Up to 80% off water + sewer for households under 60% State Median Income.",
+  },
+  {
+    id: "wallet",
+    name: "Transportation Wallet",
+    value: "$100 – $308 / yr",
+    jurisdiction: "portland" as const,
+    blurb:
+      "TriMet, BIKETOWN, and parking credits for income-qualified residents.",
+  },
 ];
 
-export default function Home() {
+const SCENARIO_SUMMARIES = [
+  {
+    slug: "maria",
+    name: "María & family",
+    short: "María",
+    zip: "97218 · Cully",
+    blurb:
+      "Single parent · 2 kids · part-time at Fred Meyer · rent went up 12%.",
+    total: 40308,
+    eligibleCount: 13,
+    accent: "rose" as const,
+  },
+  {
+    slug: "james",
+    name: "James",
+    short: "James",
+    zip: "97203 · St. Johns",
+    blurb: "Single · disabled vet · unemployed · owns home in St. Johns.",
+    total: 24448,
+    eligibleCount: 12,
+    accent: "moss" as const,
+  },
+  {
+    slug: "rose",
+    name: "Rose",
+    short: "Rose",
+    zip: "97266 · Lents",
+    blurb: "Senior · widow · Social Security only · owns home in Lents.",
+    total: 19620,
+    eligibleCount: 11,
+    accent: "sun" as const,
+  },
+];
+
+const MARQUEE_ITEMS = [
+  ["Portland Renter Relocation", "$4,500"],
+  ["PCEF Home Energy", "up to $15,000"],
+  ["SUN Service System", "$3,000"],
+  ["Multnomah Eviction Prevention", "$2,000"],
+  ["Water Bureau Discount", "80% off"],
+  ["Transportation Wallet", "$308 / yr"],
+  ["Inclusionary Housing", "$9,000 / yr"],
+];
+
+const STEP_TONES = {
+  rose: { bg: "var(--rose-soft)", text: "oklch(0.40 0.10 150)" },
+  moss: { bg: "var(--moss-soft)", text: "var(--moss-2)" },
+  sun: { bg: "var(--sun-soft)", text: "oklch(0.46 0.12 65)" },
+} as const;
+
+export default function HomePage() {
   return (
-    <main className="flex flex-1 flex-col">
-      <section className="mx-auto flex w-full max-w-3xl flex-col items-start gap-8 px-6 pb-16 pt-20 sm:pt-28">
-        <div className="flex flex-col gap-1">
-          <p className="text-xs font-medium uppercase tracking-[0.2em] text-emerald-700">
-            PDX Benefits Navigator
-          </p>
-          <p className="text-base text-muted-foreground">
-            Oregon families leave behind, every year:
-          </p>
-        </div>
+    <>
+      <AppBar />
+      <main className="w-full" style={{ paddingBottom: 96 }}>
+        {/* ─────────────────────── Hero ─────────────────────── */}
+        <section style={{ position: "relative", overflow: "hidden" }}>
+          <SoftBlobs />
 
-        <StatReveal
-          target={1.2}
-          decimals={1}
-          prefix="$"
-          suffix="billion"
-          className="text-6xl font-bold tracking-tight tabular-nums text-emerald-600 sm:text-7xl md:text-8xl"
-        />
-
-        <h1 className="max-w-2xl text-3xl font-semibold leading-tight tracking-tight sm:text-4xl">
-          Find what you&rsquo;re owed.
-        </h1>
-
-        <p className="max-w-2xl text-lg leading-relaxed text-muted-foreground">
-          Most Portlanders qualify for thousands in benefits they don&rsquo;t know exist. Federal,
-          Oregon, Multnomah County, and the City of Portland each run their own programs —{' '}
-          <span className="font-medium text-foreground">most tools only check federal.</span>{' '}
-          Answer a few questions, and we&rsquo;ll check all 20.
-        </p>
-
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-          <Link
-            href="/intake"
-            className={cn(buttonVariants({ size: 'lg' }), 'text-base')}
+          <div
+            className="mx-auto"
+            style={{
+              maxWidth: 1240,
+              padding: "84px 32px 64px",
+              position: "relative",
+            }}
           >
-            Find my benefits
-            <ArrowRight className="ml-2 h-4 w-4" />
-          </Link>
-          <p className="text-sm text-muted-foreground">
-            ~3 minutes · Nothing is stored · 7 languages
-          </p>
-        </div>
-      </section>
-
-      <section className="border-y bg-muted/30">
-        <div className="mx-auto flex w-full max-w-3xl flex-col gap-8 px-6 py-16">
-          <h2 className="text-2xl font-semibold tracking-tight">How it works</h2>
-          <ol className="grid gap-6 sm:grid-cols-3">
-            <Step
-              icon={<FileSearch className="h-5 w-5" />}
-              n={1}
-              title="Tell us about you"
-              body="Household size, income, ZIP code, situation. Answers stay in your browser."
-            />
-            <Step
-              icon={<ListChecks className="h-5 w-5" />}
-              n={2}
-              title="We check 20 programs"
-              body="Federal, Oregon, Multnomah County, and the City of Portland — graded against the 2026 Federal Poverty Level."
-            />
-            <Step
-              icon={<Sparkles className="h-5 w-5" />}
-              n={3}
-              title="Get apply-now links"
-              body="Personalized dollar estimates, deadlines, document checklists, and direct links to every application."
-            />
-          </ol>
-        </div>
-      </section>
-
-      <section className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-6 py-16">
-        <div className="flex flex-col gap-2">
-          <h2 className="text-2xl font-semibold tracking-tight">Where the money is hiding</h2>
-          <p className="text-muted-foreground">
-            National tools only check SNAP, Medicaid, and a few federal programs. We surface
-            hyperlocal Portland and Multnomah programs that add{' '}
-            <span className="font-semibold text-foreground">$10,000–$25,000 a year</span> for the
-            average family.
-          </p>
-        </div>
-        <ul className="grid gap-2 sm:grid-cols-2">
-          {HIDDEN_GEMS.map((g) => (
-            <li
-              key={g.name}
-              className="flex items-center justify-between gap-3 rounded-md border bg-card px-4 py-3 text-sm"
+            <div
+              className="grid gap-14 items-center"
+              style={{
+                gridTemplateColumns: "minmax(0, 1.45fr) minmax(0, 1fr)",
+              }}
             >
-              <span className="flex items-center gap-2">
-                <Sparkles className="h-3.5 w-3.5 text-amber-600" />
-                <span className="font-medium">{g.name}</span>
-              </span>
-              <span className="font-semibold tabular-nums text-emerald-700">{g.value}</span>
-            </li>
-          ))}
-        </ul>
-        <div>
-          <Link
-            href="/intake"
-            className={cn(buttonVariants({ size: 'lg' }), 'mt-2 text-base')}
-          >
-            See what you qualify for
-            <ArrowRight className="ml-2 h-4 w-4" />
-          </Link>
-        </div>
-      </section>
+              <div className="rc-enter">
+                <div className="flex items-center gap-2 mb-7 flex-wrap">
+                  <span className="pill pill-rose">
+                    <Heart size={12} /> Made in Portland · 2026 Hackathon
+                  </span>
+                  <span className="pill pill-sky">7 languages</span>
+                  <span className="pill pill-moss">Nothing stored</span>
+                </div>
 
-      <footer className="border-t">
-        <div className="mx-auto w-full max-w-3xl px-6 py-8 text-xs text-muted-foreground">
-          Estimates only — not legal advice. Confirm eligibility with each program before applying.
-          We never store your data; everything runs in your browser session.
-        </div>
-      </footer>
-    </main>
+                <h1
+                  className="font-display"
+                  style={{
+                    fontSize: "clamp(3rem, 6.5vw, 5.4rem)",
+                    lineHeight: 1.02,
+                    margin: 0,
+                    letterSpacing: "-0.025em",
+                    fontWeight: 500,
+                  }}
+                >
+                  Portland has set aside{" "}
+                  <span style={{ color: "var(--rose)" }}>
+                    <StatReveal
+                      target={1.2}
+                      decimals={1}
+                      prefix="$"
+                      duration={2.4}
+                    />{" "}
+                    billion
+                  </span>{" "}
+                  for families who never claim it.
+                </h1>
+
+                <p
+                  style={{
+                    fontSize: "1.15rem",
+                    lineHeight: 1.55,
+                    color: "var(--ink-2)",
+                    maxWidth: 580,
+                    margin: "28px 0 32px",
+                  }}
+                >
+                  Most national tools only check federal benefits. We check{" "}
+                  <strong style={{ color: "var(--ink)" }}>all twenty</strong> —
+                  federal, Oregon, Multnomah County, and the City of Portland —
+                  and put together a kind, useful packet for you in about three
+                  minutes.
+                </p>
+
+                <div className="flex flex-wrap items-center gap-3">
+                  <Link
+                    href="/intake"
+                    className="rc-btn rc-btn-rose"
+                    style={{ padding: "0.95rem 1.6rem", fontSize: "1.02rem" }}
+                  >
+                    Find what you&rsquo;re owed
+                    <ArrowRight size={16} />
+                  </Link>
+                  <Link href="/demo/maria" className="rc-btn rc-btn-outline">
+                    <Play size={13} />
+                    Try a demo first
+                  </Link>
+                </div>
+
+                <div
+                  className="flex items-center gap-4 mt-8 flex-wrap"
+                  style={{ color: "var(--ink-3)", fontSize: "0.86rem" }}
+                >
+                  <span className="inline-flex items-center gap-1.5">
+                    <Check size={14} strokeWidth={2.2} /> No login
+                  </span>
+                  <span style={{ color: "var(--rule-2)" }}>·</span>
+                  <span className="inline-flex items-center gap-1.5">
+                    <Check size={14} strokeWidth={2.2} /> ~3 minutes
+                  </span>
+                  <span style={{ color: "var(--rule-2)" }}>·</span>
+                  <span className="inline-flex items-center gap-1.5">
+                    <Check size={14} strokeWidth={2.2} /> Built by neighbors
+                  </span>
+                </div>
+              </div>
+
+              <aside
+                className="rc-enter"
+                style={{ animationDelay: "120ms" }}
+              >
+                <div
+                  className="rc-card"
+                  style={{ padding: 30, position: "relative", overflow: "hidden" }}
+                >
+                  <div className="flex items-start justify-between mb-5">
+                    <div>
+                      <div
+                        className="eyebrow mb-1"
+                        style={{ color: "var(--moss-2)" }}
+                      >
+                        For a family like
+                      </div>
+                      <div
+                        className="font-display"
+                        style={{
+                          fontSize: "1.6rem",
+                          fontWeight: 500,
+                          lineHeight: 1.05,
+                        }}
+                      >
+                        María, in Cully
+                      </div>
+                    </div>
+                    <RoseStamp size={56} />
+                  </div>
+
+                  <p
+                    style={{
+                      color: "var(--ink-2)",
+                      fontSize: "0.92rem",
+                      lineHeight: 1.55,
+                      margin: "0 0 18px",
+                    }}
+                  >
+                    Single parent · 2 kids · part-time at Fred Meyer · rent
+                    went up 12%.
+                  </p>
+
+                  <div className="rc-card-soft" style={{ padding: 20 }}>
+                    <div className="flex items-baseline justify-between mb-2">
+                      <span className="tag">We could find</span>
+                      <span
+                        style={{
+                          fontSize: "0.78rem",
+                          color: "var(--ink-3)",
+                        }}
+                      >
+                        per year
+                      </span>
+                    </div>
+                    <div
+                      className="font-display tabular"
+                      style={{
+                        fontSize: "3rem",
+                        lineHeight: 1,
+                        color: "var(--rose)",
+                        fontWeight: 500,
+                      }}
+                    >
+                      $40,308
+                    </div>
+                    <div
+                      className="flex items-center gap-2 mt-3"
+                      style={{ fontSize: "0.85rem", color: "var(--ink-2)" }}
+                    >
+                      <span
+                        className="pill pill-sun"
+                        style={{ fontSize: "0.72rem" }}
+                      >
+                        <Sparkles size={11} /> 13 programs
+                      </span>
+                      <span style={{ color: "var(--ink-3)" }}>·</span>
+                      <span>5 only Portland tools find</span>
+                    </div>
+                  </div>
+
+                  <Link
+                    href="/demo/maria"
+                    className="rc-btn rc-btn-outline mt-4"
+                    style={{
+                      width: "100%",
+                      justifyContent: "center",
+                      marginTop: 16,
+                    }}
+                  >
+                    See María&rsquo;s full results
+                    <ArrowRight size={14} />
+                  </Link>
+                </div>
+              </aside>
+            </div>
+          </div>
+
+          {/* Marquee */}
+          <div
+            style={{
+              borderTop: "1px solid var(--rule)",
+              borderBottom: "1px solid var(--rule)",
+              background: "var(--paper-2)",
+              overflow: "hidden",
+              padding: "16px 0",
+            }}
+          >
+            <div className="rc-marquee-track">
+              {[0, 1].map((i) => (
+                <div
+                  key={i}
+                  className="flex items-center gap-12"
+                  style={{ flexShrink: 0 }}
+                >
+                  {MARQUEE_ITEMS.map(([n, v]) => (
+                    <span
+                      key={n}
+                      className="flex items-center gap-3"
+                      style={{ whiteSpace: "nowrap" }}
+                    >
+                      <span
+                        style={{
+                          width: 8,
+                          height: 8,
+                          borderRadius: 999,
+                          background: "var(--rose)",
+                          flexShrink: 0,
+                        }}
+                      />
+                      <span
+                        className="font-display"
+                        style={{ fontSize: "1.25rem", fontWeight: 500 }}
+                      >
+                        {n}
+                      </span>
+                      <span
+                        className="tabular"
+                        style={{
+                          color: "var(--moss-2)",
+                          fontWeight: 600,
+                          fontSize: "0.95rem",
+                        }}
+                      >
+                        {v}
+                      </span>
+                    </span>
+                  ))}
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ─────────────────────── How it works ─────────────────────── */}
+        <section
+          className="mx-auto"
+          style={{ maxWidth: 1240, padding: "84px 32px 32px" }}
+        >
+          <SectionHeading
+            kicker="How it works"
+            title="Three short steps. One useful packet."
+          >
+            <p
+              style={{
+                color: "var(--ink-3)",
+                margin: 0,
+                fontSize: "0.94rem",
+                maxWidth: 320,
+                textAlign: "right",
+              }}
+            >
+              Designed to be the friendliest part of your week.
+            </p>
+          </SectionHeading>
+
+          <div
+            className="grid gap-5"
+            style={{ gridTemplateColumns: "repeat(3, 1fr)" }}
+          >
+            <Step
+              n="1"
+              tone="rose"
+              title="Tell us about your household"
+              body="Twelve gentle questions: size, income, ZIP, what's going on. Your answers stay in this browser."
+            />
+            <Step
+              n="2"
+              tone="moss"
+              title="We check all 20 programs at once"
+              body="An AI reads the 2026 poverty tables and every active rule — ORS, City Code, county ordinances — and writes you a brief in plain language."
+            />
+            <Step
+              n="3"
+              tone="sun"
+              title="Apply with one stack of links"
+              body="Dollar estimates, deadlines, document checklists, and a renewal calendar you can drop into Google or Apple."
+            />
+          </div>
+        </section>
+
+        {/* ─────────────────────── Hidden gems ─────────────────────── */}
+        <section
+          className="mx-auto"
+          style={{ maxWidth: 1240, padding: "72px 32px 32px" }}
+        >
+          <SectionHeading
+            kicker="The hidden gems"
+            title="Programs Portland built — but most tools miss."
+          >
+            <p
+              style={{
+                maxWidth: 380,
+                color: "var(--ink-3)",
+                margin: 0,
+                fontSize: "0.94rem",
+                textAlign: "right",
+              }}
+            >
+              These nine hyperlocal programs alone add{" "}
+              <strong style={{ color: "var(--rose)" }}>
+                $10–25K a year
+              </strong>{" "}
+              for the average family.
+            </p>
+          </SectionHeading>
+
+          <div
+            className="grid gap-4"
+            style={{ gridTemplateColumns: "repeat(3, 1fr)" }}
+          >
+            {HIDDEN_GEMS.map((g) => (
+              <article key={g.id} className="rc-card" style={{ padding: 24 }}>
+                <div
+                  className="flex items-center justify-between mb-3 flex-wrap"
+                  style={{ gap: 6 }}
+                >
+                  <JurisdictionPill jurisdiction={g.jurisdiction} />
+                  <span
+                    className="pill pill-sun"
+                    style={{ fontSize: "0.72rem" }}
+                  >
+                    <Sparkles size={11} /> Hidden gem
+                  </span>
+                </div>
+                <h3
+                  className="font-display"
+                  style={{
+                    fontSize: "1.3rem",
+                    lineHeight: 1.2,
+                    margin: "0 0 8px",
+                    fontWeight: 500,
+                    letterSpacing: "-0.015em",
+                  }}
+                >
+                  {g.name}
+                </h3>
+                <p
+                  style={{
+                    color: "var(--ink-2)",
+                    fontSize: "0.92rem",
+                    lineHeight: 1.55,
+                    margin: 0,
+                  }}
+                >
+                  {g.blurb}
+                </p>
+                <div className="divider my-4" />
+                <div className="flex items-end justify-between">
+                  <span
+                    className="tabular"
+                    style={{
+                      fontSize: "1.1rem",
+                      color: "var(--rose)",
+                      fontWeight: 600,
+                    }}
+                  >
+                    {g.value}
+                  </span>
+                  <span className="tag">per year</span>
+                </div>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        {/* ─────────────────────── Demo families ─────────────────────── */}
+        <section
+          className="mx-auto"
+          style={{ maxWidth: 1240, padding: "72px 32px 32px" }}
+        >
+          <SectionHeading
+            kicker="Meet three Portland families"
+            title="Same questions. Very different answers."
+          >
+            <span className="tag">Click any to see their full results</span>
+          </SectionHeading>
+
+          <div
+            className="grid gap-4"
+            style={{ gridTemplateColumns: "repeat(3, 1fr)" }}
+          >
+            {SCENARIO_SUMMARIES.map((s) => (
+              <Link
+                key={s.slug}
+                href={`/demo/${s.slug}`}
+                className="rc-card group"
+                style={{
+                  padding: 26,
+                  textAlign: "left",
+                  textDecoration: "none",
+                  color: "var(--ink)",
+                  display: "block",
+                  transition: "transform 0.2s, border-color 0.2s",
+                }}
+              >
+                <div className="flex items-start justify-between mb-3">
+                  <div>
+                    <div
+                      className="font-display"
+                      style={{
+                        fontSize: "1.6rem",
+                        lineHeight: 1.05,
+                        fontWeight: 500,
+                        letterSpacing: "-0.015em",
+                      }}
+                    >
+                      {s.name}
+                    </div>
+                    <div
+                      style={{
+                        color: "var(--ink-3)",
+                        fontSize: "0.82rem",
+                        marginTop: 3,
+                      }}
+                    >
+                      {s.zip}
+                    </div>
+                  </div>
+                  {s.accent === "rose" && <RoseStamp size={40} />}
+                  {s.accent === "moss" && (
+                    <div
+                      style={{
+                        width: 40,
+                        height: 40,
+                        borderRadius: 999,
+                        background: "var(--moss-soft)",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        color: "var(--moss-2)",
+                      }}
+                    >
+                      <Users size={18} />
+                    </div>
+                  )}
+                  {s.accent === "sun" && <SunBadge size={40} />}
+                </div>
+                <p
+                  style={{
+                    color: "var(--ink-2)",
+                    fontSize: "0.9rem",
+                    lineHeight: 1.55,
+                    margin: "0 0 18px",
+                  }}
+                >
+                  {s.blurb}
+                </p>
+                <div className="rc-card-soft" style={{ padding: 14 }}>
+                  <div className="flex items-baseline justify-between">
+                    <div>
+                      <div className="tag">Benefits found</div>
+                      <div
+                        className="tabular font-display"
+                        style={{
+                          fontSize: "1.85rem",
+                          lineHeight: 1,
+                          color: "var(--rose)",
+                          fontWeight: 500,
+                          marginTop: 2,
+                        }}
+                      >
+                        ${s.total.toLocaleString()}
+                      </div>
+                    </div>
+                    <div style={{ textAlign: "right" }}>
+                      <div className="tag">Programs</div>
+                      <div
+                        className="tabular"
+                        style={{
+                          fontSize: "1.4rem",
+                          color: "var(--moss-2)",
+                          fontWeight: 600,
+                          marginTop: 2,
+                        }}
+                      >
+                        {s.eligibleCount}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  className="flex items-center gap-1.5 mt-4"
+                  style={{
+                    fontSize: "0.86rem",
+                    color: "var(--ink-2)",
+                    fontWeight: 500,
+                  }}
+                >
+                  <span>See {s.short}&rsquo;s full results</span>
+                  <ArrowRight size={14} />
+                </div>
+              </Link>
+            ))}
+          </div>
+        </section>
+
+        {/* ─────────────────────── Closing CTA ─────────────────────── */}
+        <section
+          className="mx-auto"
+          style={{ maxWidth: 1240, padding: "72px 32px 24px" }}
+        >
+          <div
+            className="rc-card"
+            style={{
+              padding: "44px 40px",
+              position: "relative",
+              overflow: "hidden",
+            }}
+          >
+            <SoftBlobs tone="moss" />
+            <div
+              className="grid items-center"
+              style={{
+                gridTemplateColumns: "1fr auto",
+                gap: 32,
+                position: "relative",
+              }}
+            >
+              <div>
+                <div
+                  className="eyebrow mb-3"
+                  style={{ color: "var(--moss-2)" }}
+                >
+                  The whole point
+                </div>
+                <h3
+                  className="font-display"
+                  style={{
+                    fontSize: "2.4rem",
+                    lineHeight: 1.1,
+                    margin: "0 0 12px",
+                    fontWeight: 500,
+                    letterSpacing: "-0.02em",
+                  }}
+                >
+                  Federal tools find{" "}
+                  <span style={{ color: "var(--ink-3)" }}>$9,200</span>.
+                  <br />
+                  We find <span style={{ color: "var(--rose)" }}>$24,400</span>.
+                </h3>
+                <p
+                  style={{
+                    color: "var(--ink-2)",
+                    margin: 0,
+                    fontSize: "1rem",
+                    maxWidth: 580,
+                  }}
+                >
+                  That difference is rent. It&rsquo;s groceries through August.
+                  It&rsquo;s a heat pump that doesn&rsquo;t cost anything.
+                </p>
+              </div>
+              <Link
+                href="/intake"
+                className="rc-btn rc-btn-rose"
+                style={{ padding: "1rem 1.6rem", fontSize: "1.02rem" }}
+              >
+                Start my questions
+                <ArrowRight size={16} />
+              </Link>
+            </div>
+          </div>
+        </section>
+
+        {/* ─────────────────────── Footer ─────────────────────── */}
+        <footer
+          className="mx-auto"
+          style={{ maxWidth: 1240, padding: "48px 32px 24px", marginTop: 24 }}
+        >
+          <div
+            className="grid gap-8"
+            style={{ gridTemplateColumns: "2fr 1fr 1fr" }}
+          >
+            <div>
+              <Wordmark />
+              <p
+                style={{
+                  color: "var(--ink-3)",
+                  fontSize: "0.86rem",
+                  lineHeight: 1.6,
+                  margin: "16px 0 0",
+                  maxWidth: 460,
+                }}
+              >
+                Estimates only — not legal advice. Confirm eligibility with
+                each program before applying. We never store your data;
+                everything runs in your browser session.
+              </p>
+            </div>
+            <div>
+              <div
+                className="tag"
+                style={{
+                  marginBottom: 8,
+                  fontWeight: 600,
+                  color: "var(--ink-2)",
+                }}
+              >
+                Built with
+              </div>
+              <ul
+                style={{
+                  listStyle: "none",
+                  padding: 0,
+                  margin: 0,
+                  fontSize: "0.86rem",
+                  lineHeight: 1.9,
+                  color: "var(--ink-2)",
+                }}
+              >
+                <li>2026 Federal Poverty Level</li>
+                <li>Oregon Revised Statutes</li>
+                <li>Portland & Multnomah codes</li>
+              </ul>
+            </div>
+            <div>
+              <div
+                className="tag"
+                style={{
+                  marginBottom: 8,
+                  fontWeight: 600,
+                  color: "var(--ink-2)",
+                }}
+              >
+                Friends we&rsquo;d love
+              </div>
+              <ul
+                style={{
+                  listStyle: "none",
+                  padding: 0,
+                  margin: 0,
+                  fontSize: "0.86rem",
+                  lineHeight: 1.9,
+                  color: "var(--ink-2)",
+                }}
+              >
+                <li>211info</li>
+                <li>Multnomah County DCHS</li>
+                <li>Oregon Food Bank</li>
+              </ul>
+            </div>
+          </div>
+        </footer>
+      </main>
+    </>
+  );
+}
+
+function SectionHeading({
+  kicker,
+  title,
+  children,
+}: {
+  kicker: string;
+  title: string;
+  children?: React.ReactNode;
+}) {
+  return (
+    <header className="flex items-end justify-between gap-6 flex-wrap mb-8">
+      <div>
+        <div className="eyebrow mb-2">{kicker}</div>
+        <h2
+          className="font-display"
+          style={{
+            fontSize: "2.2rem",
+            lineHeight: 1.1,
+            margin: 0,
+            fontWeight: 500,
+            letterSpacing: "-0.02em",
+          }}
+        >
+          {title}
+        </h2>
+      </div>
+      {children}
+    </header>
   );
 }
 
 function Step({
-  icon,
   n,
   title,
   body,
+  tone,
 }: {
-  icon: React.ReactNode;
-  n: number;
+  n: string;
   title: string;
   body: string;
+  tone: keyof typeof STEP_TONES;
 }) {
+  const t = STEP_TONES[tone];
   return (
-    <li className="flex flex-col gap-3 rounded-lg border bg-card p-5">
-      <div className="flex items-center gap-3">
-        <span className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-100 text-emerald-700">
-          {icon}
+    <article className="rc-card" style={{ padding: 26 }}>
+      <div className="flex items-center gap-3 mb-4">
+        <span
+          style={{
+            display: "inline-flex",
+            width: 38,
+            height: 38,
+            borderRadius: 12,
+            background: t.bg,
+            color: t.text,
+            alignItems: "center",
+            justifyContent: "center",
+            fontWeight: 700,
+            fontSize: "1.05rem",
+          }}
+        >
+          {n}
         </span>
-        <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-          Step {n}
-        </span>
+        <span
+          style={{ flex: 1, height: 1, background: "var(--rule)" }}
+        />
       </div>
-      <h3 className="font-semibold leading-tight">{title}</h3>
-      <p className="text-sm text-muted-foreground">{body}</p>
-    </li>
+      <h3
+        className="font-display"
+        style={{
+          fontSize: "1.45rem",
+          lineHeight: 1.15,
+          margin: "0 0 10px",
+          fontWeight: 500,
+          letterSpacing: "-0.015em",
+        }}
+      >
+        {title}
+      </h3>
+      <p
+        style={{
+          color: "var(--ink-2)",
+          fontSize: "0.95rem",
+          lineHeight: 1.6,
+          margin: 0,
+        }}
+      >
+        {body}
+      </p>
+    </article>
   );
 }

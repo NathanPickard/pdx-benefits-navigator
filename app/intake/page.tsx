@@ -1,3 +1,4 @@
+import { AppBar } from '@/components/brand/AppBar';
 import { ConversationalForm } from '@/components/intake/ConversationalForm';
 
 export const metadata = {
@@ -6,8 +7,9 @@ export const metadata = {
 
 export default function IntakePage() {
   return (
-    <main className="flex flex-1 flex-col bg-background">
+    <>
+      <AppBar />
       <ConversationalForm />
-    </main>
+    </>
   );
 }

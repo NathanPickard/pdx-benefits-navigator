@@ -1,7 +1,6 @@
 'use client';
 
-import { motion } from 'framer-motion';
-import { AlertOctagon, AlertTriangle } from 'lucide-react';
+import { AlertTriangle } from 'lucide-react';
 
 import type { Chrome } from '@/lib/i18n';
 import type { IntakeData } from '@/types/program';
@@ -46,31 +45,69 @@ export function UrgencyBanner({
   if (!event) return null;
 
   const isCritical = event.severity === 'critical';
-  const Icon = isCritical ? AlertOctagon : AlertTriangle;
 
   return (
-    <motion.aside
+    <section
       role="alert"
-      initial={{ opacity: 0, y: -8 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, delay: 0.35 }}
-      className={
-        isCritical
-          ? 'flex items-start gap-3 rounded-lg border-2 border-red-500 bg-red-50 p-4 text-red-950 shadow-sm'
-          : 'flex items-start gap-3 rounded-lg border-2 border-amber-500 bg-amber-50 p-4 text-amber-950 shadow-sm'
-      }
+      className="rc-card"
+      style={{
+        padding: '22px 24px',
+        borderColor: isCritical ? 'var(--rose)' : 'oklch(0.86 0.07 75)',
+        background: isCritical ? 'var(--rose-soft)' : 'var(--sun-soft)',
+        borderWidth: 2,
+        borderRadius: 18,
+        marginBottom: 40,
+      }}
     >
-      <Icon
-        className={
-          isCritical
-            ? 'mt-0.5 h-5 w-5 shrink-0 text-red-600'
-            : 'mt-0.5 h-5 w-5 shrink-0 text-amber-600'
-        }
-      />
-      <div className="flex flex-col gap-1.5">
-        <h2 className="text-xs font-bold uppercase tracking-wider">{event.title}</h2>
-        <p className="text-sm leading-relaxed">{event.body}</p>
+      <div className="flex items-start" style={{ gap: 16 }}>
+        <span
+          style={{
+            width: 40,
+            height: 40,
+            borderRadius: 12,
+            background: isCritical ? 'var(--rose)' : 'var(--sun)',
+            color: isCritical ? 'oklch(0.98 0.01 30)' : 'oklch(0.32 0.06 70)',
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexShrink: 0,
+          }}
+        >
+          <AlertTriangle size={20} strokeWidth={2.2} />
+        </span>
+        <div>
+          <div
+            className="eyebrow mb-1"
+            style={{
+              color: isCritical ? 'var(--rose)' : 'oklch(0.42 0.12 70)',
+            }}
+          >
+            {isCritical ? 'Time-critical · today' : 'Time-sensitive · this week'}
+          </div>
+          <h3
+            className="font-display"
+            style={{
+              fontSize: '1.3rem',
+              margin: '0 0 6px',
+              lineHeight: 1.15,
+              fontWeight: 500,
+              letterSpacing: '-0.015em',
+            }}
+          >
+            {event.title}
+          </h3>
+          <p
+            style={{
+              margin: 0,
+              fontSize: '0.94rem',
+              lineHeight: 1.55,
+              color: 'var(--ink-2)',
+            }}
+          >
+            {event.body}
+          </p>
+        </div>
       </div>
-    </motion.aside>
+    </section>
   );
 }

@@ -3,9 +3,17 @@
 import { useEffect } from 'react';
 import { animate, motion, useMotionValue, useTransform } from 'framer-motion';
 
-export function MoneyCounter({ value, duration = 2.5 }: { value: number; duration?: number }) {
+export function MoneyCounter({
+  value,
+  duration = 2.2,
+  className,
+}: {
+  value: number;
+  duration?: number;
+  className?: string;
+}) {
   const count = useMotionValue(0);
-  const formatted = useTransform(count, (v) => `$${Math.round(v).toLocaleString()}`);
+  const formatted = useTransform(count, (v) => Math.round(v).toLocaleString());
 
   useEffect(() => {
     const controls = animate(count, value, { duration, ease: 'easeOut' });
@@ -13,8 +21,19 @@ export function MoneyCounter({ value, duration = 2.5 }: { value: number; duratio
   }, [value, duration, count]);
 
   return (
-    <motion.span className="text-7xl font-bold tabular-nums text-emerald-600 sm:text-8xl md:text-9xl">
-      {formatted}
-    </motion.span>
+    <h1
+      className={`font-display tabular ${className ?? ''}`}
+      style={{
+        fontSize: 'clamp(4rem, 10vw, 8.5rem)',
+        lineHeight: 0.95,
+        margin: 0,
+        color: 'var(--ink)',
+        letterSpacing: '-0.025em',
+        fontWeight: 500,
+      }}
+    >
+      <span style={{ color: 'var(--rose)' }}>$</span>
+      <motion.span>{formatted}</motion.span>
+    </h1>
   );
 }

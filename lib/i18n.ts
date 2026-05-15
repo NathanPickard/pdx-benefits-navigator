@@ -22,6 +22,7 @@ export interface Chrome {
   confidenceMedium: string;
   confidenceLow: string;
   estimatedYear: string;
+  whyYouQualify: string;
   nextSteps: string;
   whatToBring: string;
   applyNow: string;
@@ -62,6 +63,7 @@ export const CHROME_EN: Chrome = {
   confidenceMedium: 'Worth checking',
   confidenceLow: 'Edge case',
   estimatedYear: 'estimated / year',
+  whyYouQualify: 'Why you qualify',
   nextSteps: 'Next steps',
   whatToBring: 'What to bring',
   applyNow: 'Apply now',

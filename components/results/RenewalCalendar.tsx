@@ -1,6 +1,6 @@
 'use client';
 
-import { CalendarDays, Clock, Download } from 'lucide-react';
+import { Calendar, Download } from 'lucide-react';
 
 import { buildIcsCalendar, downloadIcsFile, renewalIntervalMonths } from '@/lib/calendar';
 import type { Chrome, LanguageCode } from '@/lib/i18n';
@@ -22,6 +22,8 @@ const LOCALE: Record<LanguageCode, string> = {
   vi: 'vi-VN',
 };
 
+const SHORT_MONTH = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
 function startOfMonth(d: Date): Date {
   return new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), 1));
 }
@@ -30,12 +32,8 @@ function monthKey(d: Date): string {
   return `${d.getUTCFullYear()}-${d.getUTCMonth().toString().padStart(2, '0')}`;
 }
 
-function formatMonth(d: Date, locale: string): string {
-  return new Intl.DateTimeFormat(locale, {
-    month: 'long',
-    year: 'numeric',
-    timeZone: 'UTC',
-  }).format(d);
+function formatYear(d: Date): string {
+  return String(d.getUTCFullYear());
 }
 
 function formatShortDate(d: Date, locale: string): string {
@@ -61,19 +59,24 @@ export function RenewalCalendar({
   const today = new Date(
     Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate())
   );
-  const sixMonthsOut = new Date(today);
-  sixMonthsOut.setUTCMonth(sixMonthsOut.getUTCMonth() + 6);
+  const oneYearOut = new Date(today);
+  oneYearOut.setUTCFullYear(oneYearOut.getUTCFullYear() + 1);
 
-  const renderable: RenderableEntry[] = entries.map((e) => {
-    const months = renewalIntervalMonths(e.program.renewal_cycle);
-    const renewalDate = new Date(today);
-    renewalDate.setUTCMonth(renewalDate.getUTCMonth() + months);
-    return { ...e, renewalDate, intervalMonths: months };
-  });
+  const renderable: RenderableEntry[] = entries
+    .map((e) => {
+      const months = renewalIntervalMonths(e.program.renewal_cycle);
+      const renewalDate = new Date(today);
+      renewalDate.setUTCMonth(renewalDate.getUTCMonth() + months);
+      return { ...e, renewalDate, intervalMonths: months };
+    })
+    .filter((e) => e.intervalMonths > 0);
+
+  if (renderable.length === 0) return null;
+
   renderable.sort((a, b) => a.renewalDate.getTime() - b.renewalDate.getTime());
 
-  const upcoming = renderable.filter((e) => e.renewalDate <= sixMonthsOut);
-  const later = renderable.filter((e) => e.renewalDate > sixMonthsOut);
+  const upcoming = renderable.filter((e) => e.renewalDate <= oneYearOut);
+  const later = renderable.filter((e) => e.renewalDate > oneYearOut);
 
   const handleExport = () => {
     const ics = buildIcsCalendar(entries);
@@ -83,26 +86,50 @@ export function RenewalCalendar({
   const locale = LOCALE[lang];
 
   return (
-    <section className="flex flex-col gap-4 rounded-lg border bg-card p-6">
-      <header className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-        <div className="flex items-start gap-3">
-          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-emerald-700">
-            <CalendarDays className="h-5 w-5" />
+    <section className="rc-card" style={{ padding: 28 }}>
+      <header
+        className="flex items-start justify-between mb-6 flex-wrap"
+        style={{ gap: 12 }}
+      >
+        <div className="flex items-start" style={{ gap: 12 }}>
+          <span
+            style={{
+              width: 40,
+              height: 40,
+              borderRadius: 12,
+              background: 'var(--moss-soft)',
+              color: 'var(--moss-2)',
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <Calendar size={18} strokeWidth={2} />
           </span>
-          <div className="flex flex-col gap-1">
-            <h2 className="text-lg font-semibold tracking-tight">
+          <div>
+            <div className="eyebrow mb-1" style={{ color: 'var(--moss-2)' }}>
               {chrome.renewalCalendarTitle}
-            </h2>
-            <p className="text-sm text-muted-foreground">{chrome.renewalCalendarSubtitle}</p>
+            </div>
+            <h3
+              className="font-display"
+              style={{
+                fontSize: '1.55rem',
+                margin: 0,
+                lineHeight: 1.1,
+                fontWeight: 500,
+                letterSpacing: '-0.018em',
+              }}
+            >
+              {chrome.renewalCalendarSubtitle}
+            </h3>
           </div>
         </div>
         <button
           type="button"
           onClick={handleExport}
-          className="inline-flex shrink-0 items-center gap-1.5 self-start rounded-full border bg-card px-3 py-1.5 text-xs font-medium shadow-sm transition-colors hover:bg-muted"
+          className="rc-btn rc-btn-outline rc-btn-sm"
         >
-          <Download className="h-3.5 w-3.5" />
-          {chrome.exportCalendar}
+          <Download size={13} /> {chrome.exportCalendar}
         </button>
       </header>
 
@@ -147,56 +174,72 @@ function CalendarBucket({
   );
 
   return (
-    <div className="flex flex-col gap-3">
-      <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-        {label}
-      </h3>
-      <ol className="flex flex-col gap-3">
+    <div style={{ marginBottom: 20 }}>
+      <div className="eyebrow mb-3">{label}</div>
+      <div
+        className="grid"
+        style={{ gridTemplateColumns: '180px 1fr', gap: 14 }}
+      >
         {ordered.map((group) => (
-          <li
-            key={monthKey(group.date)}
-            className="grid grid-cols-[auto_1fr] gap-4 sm:grid-cols-[8rem_1fr]"
-          >
-            <div className="flex shrink-0 flex-col">
-              <span
-                className={
-                  highlight
-                    ? 'text-sm font-semibold text-emerald-700'
-                    : 'text-sm font-semibold'
-                }
+          <div key={monthKey(group.date)} style={{ display: 'contents' }}>
+            <div>
+              <div
+                className="font-display tabular"
+                style={{
+                  fontSize: '1.7rem',
+                  lineHeight: 1,
+                  fontWeight: 500,
+                  color: highlight ? 'var(--rose)' : 'var(--ink)',
+                }}
               >
-                {formatMonth(group.date, locale)}
-              </span>
-              <span className="text-[10px] uppercase tracking-wide text-muted-foreground">
-                {group.items.length} {group.items.length === 1 ? 'renewal' : 'renewals'}
-              </span>
+                {SHORT_MONTH[group.date.getUTCMonth()]}
+              </div>
+              <div className="tag" style={{ marginTop: 4 }}>
+                {formatYear(group.date)} · {group.items.length}{' '}
+                {group.items.length === 1 ? 'renewal' : 'renewals'}
+              </div>
             </div>
-            <ul className="flex flex-col gap-1.5">
+            <ul
+              style={{
+                listStyle: 'none',
+                padding: 0,
+                margin: 0,
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 8,
+              }}
+            >
               {group.items.map(({ match, program, renewalDate }) => (
                 <li
                   key={program.id}
-                  className="flex items-baseline justify-between gap-3 rounded-md border bg-muted/20 px-3 py-2 text-sm"
+                  className="rc-card-flat flex items-baseline justify-between"
+                  style={{ padding: '12px 16px', fontSize: '0.92rem' }}
                 >
-                  <div className="flex flex-col gap-0.5">
-                    <span className="font-medium leading-tight">{program.name}</span>
-                    <span className="text-xs text-muted-foreground">
-                      {program.renewal_cycle ?? 'Annual'}
-                      {' · '}
+                  <div>
+                    <div style={{ fontWeight: 600 }}>{program.name}</div>
+                    <div
+                      style={{
+                        color: 'var(--ink-3)',
+                        fontSize: '0.78rem',
+                        marginTop: 2,
+                      }}
+                    >
+                      {program.renewal_cycle ?? 'Annual'} ·{' '}
                       {formatShortDate(renewalDate, locale)}
-                    </span>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-2 whitespace-nowrap">
-                    <Clock className="h-3 w-3 text-muted-foreground" />
-                    <span className="font-semibold tabular-nums">
-                      ${match.estimated_annual_value.toLocaleString()}
-                    </span>
+                  <div
+                    className="tabular"
+                    style={{ color: 'var(--moss-2)', fontWeight: 600 }}
+                  >
+                    ${match.estimated_annual_value.toLocaleString()}
                   </div>
                 </li>
               ))}
             </ul>
-          </li>
+          </div>
         ))}
-      </ol>
+      </div>
     </div>
   );
 }

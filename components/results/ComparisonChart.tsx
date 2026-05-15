@@ -1,6 +1,6 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { useEffect, useState } from 'react';
 import { ArrowRight } from 'lucide-react';
 
 export function ComparisonChart({
@@ -20,49 +20,91 @@ export function ComparisonChart({
   pdxLabel: string;
   missLabel: string;
 }) {
+  const [animated, setAnimated] = useState(false);
+  useEffect(() => {
+    const t = setTimeout(() => setAnimated(true), 180);
+    return () => clearTimeout(t);
+  }, []);
+
   const delta = total - federal;
   const max = Math.max(total, 1);
   const federalPct = (federal / max) * 100;
+  const upliftPct = federal > 0 ? Math.round((delta / federal) * 100) : 0;
 
   return (
-    <section className="flex flex-col gap-5 rounded-lg border bg-card p-6">
-      <header className="flex flex-col gap-1">
-        <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-          {title}
-        </h2>
-        <p className="text-sm text-muted-foreground">{subtitle}</p>
-      </header>
+    <section
+      className="rc-card"
+      style={{ padding: 32, position: 'relative', overflow: 'hidden', marginBottom: 40 }}
+    >
+      <div className="flex items-end justify-between mb-6 flex-wrap" style={{ gap: 12 }}>
+        <div>
+          <div className="eyebrow mb-2" style={{ color: 'var(--moss-2)' }}>
+            {title}
+          </div>
+          <h3
+            className="font-display"
+            style={{
+              fontSize: '1.65rem',
+              lineHeight: 1.15,
+              margin: 0,
+              fontWeight: 500,
+              letterSpacing: '-0.018em',
+            }}
+          >
+            {subtitle}
+          </h3>
+        </div>
+        <div className="pill pill-rose" style={{ fontSize: '0.86rem', padding: '8px 14px' }}>
+          <ArrowRight size={13} />
+          <span className="tabular" style={{ fontWeight: 700 }}>
+            +${delta.toLocaleString()}
+          </span>
+          <span>{missLabel}</span>
+        </div>
+      </div>
 
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col" style={{ gap: 20 }}>
         <BarRow
           label={federalLabel}
           value={federal}
           widthPct={federalPct}
-          colorClass="bg-zinc-300 dark:bg-zinc-700"
-          textClass="text-zinc-700 dark:text-zinc-300"
-          delay={0.1}
+          color="var(--ink-3)"
+          animated={animated}
+          delay={120}
         />
         <BarRow
           label={pdxLabel}
           value={total}
           widthPct={100}
-          colorClass="bg-emerald-500"
-          textClass="text-emerald-700"
-          delay={0.35}
+          color="var(--rose)"
+          animated={animated}
+          delay={500}
           highlight
         />
       </div>
 
-      <motion.div
-        initial={{ opacity: 0, y: 6 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4, delay: 1.6 }}
-        className="flex items-center gap-2 self-end rounded-full bg-emerald-50 px-3 py-1.5 text-sm font-medium text-emerald-800"
+      <div
+        className="grid mt-6 pt-5"
+        style={{
+          gridTemplateColumns: 'repeat(3, 1fr)',
+          gap: 24,
+          borderTop: '1px solid var(--rule)',
+        }}
       >
-        <ArrowRight className="h-4 w-4" />
-        <span className="tabular-nums">+${delta.toLocaleString()}</span>
-        <span className="text-emerald-700/80">{missLabel}</span>
-      </motion.div>
+        <Mini label="Federal-only finds" value={`$${federal.toLocaleString()}`} sub="the national tools" />
+        <Mini
+          label="Hyperlocal delta"
+          value={`+$${delta.toLocaleString()}`}
+          sub="what we add on top"
+          tone="rose"
+        />
+        <Mini
+          label="Total uplift"
+          value={federal > 0 ? `+${upliftPct}%` : '—'}
+          sub="more for your household"
+          tone="moss"
+        />
+      </div>
     </section>
   );
 }
@@ -71,35 +113,96 @@ function BarRow({
   label,
   value,
   widthPct,
-  colorClass,
-  textClass,
+  color,
+  animated,
   delay,
   highlight,
 }: {
   label: string;
   value: number;
   widthPct: number;
-  colorClass: string;
-  textClass: string;
+  color: string;
+  animated: boolean;
   delay: number;
   highlight?: boolean;
 }) {
   return (
-    <div className="flex flex-col gap-1.5">
-      <div className="flex items-baseline justify-between gap-4 text-sm">
-        <span className={highlight ? 'font-semibold' : 'text-muted-foreground'}>{label}</span>
-        <span className={`font-semibold tabular-nums ${textClass}`}>
+    <div>
+      <div
+        className="flex items-baseline justify-between mb-2 flex-wrap"
+        style={{ gap: 12 }}
+      >
+        <span
+          style={{
+            fontWeight: highlight ? 600 : 500,
+            color: highlight ? 'var(--ink)' : 'var(--ink-2)',
+            fontSize: '0.94rem',
+          }}
+        >
+          {label}
+        </span>
+        <span
+          className="font-display tabular"
+          style={{ fontSize: '1.45rem', color, fontWeight: 500 }}
+        >
           ${value.toLocaleString()}
         </span>
       </div>
-      <div className="h-6 overflow-hidden rounded-md bg-muted/40">
-        <motion.div
-          initial={{ width: 0 }}
-          animate={{ width: `${widthPct}%` }}
-          transition={{ duration: 1.2, delay, ease: 'easeOut' }}
-          className={`h-full rounded-md ${colorClass}`}
+      <div
+        style={{
+          height: 18,
+          borderRadius: 999,
+          background: 'var(--paper-2)',
+          overflow: 'hidden',
+          border: '1px solid var(--rule)',
+        }}
+      >
+        <div
+          style={{
+            height: '100%',
+            width: animated ? `${widthPct}%` : '0%',
+            background: color,
+            transition: `width 1100ms cubic-bezier(0.22, 1, 0.36, 1) ${delay}ms`,
+            borderRadius: 999,
+          }}
         />
       </div>
+    </div>
+  );
+}
+
+function Mini({
+  label,
+  value,
+  sub,
+  tone,
+}: {
+  label: string;
+  value: string;
+  sub: string;
+  tone?: 'rose' | 'moss';
+}) {
+  const color =
+    tone === 'rose' ? 'var(--rose)' : tone === 'moss' ? 'var(--moss-2)' : 'var(--ink)';
+  return (
+    <div>
+      <div className="tag" style={{ fontWeight: 500 }}>
+        {label}
+      </div>
+      <div
+        className="font-display tabular"
+        style={{
+          fontSize: '1.85rem',
+          lineHeight: 1.05,
+          color,
+          marginTop: 4,
+          fontWeight: 500,
+          letterSpacing: '-0.018em',
+        }}
+      >
+        {value}
+      </div>
+      <div style={{ color: 'var(--ink-3)', fontSize: '0.84rem', marginTop: 2 }}>{sub}</div>
     </div>
   );
 }

@@ -2,9 +2,11 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { motion } from 'framer-motion';
-import { AlertTriangle, Download, Loader2 } from 'lucide-react';
+import Link from 'next/link';
+import { ArrowLeft, Calendar, Download, Loader2 } from 'lucide-react';
 
+import { AppBar } from '@/components/brand/AppBar';
+import { RoseStamp } from '@/components/brand/RoseStamp';
 import { MoneyCounter } from '@/components/results/MoneyCounter';
 import { BenefitCard } from '@/components/results/BenefitCard';
 import { ComparisonChart } from '@/components/results/ComparisonChart';
@@ -20,12 +22,10 @@ const PROGRAM_BY_ID = new Map(PROGRAMS.map((p) => [p.id, p]));
 
 type TranslatedBundle = { output: AnalysisOutput; chrome: Chrome };
 
-type LoadingProgress = {
-  evaluated: string[]; // program ids in order seen
-};
+type LoadingProgress = { evaluated: string[] };
 
 type State =
-  | { kind: 'loading'; tick: number; progress: LoadingProgress }
+  | { kind: 'loading'; progress: LoadingProgress }
   | { kind: 'ok'; data: AnalysisOutput }
   | { kind: 'error'; message: string };
 
@@ -33,7 +33,6 @@ export default function ResultsPage() {
   const router = useRouter();
   const [state, setState] = useState<State>({
     kind: 'loading',
-    tick: 0,
     progress: { evaluated: [] },
   });
   const [intake, setIntake] = useState<IntakeData | null>(null);
@@ -50,37 +49,23 @@ export default function ResultsPage() {
       router.replace('/intake');
       return;
     }
-    const intake = JSON.parse(raw) as IntakeData;
-    setIntake(intake);
-
-    const ticker = setInterval(() => {
-      setState((s) => (s.kind === 'loading' ? { ...s, tick: s.tick + 1 } : s));
-    }, 1400);
+    const parsed = JSON.parse(raw) as IntakeData;
+    setIntake(parsed);
 
     const abort = new AbortController();
-    streamAnalyze(intake, abort.signal, {
+    streamAnalyze(parsed, abort.signal, {
       onProgress: (programId) => {
         setState((s) =>
           s.kind === 'loading'
-            ? {
-                ...s,
-                progress: { evaluated: [...s.progress.evaluated, programId] },
-              }
+            ? { ...s, progress: { evaluated: [...s.progress.evaluated, programId] } }
             : s
         );
       },
-      onComplete: (output) => {
-        setState({ kind: 'ok', data: output });
-      },
-      onError: (message) => {
-        setState({ kind: 'error', message });
-      },
-    }).finally(() => clearInterval(ticker));
+      onComplete: (output) => setState({ kind: 'ok', data: output }),
+      onError: (message) => setState({ kind: 'error', message }),
+    });
 
-    return () => {
-      abort.abort();
-      clearInterval(ticker);
-    };
+    return () => abort.abort();
   }, [router]);
 
   const originalData = state.kind === 'ok' ? state.data : null;
@@ -94,12 +79,10 @@ export default function ResultsPage() {
         setLang('en');
         return;
       }
-
       if (translations[next]) {
         setLang(next);
         return;
       }
-
       if (!originalData) return;
 
       setPendingLang(next);
@@ -131,9 +114,22 @@ export default function ResultsPage() {
     [lang, pendingLang, translations, originalData]
   );
 
-  if (state.kind === 'loading')
-    return <LoadingView tick={state.tick} progress={state.progress} />;
-  if (state.kind === 'error') return <ErrorView message={state.message} />;
+  if (state.kind === 'loading') {
+    return (
+      <>
+        <AppBar />
+        <LoadingView progress={state.progress} />
+      </>
+    );
+  }
+  if (state.kind === 'error') {
+    return (
+      <>
+        <AppBar />
+        <ErrorView message={state.message} />
+      </>
+    );
+  }
 
   const bundle: TranslatedBundle =
     lang === 'en'
@@ -144,83 +140,121 @@ export default function ResultsPage() {
         };
 
   return (
-    <ResultsView
-      data={bundle.output}
-      originalData={state.data}
-      intake={intake}
-      chrome={bundle.chrome}
-      lang={lang}
-      pendingLang={pendingLang}
-      onLanguageChange={handleLanguageChange}
-      translateError={translateError}
-    />
+    <>
+      <AppBar>
+        <LanguageToggle
+          current={lang}
+          pendingLanguage={pendingLang}
+          translatedByAILabel={bundle.chrome.translatedByAI}
+          onChange={handleLanguageChange}
+        />
+      </AppBar>
+      <Dashboard
+        data={bundle.output}
+        originalData={state.data}
+        intake={intake}
+        chrome={bundle.chrome}
+        lang={lang}
+        translateError={translateError}
+      />
+    </>
   );
 }
 
-function LoadingView({ tick, progress }: { tick: number; progress: LoadingProgress }) {
+/* ─────────────────────── Loading ─────────────────────── */
+
+function LoadingView({ progress }: { progress: LoadingProgress }) {
   const total = PROGRAMS.length;
   const count = progress.evaluated.length;
   const latestId = progress.evaluated[count - 1];
   const latestProgram = latestId ? PROGRAM_BY_ID.get(latestId) : undefined;
-
-  const idleMessages = [
-    'Loading the 2026 Federal Poverty Level tables…',
-    'Connecting to Claude Haiku 4.5…',
-    'Cache primed — beginning eligibility check…',
-  ];
+  const pct = (count / total) * 100;
 
   return (
-    <main className="flex flex-1 items-center justify-center p-6">
-      <div className="flex w-full max-w-lg flex-col items-center gap-6 text-center">
-        <div className="h-10 w-10 animate-spin rounded-full border-2 border-foreground border-t-transparent" />
-
-        <div className="flex flex-col gap-2">
-          <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-            Claude is evaluating your eligibility
-          </p>
-          {count === 0 ? (
-            <p className="text-base font-medium tabular-nums">
-              {idleMessages[tick % idleMessages.length]}
-            </p>
-          ) : (
-            <p className="text-base font-medium" key={latestId}>
-              Checking{' '}
-              <span className="text-emerald-700">{latestProgram?.name ?? latestId}</span>
-            </p>
-          )}
-          <p className="text-xs tabular-nums text-muted-foreground">
-            {count} of {total} programs evaluated
-          </p>
+    <main className="mx-auto" style={{ maxWidth: 760, padding: '120px 32px' }}>
+      <div className="text-center">
+        <div className="flex items-center justify-center mb-5" style={{ gap: 8 }}>
+          <RoseStamp size={56} />
         </div>
-
-        <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted/60">
-          <motion.div
-            className="h-full bg-emerald-500"
-            initial={{ width: 0 }}
-            animate={{ width: `${Math.min(100, (count / total) * 100)}%` }}
-            transition={{ duration: 0.4, ease: 'easeOut' }}
-          />
+        <div className="eyebrow mb-3" style={{ color: 'var(--moss-2)' }}>
+          Just a moment
         </div>
+        <h1
+          className="font-display"
+          style={{
+            fontSize: '2.3rem',
+            lineHeight: 1.1,
+            margin: '0 0 10px',
+            fontWeight: 500,
+            letterSpacing: '-0.02em',
+          }}
+        >
+          Checking every program for you…
+        </h1>
+        <p style={{ color: 'var(--ink-2)', margin: '0 0 32px', fontSize: '1rem' }}>
+          Reading 2026 poverty tables, Oregon statutes, and Portland city code.
+        </p>
 
-        {progress.evaluated.length > 0 && (
-          <ul className="flex w-full flex-wrap justify-center gap-1.5">
-            {progress.evaluated.slice(-12).map((id) => {
+        <div className="rc-card" style={{ padding: 28, textAlign: 'left' }}>
+          <div
+            className="flex items-center justify-between mb-3 flex-wrap"
+            style={{ gap: 12 }}
+          >
+            <div style={{ fontSize: '0.94rem' }}>
+              <span style={{ color: 'var(--ink-3)' }}>Currently checking — </span>
+              <strong style={{ color: 'var(--rose)' }}>
+                {latestProgram?.name ?? 'Loading…'}
+              </strong>
+            </div>
+            <div className="tag tabular">
+              {count} / {total}
+            </div>
+          </div>
+
+          <div
+            style={{
+              height: 8,
+              borderRadius: 999,
+              background: 'var(--paper-2)',
+              overflow: 'hidden',
+              border: '1px solid var(--rule)',
+            }}
+          >
+            <div
+              style={{
+                width: `${pct}%`,
+                height: '100%',
+                background: 'var(--rose)',
+                transition: 'width 0.3s ease-out',
+                borderRadius: 999,
+              }}
+            />
+          </div>
+
+          <div
+            className="flex flex-wrap gap-1.5 mt-5"
+            style={{ minHeight: 60, gap: 6 }}
+          >
+            {progress.evaluated.slice(-20).map((id) => {
               const p = PROGRAM_BY_ID.get(id);
               return (
-                <li
+                <span
                   key={id}
-                  className="rounded-full border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-[10px] font-medium text-emerald-800"
+                  className="pill pill-moss tabular"
+                  style={{ fontSize: '0.72rem' }}
                 >
                   ✓ {p?.short_name ?? id}
-                </li>
+                </span>
               );
             })}
-          </ul>
-        )}
+          </div>
+        </div>
       </div>
     </main>
   );
 }
+
+/* ─────────────────────── Stream ─────────────────────── */
 
 async function streamAnalyze(
   intake: IntakeData,
@@ -258,11 +292,14 @@ async function streamAnalyze(
       while ((idx = buffer.indexOf('\n\n')) !== -1) {
         const rawEvent = buffer.slice(0, idx);
         buffer = buffer.slice(idx + 2);
-        const dataLine = rawEvent
-          .split('\n')
-          .find((l) => l.startsWith('data: '));
+        const dataLine = rawEvent.split('\n').find((l) => l.startsWith('data: '));
         if (!dataLine) continue;
-        let payload: { type: string; programId?: string; output?: AnalysisOutput; message?: string };
+        let payload: {
+          type: string;
+          programId?: string;
+          output?: AnalysisOutput;
+          message?: string;
+        };
         try {
           payload = JSON.parse(dataLine.slice(6));
         } catch {
@@ -285,23 +322,55 @@ async function streamAnalyze(
 
 function ErrorView({ message }: { message: string }) {
   return (
-    <main className="flex flex-1 items-center justify-center p-6">
-      <div className="max-w-md text-center">
-        <h1 className="text-xl font-semibold">Something went wrong</h1>
-        <p className="mt-2 text-sm text-muted-foreground">{message}</p>
-      </div>
+    <main
+      className="flex flex-col items-center justify-center"
+      style={{ padding: '120px 32px', textAlign: 'center' }}
+    >
+      <h1
+        className="font-display"
+        style={{ fontSize: '2rem', margin: 0, fontWeight: 500 }}
+      >
+        Something went wrong
+      </h1>
+      <p style={{ marginTop: 12, color: 'var(--ink-2)', maxWidth: 460 }}>{message}</p>
     </main>
   );
 }
 
-function ResultsView({
+/* ─────────────────────── Dashboard ─────────────────────── */
+
+const HOUSING_LABEL: Record<IntakeData['housing_status'], string> = {
+  rent: 'Renting',
+  own: 'Own home',
+  staying_with_others: 'With others',
+  unhoused: 'Unhoused',
+};
+
+const EMPLOYMENT_LABEL: Record<IntakeData['employment_status'], string> = {
+  employed_ft: 'Full-time',
+  employed_pt: 'Part-time',
+  self_employed: 'Self-employed',
+  unemployed: 'Unemployed',
+  retired: 'Retired',
+  disabled: 'On disability',
+};
+
+const LANG_LABEL: Record<IntakeData['primary_language'], string> = {
+  en: 'English',
+  es: 'Español',
+  vi: 'Tiếng Việt',
+  ru: 'Русский',
+  zh: '中文',
+  so: 'Soomaali',
+  ar: 'العربية',
+};
+
+function Dashboard({
   data,
   originalData,
   intake,
   chrome,
   lang,
-  pendingLang,
-  onLanguageChange,
   translateError,
 }: {
   data: AnalysisOutput;
@@ -309,8 +378,6 @@ function ResultsView({
   intake: IntakeData | null;
   chrome: Chrome;
   lang: LanguageCode;
-  pendingLang: LanguageCode | null;
-  onLanguageChange: (lang: LanguageCode) => void;
   translateError: string | null;
 }) {
   const [packetState, setPacketState] = useState<'idle' | 'loading' | 'error'>('idle');
@@ -349,139 +416,371 @@ function ResultsView({
     }
   }, [packetState, originalData]);
 
+  const [sortMode, setSortMode] = useState<'gems' | 'amount'>('gems');
+
   const eligible = useMemo(() => {
-    return data.matches
+    const rows = data.matches
       .filter((m) => m.eligible)
       .map((m) => ({ match: m, program: PROGRAM_BY_ID.get(m.program_id) }))
-      .filter((row): row is { match: typeof row.match; program: Program } => !!row.program)
-      .sort((a, b) => {
-        if (a.program.hidden_gem !== b.program.hidden_gem) return a.program.hidden_gem ? -1 : 1;
-        return b.match.estimated_annual_value - a.match.estimated_annual_value;
-      });
-  }, [data]);
+      .filter((row): row is { match: typeof row.match; program: Program } => !!row.program);
 
+    if (sortMode === 'amount') {
+      return rows.sort(
+        (a, b) => b.match.estimated_annual_value - a.match.estimated_annual_value
+      );
+    }
+    return rows.sort((a, b) => {
+      if (a.program.hidden_gem !== b.program.hidden_gem) return a.program.hidden_gem ? -1 : 1;
+      return b.match.estimated_annual_value - a.match.estimated_annual_value;
+    });
+  }, [data, sortMode]);
+
+  const gemCount = eligible.filter((e) => e.program.hidden_gem).length;
   const programsHeading = chrome.programsCountTemplate.replace(
     '{count}',
     String(eligible.length)
   );
 
   return (
-    <main className="mx-auto flex w-full max-w-3xl flex-col gap-10 px-6 py-8">
-      <div className="flex flex-wrap items-center justify-end gap-3">
-        <button
-          type="button"
-          onClick={handleDownloadPacket}
-          disabled={packetState === 'loading'}
-          className="inline-flex items-center gap-1.5 rounded-full border bg-card px-3 py-1.5 text-xs font-medium shadow-sm transition-colors hover:bg-muted disabled:opacity-60"
-        >
-          {packetState === 'loading' ? (
-            <Loader2 className="h-3.5 w-3.5 animate-spin" />
-          ) : (
-            <Download className="h-3.5 w-3.5" />
-          )}
-          {packetState === 'loading' ? chrome.buildingPacket : chrome.downloadPacket}
-        </button>
-        <LanguageToggle
-          current={lang}
-          pendingLanguage={pendingLang}
-          translatedByAILabel={chrome.translatedByAI}
-          onChange={onLanguageChange}
-        />
+    <main
+      className="mx-auto"
+      style={{ maxWidth: 1240, padding: '32px 32px 96px' }}
+    >
+      <Link
+        href="/"
+        className="rc-btn rc-btn-ghost rc-btn-sm mb-6"
+        style={{ marginBottom: 24 }}
+      >
+        <ArrowLeft size={14} /> Back to navigator
+      </Link>
+
+      {/* Top action strip */}
+      <div
+        className="flex items-center justify-between flex-wrap mb-8"
+        style={{ gap: 12 }}
+      >
+        <div className="eyebrow" style={{ color: 'var(--moss-2)' }}>
+          Personal benefits brief
+        </div>
+        <div className="flex items-center" style={{ gap: 8 }}>
+          <button
+            type="button"
+            onClick={handleDownloadPacket}
+            disabled={packetState === 'loading'}
+            className="rc-btn rc-btn-outline rc-btn-sm"
+          >
+            {packetState === 'loading' ? (
+              <Loader2 size={13} className="animate-spin" />
+            ) : (
+              <Download size={13} />
+            )}
+            {packetState === 'loading' ? chrome.buildingPacket : chrome.downloadPacket}
+          </button>
+          <button type="button" className="rc-btn rc-btn-outline rc-btn-sm">
+            <Calendar size={13} /> {chrome.exportCalendar}
+          </button>
+        </div>
       </div>
 
       {packetError && (
-        <div className="rounded-md border border-destructive/30 bg-destructive/5 p-3 text-sm text-destructive">
+        <div
+          className="rc-card"
+          style={{
+            padding: 12,
+            fontSize: '0.86rem',
+            color: 'oklch(0.45 0.18 25)',
+            background: 'var(--rose-soft)',
+            borderColor: 'var(--rose)',
+            marginBottom: 24,
+          }}
+        >
           Packet download failed: {packetError}
         </div>
       )}
 
       {translateError && (
-        <div className="rounded-md border border-destructive/30 bg-destructive/5 p-3 text-sm text-destructive">
+        <div
+          className="rc-card"
+          style={{
+            padding: 12,
+            fontSize: '0.86rem',
+            color: 'oklch(0.45 0.18 25)',
+            background: 'var(--rose-soft)',
+            borderColor: 'var(--rose)',
+            marginBottom: 24,
+          }}
+        >
           {translateError}
         </div>
       )}
 
-      <motion.header
-        key={lang + '-header'}
-        initial={{ opacity: 0, y: 8 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4 }}
-        className="flex flex-col gap-3"
+      {/* Hero */}
+      <section
+        className="grid mb-10"
+        style={{
+          gridTemplateColumns: 'minmax(0,1.5fr) minmax(0,1fr)',
+          gap: 36,
+          alignItems: 'end',
+        }}
       >
-        <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-          {chrome.resultsKicker}
-        </p>
-        <div className="flex items-baseline gap-2">
+        <div>
+          <div className="eyebrow mb-3" style={{ color: 'var(--moss-2)' }}>
+            {chrome.resultsKicker}
+          </div>
           <MoneyCounter value={data.total_estimated_annual_value} />
-          <span className="text-base font-medium text-muted-foreground">{chrome.perYear}</span>
+          <p
+            style={{
+              marginTop: 16,
+              fontSize: '1.05rem',
+              color: 'var(--ink-2)',
+              lineHeight: 1.55,
+            }}
+          >
+            across{' '}
+            <strong style={{ color: 'var(--ink)' }}>{eligible.length} programs</strong>
+            {gemCount > 0 && (
+              <>
+                , including{' '}
+                <strong style={{ color: 'var(--rose)' }}>
+                  {gemCount} hyperlocal Portland gem{gemCount > 1 ? 's' : ''}
+                </strong>{' '}
+                that national tools would miss
+              </>
+            )}
+            .
+          </p>
         </div>
-      </motion.header>
 
-      {intake && <UrgencyBanner key={lang + '-urgency'} intake={intake} chrome={chrome} />}
+        {intake && (
+          <aside className="rc-card" style={{ padding: 24 }}>
+            <div className="flex items-start justify-between mb-3">
+              <div>
+                <div
+                  className="font-display"
+                  style={{
+                    fontSize: '1.55rem',
+                    lineHeight: 1.1,
+                    fontWeight: 500,
+                    letterSpacing: '-0.015em',
+                  }}
+                >
+                  Your household
+                </div>
+                <div className="tag mt-1">{intake.zip_code || '—'}</div>
+              </div>
+              <RoseStamp size={48} />
+            </div>
+            <div className="divider mb-3" />
+            <div
+              className="grid"
+              style={{
+                gridTemplateColumns: '1fr 1fr',
+                gap: 12,
+                fontSize: '0.86rem',
+              }}
+            >
+              <KV k="Household" v={`${intake.household_size} people`} />
+              <KV k="Children" v={String(intake.num_children)} />
+              <KV
+                k="Income"
+                v={`$${(intake.annual_income || 0).toLocaleString()}`}
+              />
+              <KV k="Housing" v={HOUSING_LABEL[intake.housing_status]} />
+              <KV k="Language" v={LANG_LABEL[intake.primary_language]} />
+              <KV
+                k="Employment"
+                v={EMPLOYMENT_LABEL[intake.employment_status]}
+              />
+            </div>
+          </aside>
+        )}
+      </section>
 
-      <motion.div
-        key={lang + '-chart'}
-        initial={{ opacity: 0, y: 8 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4, delay: 0.15 }}
-      >
-        <ComparisonChart
-          federal={data.federal_only_value}
-          total={data.total_estimated_annual_value}
-          title={chrome.howWeCompare}
-          subtitle={chrome.mostToolsOnly}
-          federalLabel={chrome.federalStateBarLabel}
-          pdxLabel={chrome.pdxNavigatorBarLabel}
-          missLabel={chrome.youdMiss}
-        />
-      </motion.div>
+      {intake && <UrgencyBanner intake={intake} chrome={chrome} />}
+
+      <ComparisonChart
+        federal={data.federal_only_value}
+        total={data.total_estimated_annual_value}
+        title={chrome.howWeCompare}
+        subtitle={chrome.mostToolsOnly}
+        federalLabel={chrome.federalStateBarLabel}
+        pdxLabel={chrome.pdxNavigatorBarLabel}
+        missLabel={chrome.youdMiss}
+      />
 
       {data.warnings?.length > 0 && (
-        <motion.section
-          key={lang + '-warnings'}
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4 }}
-          className="rounded-lg border border-amber-200 bg-amber-50 p-4"
+        <section
+          className="rc-card mb-10"
+          style={{
+            padding: 22,
+            borderColor: 'oklch(0.86 0.07 75)',
+            background: 'var(--sun-soft)',
+          }}
         >
-          <div className="flex items-start gap-2">
-            <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-700" />
-            <div className="flex flex-col gap-1.5">
-              <h2 className="text-sm font-semibold text-amber-900">{chrome.readFirst}</h2>
-              <ul className="flex flex-col gap-1.5 text-sm text-amber-900/90">
+          <div className="flex items-start" style={{ gap: 12 }}>
+            <span
+              style={{
+                width: 32,
+                height: 32,
+                borderRadius: 12,
+                background: 'var(--sun)',
+                color: 'oklch(0.30 0.06 70)',
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexShrink: 0,
+              }}
+            >
+              !
+            </span>
+            <div>
+              <h3
+                className="font-display"
+                style={{
+                  fontSize: '1.2rem',
+                  margin: '0 0 6px',
+                  fontWeight: 500,
+                  letterSpacing: '-0.015em',
+                }}
+              >
+                {chrome.readFirst}
+              </h3>
+              <ul
+                style={{
+                  margin: 0,
+                  paddingLeft: 20,
+                  fontSize: '0.94rem',
+                  lineHeight: 1.55,
+                  color: 'var(--ink-2)',
+                }}
+              >
                 {data.warnings.map((w, i) => (
-                  <li key={i}>{w}</li>
+                  <li key={i} style={{ marginBottom: 6 }}>
+                    {w}
+                  </li>
                 ))}
               </ul>
             </div>
           </div>
-        </motion.section>
+        </section>
       )}
 
-      <section className="flex flex-col gap-4">
-        <div className="flex items-baseline justify-between gap-4">
-          <h2 className="text-lg font-semibold">{programsHeading}</h2>
-          <p className="text-xs text-muted-foreground">{chrome.sortNote}</p>
-        </div>
-        <div className="flex flex-col gap-4">
-          {eligible.map(({ match, program }, i) => (
-            <motion.div
-              key={lang + '-' + match.program_id}
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3, delay: 0.05 * i }}
+      <section className="mb-10">
+        <header className="flex items-end justify-between gap-6 flex-wrap mb-8">
+          <div>
+            <div className="eyebrow mb-2">
+              {eligible.length} programs ·{' '}
+              {sortMode === 'gems' ? 'hidden gems first' : 'largest amount first'}
+            </div>
+            <h2
+              className="font-display"
+              style={{
+                fontSize: '2.2rem',
+                lineHeight: 1.1,
+                margin: 0,
+                fontWeight: 500,
+                letterSpacing: '-0.02em',
+              }}
             >
-              <BenefitCard match={match} program={program} chrome={chrome} />
-            </motion.div>
+              {programsHeading}
+            </h2>
+          </div>
+          <SortToggle value={sortMode} onChange={setSortMode} />
+        </header>
+
+        <div
+          className="grid"
+          style={{ gridTemplateColumns: '1fr', gap: 16 }}
+        >
+          {eligible.map(({ match, program }) => (
+            <BenefitCard
+              key={lang + '-' + match.program_id}
+              match={match}
+              program={program}
+              chrome={chrome}
+            />
           ))}
         </div>
       </section>
 
       <RenewalCalendar entries={eligible} chrome={chrome} lang={lang} />
 
-      <footer className="border-t pt-6 text-xs text-muted-foreground">
-        <p>{chrome.disclaimer}</p>
+      <footer
+        className="mt-12 pt-6"
+        style={{
+          borderTop: '1px solid var(--rule)',
+          color: 'var(--ink-3)',
+          fontSize: '0.82rem',
+          lineHeight: 1.6,
+          marginTop: 48,
+        }}
+      >
+        {chrome.disclaimer}
       </footer>
     </main>
+  );
+}
+
+function KV({ k, v }: { k: string; v: string }) {
+  return (
+    <div>
+      <div className="tag" style={{ fontWeight: 500 }}>
+        {k}
+      </div>
+      <div style={{ fontWeight: 600, marginTop: 2 }}>{v}</div>
+    </div>
+  );
+}
+
+function SortToggle({
+  value,
+  onChange,
+}: {
+  value: 'gems' | 'amount';
+  onChange: (v: 'gems' | 'amount') => void;
+}) {
+  return (
+    <div
+      role="group"
+      aria-label="Sort benefits"
+      className="flex items-center"
+      style={{
+        border: '1px solid var(--rule-2)',
+        borderRadius: 999,
+        padding: 3,
+        background: 'var(--paper-2)',
+      }}
+    >
+      {(
+        [
+          { v: 'gems', label: 'Hidden gems first' },
+          { v: 'amount', label: 'Largest amount' },
+        ] as const
+      ).map((opt) => {
+        const active = value === opt.v;
+        return (
+          <button
+            key={opt.v}
+            type="button"
+            onClick={() => onChange(opt.v)}
+            disabled={active}
+            style={{
+              padding: '6px 14px',
+              borderRadius: 999,
+              fontSize: '0.78rem',
+              fontWeight: 600,
+              background: active ? 'var(--card-rose)' : 'transparent',
+              color: active ? 'var(--ink)' : 'var(--ink-3)',
+              border: 0,
+              cursor: active ? 'default' : 'pointer',
+              boxShadow: active ? '0 1px 2px oklch(0.5 0.06 50 / 0.15)' : 'none',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {opt.label}
+          </button>
+        );
+      })}
+    </div>
   );
 }

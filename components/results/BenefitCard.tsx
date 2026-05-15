@@ -1,36 +1,22 @@
-import { ExternalLink, Sparkles, AlertTriangle } from 'lucide-react';
+import {
+  AlertTriangle,
+  Calendar,
+  Clock,
+  ExternalLink,
+  FileText,
+  Phone,
+  Sparkles,
+} from 'lucide-react';
 
-import { Badge } from '@/components/ui/badge';
-import { buttonVariants } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
+import { JurisdictionPill } from '@/components/brand/JurisdictionPill';
 import type { Chrome } from '@/lib/i18n';
 import type { MatchResult, Program } from '@/types/program';
 
-const JURISDICTION_CLASS: Record<Program['jurisdiction'], string> = {
-  federal: 'bg-slate-100 text-slate-700 border-slate-200',
-  oregon: 'bg-blue-50 text-blue-700 border-blue-200',
-  multnomah: 'bg-green-50 text-green-700 border-green-200',
-  portland: 'bg-emerald-50 text-emerald-700 border-emerald-200',
-};
-
 const CONFIDENCE_DOT: Record<MatchResult['confidence'], string> = {
-  high: 'bg-emerald-500',
-  medium: 'bg-amber-500',
-  low: 'bg-zinc-400',
+  high: 'var(--moss)',
+  medium: 'var(--sun)',
+  low: 'var(--ink-3)',
 };
-
-function jurisdictionLabel(j: Program['jurisdiction'], c: Chrome): string {
-  switch (j) {
-    case 'federal':
-      return c.jurisdictionFederal;
-    case 'oregon':
-      return c.jurisdictionOregon;
-    case 'multnomah':
-      return c.jurisdictionMultnomah;
-    case 'portland':
-      return c.jurisdictionPortland;
-  }
-}
 
 function confidenceLabel(level: MatchResult['confidence'], c: Chrome): string {
   switch (level) {
@@ -43,6 +29,19 @@ function confidenceLabel(level: MatchResult['confidence'], c: Chrome): string {
   }
 }
 
+const CATEGORY_LABEL: Record<Program['category'], string> = {
+  food: 'Food',
+  healthcare: 'Healthcare',
+  housing: 'Housing',
+  utility: 'Utility',
+  childcare: 'Childcare',
+  education: 'Education',
+  tax: 'Tax',
+  transportation: 'Transportation',
+  cash: 'Cash',
+  connectivity: 'Connectivity',
+};
+
 export function BenefitCard({
   match,
   program,
@@ -53,100 +52,255 @@ export function BenefitCard({
   chrome: Chrome;
 }) {
   return (
-    <article className="flex flex-col gap-4 rounded-lg border bg-card p-6 shadow-sm">
-      <header className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-        <div className="flex flex-col gap-2">
-          <div className="flex flex-wrap items-center gap-2">
-            <h3 className="text-lg font-semibold leading-tight">{program.name}</h3>
+    <article className="rc-card" style={{ padding: 0, overflow: 'hidden' }}>
+      <header
+        style={{
+          display: 'grid',
+          gridTemplateColumns: '1fr auto',
+          gap: 24,
+          alignItems: 'start',
+          padding: '24px 28px',
+        }}
+      >
+        <div>
+          <div className="flex flex-wrap items-center gap-2 mb-3">
+            <JurisdictionPill jurisdiction={program.jurisdiction} />
             {program.hidden_gem && (
-              <Badge className="border-amber-200 bg-amber-50 text-amber-800 hover:bg-amber-50">
-                <Sparkles className="mr-1 h-3 w-3" />
-                {chrome.hiddenGem}
-              </Badge>
+              <span className="pill pill-sun">
+                <Sparkles size={11} /> {chrome.hiddenGem}
+              </span>
             )}
+            {match.urgency_note && (
+              <span className="pill pill-rose">
+                <AlertTriangle size={11} /> Time-sensitive
+              </span>
+            )}
+            <span className="pill pill-clay">{CATEGORY_LABEL[program.category]}</span>
           </div>
-          <div className="flex flex-wrap items-center gap-2 text-xs">
-            <span
-              className={cn(
-                'inline-flex items-center rounded-full border px-2 py-0.5 font-medium',
-                JURISDICTION_CLASS[program.jurisdiction]
-              )}
+          <h3
+            className="font-display"
+            style={{
+              fontSize: '1.45rem',
+              lineHeight: 1.15,
+              margin: '0 0 12px',
+              fontWeight: 500,
+              letterSpacing: '-0.018em',
+            }}
+          >
+            {program.name}
+          </h3>
+          <div
+            style={{
+              borderLeft: '3px solid var(--moss-soft)',
+              paddingLeft: 14,
+            }}
+          >
+            <div
+              className="eyebrow mb-1"
+              style={{ color: 'var(--moss-2)' }}
             >
-              {jurisdictionLabel(program.jurisdiction, chrome)}
-            </span>
-            <span className="inline-flex items-center gap-1.5 text-muted-foreground">
-              <span className={cn('h-1.5 w-1.5 rounded-full', CONFIDENCE_DOT[match.confidence])} />
-              {confidenceLabel(match.confidence, chrome)}
-            </span>
+              {chrome.whyYouQualify}
+            </div>
+            <p
+              style={{
+                margin: 0,
+                color: 'var(--ink-2)',
+                fontSize: '0.96rem',
+                lineHeight: 1.55,
+              }}
+            >
+              {match.reasoning}
+            </p>
           </div>
         </div>
-        <div className="text-right">
-          <div className="text-3xl font-bold tabular-nums">
+        <div className="text-right" style={{ minWidth: 130 }}>
+          <div
+            className="font-display tabular"
+            style={{
+              fontSize: '2.1rem',
+              lineHeight: 1,
+              color: 'var(--ink)',
+              fontWeight: 500,
+              letterSpacing: '-0.02em',
+            }}
+          >
             ${match.estimated_annual_value.toLocaleString()}
           </div>
-          <div className="text-xs text-muted-foreground">{chrome.estimatedYear}</div>
+          <div className="tag mt-1">{chrome.estimatedYear}</div>
+          <div
+            className="flex items-center justify-end gap-1.5 mt-3"
+            style={{ fontSize: '0.78rem', color: 'var(--ink-3)' }}
+          >
+            <span
+              style={{
+                width: 8,
+                height: 8,
+                borderRadius: 999,
+                background: CONFIDENCE_DOT[match.confidence],
+              }}
+            />
+            {confidenceLabel(match.confidence, chrome)}
+          </div>
         </div>
       </header>
 
-      <p className="text-sm text-foreground/80">{match.reasoning}</p>
+      <div
+        style={{
+          padding: '0 28px 26px',
+          borderTop: '1px solid var(--rule)',
+        }}
+      >
+          <div
+            className="grid"
+            style={{
+              gridTemplateColumns: '1.4fr 1fr',
+              gap: 28,
+              paddingTop: 22,
+              alignItems: 'start',
+            }}
+          >
+            <div>
+              {match.next_steps?.length > 0 && (
+                <>
+                  <div className="eyebrow mb-3" style={{ color: 'var(--moss-2)' }}>
+                    {chrome.nextSteps}
+                  </div>
+                  <ol
+                    style={{
+                      margin: 0,
+                      padding: 0,
+                      listStyle: 'none',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: 12,
+                    }}
+                  >
+                    {match.next_steps.map((step, i) => (
+                      <li
+                        key={i}
+                        className="flex"
+                        style={{ gap: 12, fontSize: '0.94rem', lineHeight: 1.55 }}
+                      >
+                        <span
+                          style={{
+                            display: 'inline-flex',
+                            width: 26,
+                            height: 26,
+                            borderRadius: 999,
+                            background: 'var(--rose-soft)',
+                            color: 'var(--rose)',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            flexShrink: 0,
+                            fontSize: '0.8rem',
+                            fontWeight: 700,
+                          }}
+                        >
+                          {i + 1}
+                        </span>
+                        <span style={{ paddingTop: 3 }}>{step}</span>
+                      </li>
+                    ))}
+                  </ol>
+                </>
+              )}
 
-      {match.urgency_note && (
-        <div className="flex items-start gap-2 rounded-md border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900">
-          <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
-          <span>{match.urgency_note}</span>
-        </div>
-      )}
+              {match.required_documents?.length > 0 && (
+                <div style={{ marginTop: 24 }}>
+                  <div className="eyebrow mb-3" style={{ color: 'var(--moss-2)' }}>
+                    {chrome.whatToBring}
+                  </div>
+                  <div className="flex flex-wrap" style={{ gap: 8 }}>
+                    {match.required_documents.map((d, i) => (
+                      <span
+                        key={i}
+                        className="pill pill-clay"
+                        style={{ fontSize: '0.78rem' }}
+                      >
+                        <FileText size={12} /> {d}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
 
-      {match.next_steps?.length > 0 && (
-        <section className="flex flex-col gap-2">
-          <h4 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-            {chrome.nextSteps}
-          </h4>
-          <ol className="flex flex-col gap-1.5 text-sm">
-            {match.next_steps.map((step, i) => (
-              <li key={i} className="flex gap-2">
-                <span className="font-medium text-muted-foreground tabular-nums">{i + 1}.</span>
-                <span>{step}</span>
-              </li>
-            ))}
-          </ol>
-        </section>
-      )}
-
-      {match.required_documents?.length > 0 && (
-        <section className="flex flex-col gap-2">
-          <h4 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-            {chrome.whatToBring}
-          </h4>
-          <ul className="flex flex-wrap gap-1.5">
-            {match.required_documents.map((doc, i) => (
-              <li
-                key={i}
-                className="rounded-full border bg-muted/40 px-2.5 py-1 text-xs text-foreground/80"
+            <aside
+              style={{
+                background: 'var(--paper-2)',
+                borderRadius: 16,
+                padding: 20,
+                border: '1px solid var(--rule)',
+              }}
+            >
+              <div className="eyebrow mb-3" style={{ color: 'var(--moss-2)' }}>
+                About this program
+              </div>
+              <div
+                className="grid"
+                style={{ gap: 12, fontSize: '0.9rem' }}
               >
-                {doc}
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
-
-      <footer className="flex flex-col gap-2 border-t pt-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="text-xs text-muted-foreground">
-          {program.contact_org}
-          {program.contact_phone && <> · {program.contact_phone}</>}
-          {program.processing_time && <> · {program.processing_time}</>}
+                {program.contact_org && <MetaRow label="Run by" value={program.contact_org} />}
+                {program.contact_phone && (
+                  <MetaRow label="Call" value={program.contact_phone} icon="phone" />
+                )}
+                {program.processing_time && (
+                  <MetaRow label="Decision" value={program.processing_time} icon="clock" />
+                )}
+                {program.renewal_cycle && (
+                  <MetaRow label="Renews" value={program.renewal_cycle} icon="calendar" />
+                )}
+                {program.legal_basis && (
+                  <MetaRow label="Legal basis" value={program.legal_basis} />
+                )}
+              </div>
+              <a
+                href={program.application_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="rc-btn rc-btn-rose"
+                style={{
+                  width: '100%',
+                  justifyContent: 'center',
+                  marginTop: 16,
+                }}
+              >
+                {chrome.applyNow} <ExternalLink size={13} />
+              </a>
+            </aside>
+          </div>
         </div>
-        <a
-          href={program.application_url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className={buttonVariants({ size: 'sm', variant: 'default' })}
-        >
-          {chrome.applyNow}
-          <ExternalLink className="ml-1.5 h-3.5 w-3.5" />
-        </a>
-      </footer>
     </article>
+  );
+}
+
+function MetaRow({
+  label,
+  value,
+  icon,
+}: {
+  label: string;
+  value: string;
+  icon?: 'phone' | 'clock' | 'calendar';
+}) {
+  return (
+    <div className="flex items-baseline justify-between" style={{ gap: 12 }}>
+      <div className="flex items-center gap-1.5 tag">
+        {icon === 'phone' && <Phone size={12} />}
+        {icon === 'clock' && <Clock size={12} />}
+        {icon === 'calendar' && <Calendar size={12} />}
+        {label}
+      </div>
+      <div
+        style={{
+          textAlign: 'right',
+          fontSize: '0.88rem',
+          color: 'var(--ink-2)',
+          fontWeight: 500,
+        }}
+      >
+        {value}
+      </div>
+    </div>
   );
 }

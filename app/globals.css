@@ -9,7 +9,7 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-sans);
   --font-mono: var(--font-geist-mono);
-  --font-heading: var(--font-sans);
+  --font-heading: var(--font-display);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -48,83 +48,318 @@
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
+/* ─────────────────────────────────────────────────────────────────────────
+   Rose City design tokens — soft & friendly palette.
+   Theme-able via .theme-rose / .theme-forest / .theme-sunset on <html>.
+   ─────────────────────────────────────────────────────────────────────── */
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
+  /* Rose City defaults — warm, peachy, friendly */
+  --paper: oklch(0.972 0.020 70);
+  --paper-2: oklch(0.945 0.030 60);
+  --paper-3: oklch(0.92 0.035 55);
+
+  --ink: oklch(0.30 0.045 230);
+  --ink-2: oklch(0.46 0.04 225);
+  --ink-3: oklch(0.62 0.025 220);
+  --ink-4: oklch(0.74 0.02 220);
+
+  --rule: oklch(0.90 0.025 60);
+  --rule-2: oklch(0.83 0.035 55);
+
+  --moss: oklch(0.55 0.105 155);
+  --moss-2: oklch(0.42 0.09 155);
+  --moss-soft: oklch(0.93 0.04 150);
+
+  --rose: oklch(0.60 0.11 150);
+  --rose-2: oklch(0.68 0.12 150);
+  --rose-soft: oklch(0.94 0.04 150);
+
+  --sun: oklch(0.82 0.135 80);
+  --sun-soft: oklch(0.95 0.05 85);
+
+  --sky: oklch(0.66 0.085 235);
+  --sky-soft: oklch(0.92 0.035 232);
+
+  --card-rose: oklch(0.995 0.012 75);
+  --shadow-soft: 0 1px 2px oklch(0.7 0.05 60 / 0.06), 0 8px 24px -10px oklch(0.5 0.06 50 / 0.14);
+  --shadow-card: 0 1px 0 oklch(0.92 0.02 60 / 0.7), 0 12px 36px -16px oklch(0.5 0.06 50 / 0.20);
+
+  --font-display: var(--font-lora), "Plus Jakarta Sans", ui-serif, Georgia, serif;
+  --font-sans: var(--font-jakarta), ui-sans-serif, system-ui, -apple-system, sans-serif;
+
+  /* shadcn compatibility — keep so existing components don't blow up */
+  --background: var(--paper);
+  --foreground: var(--ink);
+  --card: var(--card-rose);
+  --card-foreground: var(--ink);
+  --popover: var(--card-rose);
+  --popover-foreground: var(--ink);
+  --primary: var(--ink);
+  --primary-foreground: oklch(0.98 0.01 75);
+  --secondary: var(--paper-2);
+  --secondary-foreground: var(--ink);
+  --muted: var(--paper-2);
+  --muted-foreground: var(--ink-3);
+  --accent: var(--rose-soft);
+  --accent-foreground: oklch(0.40 0.10 150);
   --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --border: var(--rule);
+  --input: var(--rule-2);
+  --ring: var(--rose);
+  --chart-1: var(--rose);
+  --chart-2: var(--moss);
+  --chart-3: var(--sun);
+  --chart-4: var(--sky);
+  --chart-5: var(--ink-3);
+  --radius: 0.75rem;
+  --sidebar: var(--paper);
+  --sidebar-foreground: var(--ink);
+  --sidebar-primary: var(--ink);
+  --sidebar-primary-foreground: oklch(0.98 0.01 75);
+  --sidebar-accent: var(--paper-2);
+  --sidebar-accent-foreground: var(--ink);
+  --sidebar-border: var(--rule);
+  --sidebar-ring: var(--rose);
 }
 
-.dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+.theme-forest {
+  --paper: oklch(0.965 0.022 145);
+  --paper-2: oklch(0.93 0.035 140);
+  --paper-3: oklch(0.90 0.04 140);
+  --ink: oklch(0.27 0.05 175);
+  --rose: oklch(0.55 0.13 155);
+  --rose-soft: oklch(0.93 0.05 150);
+  --rule: oklch(0.86 0.03 140);
+  --rule-2: oklch(0.78 0.04 140);
+  --card-rose: oklch(0.99 0.015 140);
+}
+
+.theme-sunset {
+  --paper: oklch(0.97 0.025 50);
+  --paper-2: oklch(0.93 0.04 45);
+  --paper-3: oklch(0.89 0.05 40);
+  --ink: oklch(0.33 0.06 30);
+  --rose: oklch(0.65 0.16 22);
+  --rose-soft: oklch(0.93 0.06 25);
+  --moss: oklch(0.52 0.09 160);
+  --rule: oklch(0.87 0.045 45);
+  --rule-2: oklch(0.78 0.055 45);
+  --card-rose: oklch(0.995 0.018 55);
 }
 
 @layer base {
-  * {
-    @apply border-border outline-ring/50;
+  * { box-sizing: border-box; }
+
+  html, body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    font-weight: 500;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    margin: 0;
   }
+
   body {
-    @apply bg-background text-foreground;
+    min-height: 100vh;
+    background:
+      radial-gradient(900px 540px at 100% -10%, oklch(0.88 0.08 150 / 0.30), transparent 65%),
+      radial-gradient(700px 420px at -10% 110%, oklch(0.85 0.09 155 / 0.20), transparent 65%),
+      radial-gradient(500px 420px at 50% 90%, oklch(0.90 0.07 80 / 0.15), transparent 65%),
+      var(--paper);
   }
-  html {
-    @apply font-sans;
+
+  ::selection { background: var(--rose-soft); color: oklch(0.40 0.10 150); }
+
+  :focus-visible {
+    outline: 2px solid var(--rose);
+    outline-offset: 3px;
+    border-radius: 8px;
   }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   Type
+   ─────────────────────────────────────────────────────────────────────── */
+.font-display { font-family: var(--font-display); font-weight: 400; letter-spacing: -0.015em; }
+.font-display-italic { font-family: var(--font-display); font-style: italic; font-weight: 400; }
+.tabular { font-variant-numeric: tabular-nums; }
+.tag {
+  font-family: var(--font-sans);
+  font-size: 0.72rem;
+  letter-spacing: 0.01em;
+  color: var(--ink-3);
+  font-weight: 500;
+}
+.eyebrow {
+  font-family: var(--font-sans);
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--rose);
+  font-weight: 600;
+}
+
+.divider { height: 1px; background: var(--rule); width: 100%; border: 0; }
+.hairline { border: 1px solid var(--rule); }
+
+/* ─────────────────────────────────────────────────────────────────────────
+   Cards
+   ─────────────────────────────────────────────────────────────────────── */
+.rc-card {
+  background: var(--card-rose);
+  border: 1px solid var(--rule);
+  border-radius: 20px;
+  box-shadow: var(--shadow-card);
+}
+.rc-card-flat {
+  background: var(--card-rose);
+  border: 1px solid var(--rule);
+  border-radius: 16px;
+}
+.rc-card-soft {
+  background: var(--paper-2);
+  border: 1px solid var(--rule);
+  border-radius: 16px;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   Buttons (.rc-btn family — namespaced to avoid clobbering shadcn's .btn)
+   ─────────────────────────────────────────────────────────────────────── */
+.rc-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.7rem 1.2rem;
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: 0.94rem;
+  font-family: var(--font-sans);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: transform 0.1s ease, background 0.15s, color 0.15s, border-color 0.15s, box-shadow 0.15s;
+  white-space: nowrap;
+  line-height: 1;
+  text-decoration: none;
+}
+.rc-btn:active { transform: translateY(1px); }
+.rc-btn-primary {
+  background: var(--ink);
+  color: oklch(0.98 0.01 75);
+  border-color: var(--ink);
+}
+.rc-btn-primary:hover { background: oklch(0.36 0.04 230); }
+.rc-btn-rose {
+  background: var(--rose);
+  color: oklch(0.99 0.01 150);
+  border-color: var(--rose);
+  box-shadow: 0 1px 0 oklch(0.50 0.12 150 / 0.4), 0 6px 16px -4px oklch(0.50 0.12 150 / 0.35);
+}
+.rc-btn-rose:hover { background: var(--rose-2); border-color: var(--rose-2); }
+.rc-btn-outline {
+  background: transparent;
+  color: var(--ink);
+  border-color: var(--rule-2);
+}
+.rc-btn-outline:hover { background: var(--paper-2); border-color: var(--ink-4); }
+.rc-btn-ghost {
+  background: transparent;
+  color: var(--ink-2);
+  border-color: transparent;
+}
+.rc-btn-ghost:hover { color: var(--ink); background: var(--paper-2); }
+.rc-btn-sm { padding: 0.5rem 0.9rem; font-size: 0.84rem; font-weight: 500; }
+
+/* ─────────────────────────────────────────────────────────────────────────
+   Pills / chips
+   ─────────────────────────────────────────────────────────────────────── */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.3rem 0.7rem;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 500;
+  border: 1px solid var(--rule);
+  background: var(--paper);
+  color: var(--ink-2);
+}
+.pill-moss { background: var(--moss-soft); color: var(--moss-2); border-color: oklch(0.85 0.05 150); }
+.pill-rose { background: var(--rose-soft); color: oklch(0.40 0.10 150); border-color: oklch(0.85 0.05 150); }
+.pill-sky { background: var(--sky-soft); color: oklch(0.45 0.10 232); border-color: oklch(0.84 0.04 232); }
+.pill-sun { background: var(--sun-soft); color: oklch(0.46 0.12 65); border-color: oklch(0.86 0.07 75); }
+.pill-clay { background: var(--paper-2); color: var(--ink-2); border-color: var(--rule); }
+.pill-ink { background: var(--ink); color: oklch(0.98 0.01 75); border-color: var(--ink); }
+
+/* ─────────────────────────────────────────────────────────────────────────
+   Inputs
+   ─────────────────────────────────────────────────────────────────────── */
+.rc-input {
+  background: var(--card-rose);
+  border: 1px solid var(--rule-2);
+  border-radius: 14px;
+  padding: 0.8rem 1rem;
+  font: inherit;
+  font-family: var(--font-sans);
+  color: var(--ink);
+  width: 100%;
+}
+.rc-input:focus {
+  outline: none;
+  border-color: var(--rose);
+  box-shadow: 0 0 0 3px var(--rose-soft);
+}
+
+.rc-choice {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.3rem;
+  padding: 1rem 1.1rem;
+  border: 1px solid var(--rule-2);
+  border-radius: 16px;
+  background: var(--card-rose);
+  color: var(--ink);
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font: inherit;
+  font-family: var(--font-sans);
+}
+.rc-choice:hover { border-color: var(--rose); background: var(--rose-soft); }
+.rc-choice.selected {
+  border-color: var(--ink);
+  background: var(--ink);
+  color: oklch(0.98 0.01 75);
+  box-shadow: 0 1px 0 var(--rose), 0 8px 20px -8px oklch(0.3 0.045 230 / 0.5);
+}
+.rc-choice .hint { font-size: 0.75rem; opacity: 0.75; }
+
+/* ─────────────────────────────────────────────────────────────────────────
+   Animations
+   ─────────────────────────────────────────────────────────────────────── */
+@keyframes rcSlideUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.rc-enter { animation: rcSlideUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) both; }
+
+@keyframes rcMarquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+.rc-marquee-track {
+  display: flex;
+  gap: 3rem;
+  width: max-content;
+  animation: rcMarquee 60s linear infinite;
+}
+
+.rc-blob {
+  position: absolute;
+  pointer-events: none;
+  filter: blur(80px);
+  opacity: 0.55;
+  border-radius: 50%;
 }
