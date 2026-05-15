@@ -8,7 +8,6 @@ const SLUG_MAP: Record<string, keyof typeof scenarios> = {
   maria: 'maria',
   james: 'james',
   rose: 'rose',
-  'grandma-rose': 'rose',
 };
 
 export default function DemoPage() {

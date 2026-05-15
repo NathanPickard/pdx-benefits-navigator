@@ -32,6 +32,14 @@ export interface Chrome {
   translatedByAI: string;
   translating: string;
   disclaimer: string;
+  downloadPacket: string;
+  buildingPacket: string;
+  exportCalendar: string;
+  renewalCalendarTitle: string;
+  renewalCalendarSubtitle: string;
+  renewalUpcoming: string;
+  renewalLater: string;
+  renewalNoneLabel: string;
   urgencyEvictionTitle: string;
   urgencyEvictionBody: string;
   urgencyRentIncreaseTitle: string;
@@ -65,6 +73,15 @@ export const CHROME_EN: Chrome = {
   translating: 'Translating…',
   disclaimer:
     'Estimates only — not legal advice. Confirm eligibility with each program. We never store your answers; everything runs in this browser session.',
+  downloadPacket: 'Download packet (PDF)',
+  buildingPacket: 'Building packet…',
+  exportCalendar: 'Export to calendar (.ics)',
+  renewalCalendarTitle: 'Renewal calendar',
+  renewalCalendarSubtitle:
+    'When each benefit needs to be renewed so you never lose coverage.',
+  renewalUpcoming: 'Next 6 months',
+  renewalLater: 'Later this year',
+  renewalNoneLabel: 'No renewals required',
   urgencyEvictionTitle: 'Apply today — your eviction can likely be stopped',
   urgencyEvictionBody:
     'Multnomah Eviction Prevention funds emergency rent help, and many Oregon eviction notices have procedural defects that void them. Call 503-988-3646 today — earlier calls have better odds. Start with the program below.',

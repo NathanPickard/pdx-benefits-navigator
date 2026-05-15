@@ -118,6 +118,61 @@ export async function analyzeEligibility(intake: IntakeData): Promise<AnalysisOu
   return recomputeTotals(parsed);
 }
 
+export type AnalyzeStreamEvent =
+  | { type: 'progress'; programId: string }
+  | { type: 'complete'; output: AnalysisOutput }
+  | { type: 'error'; message: string };
+
+export async function* analyzeEligibilityStream(
+  intake: IntakeData
+): AsyncGenerator<AnalyzeStreamEvent> {
+  try {
+    const stream = anthropic.messages.stream({
+      model: MODEL,
+      max_tokens: 8000,
+      system: [
+        {
+          type: 'text',
+          text: SYSTEM_PROMPT,
+          cache_control: { type: 'ephemeral' },
+        },
+      ],
+      messages: [
+        {
+          role: 'user',
+          content: `Analyze eligibility for this Portland resident:\n\n${JSON.stringify(intake, null, 2)}`,
+        },
+      ],
+    });
+
+    let buffer = '';
+    const seenIds = new Set<string>();
+    const programIdRegex = /"program_id"\s*:\s*"([^"]+)"/g;
+
+    for await (const event of stream) {
+      if (event.type === 'content_block_delta' && event.delta.type === 'text_delta') {
+        buffer += event.delta.text;
+        programIdRegex.lastIndex = 0;
+        let match: RegExpExecArray | null;
+        while ((match = programIdRegex.exec(buffer)) !== null) {
+          const id = match[1];
+          if (!seenIds.has(id)) {
+            seenIds.add(id);
+            yield { type: 'progress', programId: id };
+          }
+        }
+      }
+    }
+
+    const parsed = parseJsonObject<AnalysisOutput>(buffer);
+    const finalOutput = recomputeTotals(parsed);
+    yield { type: 'complete', output: finalOutput };
+  } catch (e) {
+    const message = e instanceof Error ? e.message : 'Unknown error';
+    yield { type: 'error', message };
+  }
+}
+
 function recomputeTotals(output: AnalysisOutput): AnalysisOutput {
   let total = 0;
   let federal = 0;

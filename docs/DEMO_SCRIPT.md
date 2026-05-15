@@ -78,7 +78,7 @@
 
 ## ⏱️ 2:30 – 3:30 — The Range (Show Versatility)
 
-**Click `/demo/grandma-rose` tab.**
+**Click `/demo/rose` tab.**
 
 > *"This isn't just for working families. Meet Rose — 73, lives alone in Lents, Social Security only, owns her home, Vietnamese speaker."*
 

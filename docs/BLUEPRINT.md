@@ -370,7 +370,7 @@ Massive animated counter on results page that ticks $0 → total found benefits 
 Recharts side-by-side bars: "Federal-only tools find $9,200" vs "PDX Benefits Navigator finds $24,400." Annotate the delta with red arrow: "+$15,200 you'd otherwise miss." This single chart wins the room.
 
 **3. Pre-Loaded Demo Scenarios**
-`/demo/maria`, `/demo/james`, `/demo/grandma-rose` — one click loads intake, runs analysis, lands on results. Zero risk during live demo.
+`/demo/maria`, `/demo/james`, `/demo/rose` — one click loads intake, runs analysis, lands on results. Zero risk during live demo.
 
 **4. PDF Application Packet**
 One button generates a beautifully designed PDF: cover page with family summary, one page per program with eligibility details, application URL, document checklist, contact info. Includes QR codes linking to each application portal.
@@ -513,7 +513,7 @@ pdx-benefits-navigator/
 **Hero programs:** OHP, SNAP, Veterans Property Tax Exemption, Energy Trust weatherization, PGE discount, ACP, Senior/Disabled Property Tax Deferral, ADVSD case management
 **Demo arc:** Show how disability + veteran status surfaces programs others miss.
 
-### Scenario 3: Grandma Rose — The Dignity Story
+### Scenario 3: Rose — The Dignity Story
 ```typescript
 {
   household_size: 1,

@@ -101,7 +101,7 @@ export async function POST(req: NextRequest) {
 ```
 
 ### 10:45–11:00 — Validate against demo scenarios
-- Hard-code Maria, James, Grandma Rose in `lib/scenarios.ts`
+- Hard-code Maria, James, Rose in `lib/scenarios.ts`
 - `curl` each through `/api/analyze`
 - Verify dollar values are in expected ranges
 - If Maria isn't hitting $24k+, debug the prompt or program values now
@@ -188,7 +188,7 @@ export function MoneyCounter({ value }: { value: number }) {
   - "Apply Now" link
 
 ### 1:25–1:30 — Demo routes
-- `/demo/maria`, `/demo/james`, `/demo/grandma-rose`
+- `/demo/maria`, `/demo/james`, `/demo/rose`
 - Each pre-loads intake, calls `/api/analyze`, lands on results
 - One click during presentation = zero risk
 
@@ -253,7 +253,7 @@ Ship each before moving to next. Priority order:
 ### Preparation checklist
 - [ ] Open `/demo/maria` in tab 1
 - [ ] Open `/demo/james` in tab 2
-- [ ] Open `/demo/grandma-rose` in tab 3
+- [ ] Open `/demo/rose` in tab 3
 - [ ] Open slide deck in tab 4 (just the $1.2B headline + closing slide)
 - [ ] Open backup screencast video in tab 5 (record this earlier as insurance)
 - [ ] Phone hotspot ready in case venue wifi dies
