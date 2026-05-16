@@ -40,6 +40,7 @@ export function Wordmark({ size = "md", href = "/" }: Props) {
           PDX Benefits Navigator
         </span>
         <span
+          className="rc-hide-sm"
           style={{
             fontSize: "0.72rem",
             marginTop: 4,

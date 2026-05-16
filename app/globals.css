@@ -363,3 +363,190 @@
   opacity: 0.55;
   border-radius: 50%;
 }
+
+/* ─────────────────────────────────────────────────────────────────────────
+   Responsive layout helpers — mobile first.
+   Breakpoints: sm 640, md 768, lg 1024.
+   ─────────────────────────────────────────────────────────────────────── */
+
+/* Page container — max-width + horizontal gutters that scale down on mobile */
+.rc-container {
+  max-width: 1240px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 16px;
+  padding-right: 16px;
+}
+@media (min-width: 640px) { .rc-container { padding-left: 24px; padding-right: 24px; } }
+@media (min-width: 1024px) { .rc-container { padding-left: 32px; padding-right: 32px; } }
+
+/* Section vertical padding (between major sections of the landing) */
+.rc-section-pad {
+  padding-top: 56px;
+  padding-bottom: 24px;
+}
+@media (min-width: 640px) { .rc-section-pad { padding-top: 64px; padding-bottom: 32px; } }
+@media (min-width: 1024px) { .rc-section-pad { padding-top: 84px; padding-bottom: 32px; } }
+
+.rc-hero-pad {
+  padding-top: 40px;
+  padding-bottom: 40px;
+}
+@media (min-width: 640px) { .rc-hero-pad { padding-top: 56px; padding-bottom: 48px; } }
+@media (min-width: 1024px) { .rc-hero-pad { padding-top: 84px; padding-bottom: 64px; } }
+
+.rc-page-pad {
+  padding-top: 24px;
+  padding-bottom: 64px;
+}
+@media (min-width: 640px) { .rc-page-pad { padding-top: 32px; padding-bottom: 80px; } }
+@media (min-width: 1024px) { .rc-page-pad { padding-top: 32px; padding-bottom: 96px; } }
+
+/* Card interior padding */
+.rc-card-pad {
+  padding: 18px;
+}
+@media (min-width: 640px) { .rc-card-pad { padding: 24px; } }
+@media (min-width: 1024px) { .rc-card-pad { padding: 28px; } }
+
+.rc-card-pad-lg {
+  padding: 22px 22px;
+}
+@media (min-width: 640px) { .rc-card-pad-lg { padding: 28px 30px; } }
+@media (min-width: 1024px) { .rc-card-pad-lg { padding: 32px 36px; } }
+
+/* AppBar */
+.rc-appbar-pad {
+  padding: 12px 16px;
+}
+@media (min-width: 640px) { .rc-appbar-pad { padding: 12px 24px; } }
+@media (min-width: 1024px) { .rc-appbar-pad { padding: 14px 32px; } }
+
+/* Stack-then-grid layouts */
+.rc-cols-2 { display: grid; grid-template-columns: 1fr; gap: 16px; }
+@media (min-width: 768px) { .rc-cols-2 { grid-template-columns: 1fr 1fr; gap: 18px; } }
+
+.rc-cols-3 { display: grid; grid-template-columns: 1fr; gap: 16px; }
+@media (min-width: 640px) { .rc-cols-3 { grid-template-columns: 1fr 1fr; gap: 18px; } }
+@media (min-width: 1024px) { .rc-cols-3 { grid-template-columns: repeat(3, 1fr); gap: 20px; } }
+
+.rc-cols-4 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+@media (min-width: 768px) { .rc-cols-4 { grid-template-columns: repeat(4, 1fr); } }
+
+/* Landing hero: text + small card */
+.rc-hero-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 32px;
+  align-items: center;
+}
+@media (min-width: 1024px) {
+  .rc-hero-grid {
+    grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr);
+    gap: 56px;
+  }
+}
+
+/* Results hero: big counter + KV sidebar */
+.rc-results-hero {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 28px;
+  align-items: end;
+}
+@media (min-width: 1024px) {
+  .rc-results-hero {
+    grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+    gap: 36px;
+  }
+}
+
+/* Closing CTA: text + button */
+.rc-cta-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+  align-items: center;
+}
+@media (min-width: 768px) {
+  .rc-cta-grid {
+    grid-template-columns: 1fr auto;
+    gap: 32px;
+  }
+}
+
+/* Footer */
+.rc-footer-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 28px;
+}
+@media (min-width: 768px) {
+  .rc-footer-grid { grid-template-columns: 2fr 1fr 1fr; gap: 32px; }
+}
+
+/* BenefitCard header (info + dollar) */
+.rc-benefit-header {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  align-items: start;
+}
+@media (min-width: 640px) {
+  .rc-benefit-header { grid-template-columns: 1fr auto; gap: 24px; }
+}
+
+/* BenefitCard detail (steps + program-info sidebar) */
+.rc-benefit-detail {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 22px;
+  align-items: start;
+}
+@media (min-width: 768px) {
+  .rc-benefit-detail { grid-template-columns: 1.4fr 1fr; gap: 28px; }
+}
+
+/* Comparison chart 3-mini stat row */
+.rc-mini-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 18px;
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--rule);
+}
+@media (min-width: 640px) {
+  .rc-mini-row { grid-template-columns: repeat(3, 1fr); gap: 24px; }
+}
+
+/* Renewal calendar month-label + items */
+.rc-renewal-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+}
+@media (min-width: 640px) {
+  .rc-renewal-row { grid-template-columns: 180px 1fr; gap: 14px; }
+}
+
+/* Intake housing (ZIP + housing) */
+.rc-housing-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+  align-items: start;
+}
+@media (min-width: 640px) {
+  .rc-housing-grid { grid-template-columns: 180px 1fr; gap: 18px; }
+}
+
+/* Visibility helpers */
+.rc-hide-sm { display: none; }
+@media (min-width: 640px) { .rc-hide-sm { display: revert; } }
+.rc-show-sm { }
+@media (min-width: 640px) { .rc-show-sm { display: none; } }
+
+.rc-hide-md { display: none; }
+@media (min-width: 768px) { .rc-hide-md { display: revert; } }
+

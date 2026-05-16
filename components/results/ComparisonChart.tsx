@@ -34,7 +34,12 @@ export function ComparisonChart({
   return (
     <section
       className="rc-card"
-      style={{ padding: 32, position: 'relative', overflow: 'hidden', marginBottom: 40 }}
+      style={{
+        padding: 'clamp(22px, 4vw, 32px)',
+        position: 'relative',
+        overflow: 'hidden',
+        marginBottom: 40,
+      }}
     >
       <div className="flex items-end justify-between mb-6 flex-wrap" style={{ gap: 12 }}>
         <div>
@@ -83,14 +88,7 @@ export function ComparisonChart({
         />
       </div>
 
-      <div
-        className="grid mt-6 pt-5"
-        style={{
-          gridTemplateColumns: 'repeat(3, 1fr)',
-          gap: 24,
-          borderTop: '1px solid var(--rule)',
-        }}
-      >
+      <div className="rc-mini-row">
         <Mini label="Federal-only finds" value={`$${federal.toLocaleString()}`} sub="the national tools" />
         <Mini
           label="Hyperlocal delta"

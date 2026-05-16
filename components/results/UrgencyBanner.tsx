@@ -51,7 +51,7 @@ export function UrgencyBanner({
       role="alert"
       className="rc-card"
       style={{
-        padding: '22px 24px',
+        padding: 'clamp(18px, 4vw, 22px) clamp(18px, 4vw, 24px)',
         borderColor: isCritical ? 'var(--rose)' : 'oklch(0.86 0.07 75)',
         background: isCritical ? 'var(--rose-soft)' : 'var(--sun-soft)',
         borderWidth: 2,

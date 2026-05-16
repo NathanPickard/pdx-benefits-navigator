@@ -171,7 +171,10 @@ function LoadingView({ progress }: { progress: LoadingProgress }) {
   const pct = (count / total) * 100;
 
   return (
-    <main className="mx-auto" style={{ maxWidth: 760, padding: '120px 32px' }}>
+    <main
+      className="rc-container"
+      style={{ maxWidth: 760, paddingTop: 80, paddingBottom: 80 }}
+    >
       <div className="text-center">
         <div className="flex items-center justify-center mb-5" style={{ gap: 8 }}>
           <RoseStamp size={56} />
@@ -442,10 +445,7 @@ function Dashboard({
   );
 
   return (
-    <main
-      className="mx-auto"
-      style={{ maxWidth: 1240, padding: '32px 32px 96px' }}
-    >
+    <main className="rc-container rc-page-pad">
       <Link
         href="/"
         className="rc-btn rc-btn-ghost rc-btn-sm mb-6"
@@ -462,7 +462,7 @@ function Dashboard({
         <div className="eyebrow" style={{ color: 'var(--moss-2)' }}>
           Personal benefits brief
         </div>
-        <div className="flex items-center" style={{ gap: 8 }}>
+        <div className="flex items-center flex-wrap" style={{ gap: 8 }}>
           <button
             type="button"
             onClick={handleDownloadPacket}
@@ -515,14 +515,7 @@ function Dashboard({
       )}
 
       {/* Hero */}
-      <section
-        className="grid mb-10"
-        style={{
-          gridTemplateColumns: 'minmax(0,1.5fr) minmax(0,1fr)',
-          gap: 36,
-          alignItems: 'end',
-        }}
-      >
+      <section className="rc-results-hero mb-10">
         <div>
           <div className="eyebrow mb-3" style={{ color: 'var(--moss-2)' }}>
             {chrome.resultsKicker}
@@ -612,7 +605,7 @@ function Dashboard({
         <section
           className="rc-card mb-10"
           style={{
-            padding: 22,
+            padding: 'clamp(18px, 4vw, 22px)',
             borderColor: 'oklch(0.86 0.07 75)',
             background: 'var(--sun-soft)',
           }}

@@ -15,8 +15,7 @@ export function AppBar({ children }: { children?: React.ReactNode }) {
       }}
     >
       <div
-        className="mx-auto flex items-center justify-between gap-4"
-        style={{ maxWidth: 1240, padding: "14px 32px" }}
+        className="rc-container rc-appbar-pad flex items-center justify-between gap-3"
       >
         <Wordmark />
         <div className="flex items-center gap-2">{children}</div>

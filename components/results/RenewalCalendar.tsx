@@ -86,7 +86,7 @@ export function RenewalCalendar({
   const locale = LOCALE[lang];
 
   return (
-    <section className="rc-card" style={{ padding: 28 }}>
+    <section className="rc-card" style={{ padding: 'clamp(22px, 4vw, 28px)' }}>
       <header
         className="flex items-start justify-between mb-6 flex-wrap"
         style={{ gap: 12 }}
@@ -176,10 +176,7 @@ function CalendarBucket({
   return (
     <div style={{ marginBottom: 20 }}>
       <div className="eyebrow mb-3">{label}</div>
-      <div
-        className="grid"
-        style={{ gridTemplateColumns: '180px 1fr', gap: 14 }}
-      >
+      <div className="rc-renewal-row">
         {ordered.map((group) => (
           <div key={monthKey(group.date)} style={{ display: 'contents' }}>
             <div>

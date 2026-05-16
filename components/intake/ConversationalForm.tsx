@@ -95,7 +95,10 @@ export function ConversationalForm() {
   };
 
   return (
-    <main className="mx-auto" style={{ maxWidth: 880, padding: '48px 32px 96px' }}>
+    <main
+      className="rc-container rc-page-pad"
+      style={{ maxWidth: 880 }}
+    >
       <Link href="/" className="rc-btn rc-btn-ghost rc-btn-sm mb-6" style={{ marginBottom: 24 }}>
         <ArrowLeft size={14} /> Back to navigator
       </Link>
@@ -125,7 +128,7 @@ export function ConversationalForm() {
       </header>
 
       <form onSubmit={form.handleSubmit(onSubmit)}>
-        <div className="rc-card" style={{ padding: '32px 36px' }}>
+        <div className="rc-card rc-card-pad-lg">
           <div className="rc-enter" key={step}>
             {step === 0 && <Household form={form} />}
             {step === 1 && <Income form={form} />}
@@ -225,6 +228,7 @@ function StepNumerals({ current }: { current: number }) {
               {state === 'done' ? <Check size={13} strokeWidth={2.4} /> : i + 1}
             </span>
             <span
+              className="rc-hide-sm"
               style={{
                 fontSize: '0.86rem',
                 color:
@@ -346,8 +350,15 @@ function Choices<T extends string>({
   options: { value: T; label: string; hint?: string }[];
   columns?: 2 | 3 | 4;
 }) {
+  // mobile: 2 cols max; desktop: requested column count
+  const gridClass =
+    columns === 4
+      ? 'grid grid-cols-2 sm:grid-cols-4 gap-2.5'
+      : columns === 3
+        ? 'grid grid-cols-2 sm:grid-cols-3 gap-2.5'
+        : 'grid grid-cols-2 gap-2.5';
   return (
-    <div className="grid" style={{ gridTemplateColumns: `repeat(${columns}, 1fr)`, gap: 10 }}>
+    <div className={gridClass}>
       {options.map((opt) => {
         const selected = value === opt.value;
         return (
@@ -447,7 +458,7 @@ function Household({ form }: { form: Form }) {
         title="Who's in your household?"
         sub="We use this for programs that depend on household size."
       />
-      <div className="grid" style={{ gridTemplateColumns: '1fr 1fr', gap: 24 }}>
+      <div className="rc-cols-2">
         <Field label="People in your household">
           <Controller
             control={form.control}
@@ -486,7 +497,7 @@ function Household({ form }: { form: Form }) {
           label="Ages of children"
           hint="Type each child's age — we use this for school-age, WIC, and ERDC eligibility."
         >
-          <div className="grid" style={{ gridTemplateColumns: 'repeat(4, 1fr)', gap: 10 }}>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
             {Array.from({ length: num_children }).map((_, i) => (
               <input
                 key={i}
@@ -611,10 +622,7 @@ function Housing({ form }: { form: Form }) {
         title="Where do you live?"
         sub="Some of Portland's most valuable programs are housing-triggered."
       />
-      <div
-        className="grid"
-        style={{ gridTemplateColumns: '180px 1fr', gap: 18, alignItems: 'start' }}
-      >
+      <div className="rc-housing-grid">
         <Field label="ZIP code" error={errors.zip_code?.message}>
           <input
             type="text"
@@ -658,7 +666,7 @@ function Housing({ form }: { form: Form }) {
           <div className="eyebrow mb-3" style={{ color: 'var(--rose)' }}>
             <Sparkles size={11} /> Two questions that unlock the hidden gems
           </div>
-          <div className="grid" style={{ gridTemplateColumns: '1fr 1fr', gap: 18 }}>
+          <div className="rc-cols-2">
             <Field
               label="Rent increase in the past 12 months"
               hint="Renters with increases over 10% in a year qualify for $2,900–$4,500 in relocation assistance."
@@ -708,7 +716,7 @@ function AboutYou({ form }: { form: Form }) {
         title="A few more details."
         sub="These unlock programs many Portlanders don't know they qualify for."
       />
-      <div className="grid" style={{ gridTemplateColumns: '1fr 1fr', gap: 18 }}>
+      <div className="rc-cols-2">
         <Field label="Anyone in your household have a disability?">
           <Controller
             control={form.control}

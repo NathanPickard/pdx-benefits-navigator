@@ -121,19 +121,10 @@ export default function HomePage() {
           <SoftBlobs />
 
           <div
-            className="mx-auto"
-            style={{
-              maxWidth: 1240,
-              padding: "84px 32px 64px",
-              position: "relative",
-            }}
+            className="rc-container rc-hero-pad"
+            style={{ position: "relative" }}
           >
-            <div
-              className="grid gap-14 items-center"
-              style={{
-                gridTemplateColumns: "minmax(0, 1.45fr) minmax(0, 1fr)",
-              }}
-            >
+            <div className="rc-hero-grid">
               <div className="rc-enter">
                 <div className="flex items-center gap-2 mb-7 flex-wrap">
                   <span className="pill pill-rose">
@@ -369,10 +360,7 @@ export default function HomePage() {
         </section>
 
         {/* ─────────────────────── How it works ─────────────────────── */}
-        <section
-          className="mx-auto"
-          style={{ maxWidth: 1240, padding: "84px 32px 32px" }}
-        >
+        <section className="rc-container rc-section-pad">
           <SectionHeading
             kicker="How it works"
             title="Three short steps. One useful packet."
@@ -383,17 +371,13 @@ export default function HomePage() {
                 margin: 0,
                 fontSize: "0.94rem",
                 maxWidth: 320,
-                textAlign: "right",
               }}
             >
               Designed to be the friendliest part of your week.
             </p>
           </SectionHeading>
 
-          <div
-            className="grid gap-5"
-            style={{ gridTemplateColumns: "repeat(3, 1fr)" }}
-          >
+          <div className="rc-cols-3">
             <Step
               n="1"
               tone="rose"
@@ -416,10 +400,7 @@ export default function HomePage() {
         </section>
 
         {/* ─────────────────────── Hidden gems ─────────────────────── */}
-        <section
-          className="mx-auto"
-          style={{ maxWidth: 1240, padding: "72px 32px 32px" }}
-        >
+        <section className="rc-container rc-section-pad">
           <SectionHeading
             kicker="The hidden gems"
             title="Programs Portland built — but most tools miss."
@@ -430,7 +411,6 @@ export default function HomePage() {
                 color: "var(--ink-3)",
                 margin: 0,
                 fontSize: "0.94rem",
-                textAlign: "right",
               }}
             >
               These nine hyperlocal programs alone add{" "}
@@ -441,10 +421,7 @@ export default function HomePage() {
             </p>
           </SectionHeading>
 
-          <div
-            className="grid gap-4"
-            style={{ gridTemplateColumns: "repeat(3, 1fr)" }}
-          >
+          <div className="rc-cols-3">
             {HIDDEN_GEMS.map((g) => (
               <article key={g.id} className="rc-card" style={{ padding: 24 }}>
                 <div
@@ -501,10 +478,7 @@ export default function HomePage() {
         </section>
 
         {/* ─────────────────────── Demo families ─────────────────────── */}
-        <section
-          className="mx-auto"
-          style={{ maxWidth: 1240, padding: "72px 32px 32px" }}
-        >
+        <section className="rc-container rc-section-pad">
           <SectionHeading
             kicker="Meet three Portland families"
             title="Same questions. Very different answers."
@@ -512,10 +486,7 @@ export default function HomePage() {
             <span className="tag">Click any to see their full results</span>
           </SectionHeading>
 
-          <div
-            className="grid gap-4"
-            style={{ gridTemplateColumns: "repeat(3, 1fr)" }}
-          >
+          <div className="rc-cols-3">
             {SCENARIO_SUMMARIES.map((s) => (
               <Link
                 key={s.slug}
@@ -632,26 +603,19 @@ export default function HomePage() {
         </section>
 
         {/* ─────────────────────── Closing CTA ─────────────────────── */}
-        <section
-          className="mx-auto"
-          style={{ maxWidth: 1240, padding: "72px 32px 24px" }}
-        >
+        <section className="rc-container rc-section-pad">
           <div
             className="rc-card"
             style={{
-              padding: "44px 40px",
+              padding: "32px 24px",
               position: "relative",
               overflow: "hidden",
             }}
           >
             <SoftBlobs tone="moss" />
             <div
-              className="grid items-center"
-              style={{
-                gridTemplateColumns: "1fr auto",
-                gap: 32,
-                position: "relative",
-              }}
+              className="rc-cta-grid"
+              style={{ position: "relative" }}
             >
               <div>
                 <div
@@ -663,7 +627,7 @@ export default function HomePage() {
                 <h3
                   className="font-display"
                   style={{
-                    fontSize: "2.4rem",
+                    fontSize: "clamp(1.6rem, 5vw, 2.4rem)",
                     lineHeight: 1.1,
                     margin: "0 0 12px",
                     fontWeight: 500,
@@ -701,13 +665,10 @@ export default function HomePage() {
 
         {/* ─────────────────────── Footer ─────────────────────── */}
         <footer
-          className="mx-auto"
-          style={{ maxWidth: 1240, padding: "48px 32px 24px", marginTop: 24 }}
+          className="rc-container"
+          style={{ padding: "48px 16px 24px", marginTop: 24 }}
         >
-          <div
-            className="grid gap-8"
-            style={{ gridTemplateColumns: "2fr 1fr 1fr" }}
-          >
+          <div className="rc-footer-grid">
             <div>
               <Wordmark />
               <p

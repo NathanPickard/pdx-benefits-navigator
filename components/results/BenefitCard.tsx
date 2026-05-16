@@ -54,13 +54,8 @@ export function BenefitCard({
   return (
     <article className="rc-card" style={{ padding: 0, overflow: 'hidden' }}>
       <header
-        style={{
-          display: 'grid',
-          gridTemplateColumns: '1fr auto',
-          gap: 24,
-          alignItems: 'start',
-          padding: '24px 28px',
-        }}
+        className="rc-benefit-header"
+        style={{ padding: 'clamp(20px, 4vw, 28px)' }}
       >
         <div>
           <div className="flex flex-wrap items-center gap-2 mb-3">
@@ -113,7 +108,7 @@ export function BenefitCard({
             </p>
           </div>
         </div>
-        <div className="text-right" style={{ minWidth: 130 }}>
+        <div className="text-left sm:text-right" style={{ minWidth: 130 }}>
           <div
             className="font-display tabular"
             style={{
@@ -128,7 +123,7 @@ export function BenefitCard({
           </div>
           <div className="tag mt-1">{chrome.estimatedYear}</div>
           <div
-            className="flex items-center justify-end gap-1.5 mt-3"
+            className="flex items-center justify-start sm:justify-end gap-1.5 mt-3"
             style={{ fontSize: '0.78rem', color: 'var(--ink-3)' }}
           >
             <span
@@ -146,18 +141,15 @@ export function BenefitCard({
 
       <div
         style={{
-          padding: '0 28px 26px',
+          paddingLeft: 'clamp(20px, 4vw, 28px)',
+          paddingRight: 'clamp(20px, 4vw, 28px)',
+          paddingBottom: 'clamp(20px, 4vw, 26px)',
           borderTop: '1px solid var(--rule)',
         }}
       >
           <div
-            className="grid"
-            style={{
-              gridTemplateColumns: '1.4fr 1fr',
-              gap: 28,
-              paddingTop: 22,
-              alignItems: 'start',
-            }}
+            className="rc-benefit-detail"
+            style={{ paddingTop: 22 }}
           >
             <div>
               {match.next_steps?.length > 0 && (
