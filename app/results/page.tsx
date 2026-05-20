@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, Calendar, Download, Loader2 } from 'lucide-react';
+import { ArrowLeft, Calendar, Download, KeyRound, Loader2 } from 'lucide-react';
 
 import { AppBar } from '@/components/brand/AppBar';
 import { RoseStamp } from '@/components/brand/RoseStamp';
@@ -13,7 +13,13 @@ import { ComparisonChart } from '@/components/results/ComparisonChart';
 import { LanguageToggle } from '@/components/results/LanguageToggle';
 import { UrgencyBanner } from '@/components/results/UrgencyBanner';
 import { RenewalCalendar } from '@/components/results/RenewalCalendar';
+import {
+  analyzeEligibilityStream,
+  translatePayload,
+} from '@/lib/claudeBrowser';
+import { buildIcsCalendar, downloadIcsFile } from '@/lib/calendar';
 import { CHROME_EN, type Chrome, type LanguageCode } from '@/lib/i18n';
+import { useApiKey } from '@/lib/userKey';
 import programsData from '@/data/programs.json';
 import type { AnalysisOutput, IntakeData, Program } from '@/types/program';
 
@@ -27,10 +33,12 @@ type LoadingProgress = { evaluated: string[] };
 type State =
   | { kind: 'loading'; progress: LoadingProgress }
   | { kind: 'ok'; data: AnalysisOutput }
-  | { kind: 'error'; message: string };
+  | { kind: 'error'; message: string }
+  | { kind: 'needs-key' };
 
 export default function ResultsPage() {
   const router = useRouter();
+  const { apiKey, hydrated } = useApiKey();
   const [state, setState] = useState<State>({
     kind: 'loading',
     progress: { evaluated: [] },
@@ -44,29 +52,92 @@ export default function ResultsPage() {
   const [translateError, setTranslateError] = useState<string | null>(null);
 
   useEffect(() => {
-    const raw = sessionStorage.getItem('pdx_intake');
-    if (!raw) {
+    if (!hydrated) return; // wait for key hydration before deciding what to do
+
+    // Demo routes stash a pre-baked AnalysisOutput here so the dashboard can
+    // skip the API call entirely.
+    const prebaked = sessionStorage.getItem('pdx_prebaked');
+    if (prebaked) {
+      let output: AnalysisOutput;
+      try {
+        output = JSON.parse(prebaked) as AnalysisOutput;
+      } catch {
+        setState({ kind: 'error', message: 'Could not load demo data.' });
+        return;
+      }
+      const rawIntake = sessionStorage.getItem('pdx_intake');
+      if (rawIntake) setIntake(JSON.parse(rawIntake) as IntakeData);
+
+      const simulate = sessionStorage.getItem('pdx_demo_simulate') === '1';
+      if (!simulate) {
+        setState({ kind: 'ok', data: output });
+        return;
+      }
+
+      // Defer removing the flag until the simulation finishes — otherwise
+      // StrictMode's double-effect-invocation eats it on the first cleanup
+      // and the second run shows results instantly.
+      const programIds = PROGRAMS.map((p) => p.id);
+      let i = 0;
+      let finishTimeout: ReturnType<typeof setTimeout> | null = null;
+      const interval = setInterval(() => {
+        if (i >= programIds.length) {
+          clearInterval(interval);
+          finishTimeout = setTimeout(() => {
+            sessionStorage.removeItem('pdx_demo_simulate');
+            setState({ kind: 'ok', data: output });
+          }, 250);
+          return;
+        }
+        const id = programIds[i++];
+        setState((s) =>
+          s.kind === 'loading'
+            ? { ...s, progress: { evaluated: [...s.progress.evaluated, id] } }
+            : s
+        );
+      }, 438);
+
+      return () => {
+        clearInterval(interval);
+        if (finishTimeout) clearTimeout(finishTimeout);
+      };
+    }
+
+    const rawIntake = sessionStorage.getItem('pdx_intake');
+    if (!rawIntake) {
       router.replace('/intake');
       return;
     }
-    const parsed = JSON.parse(raw) as IntakeData;
+    const parsed = JSON.parse(rawIntake) as IntakeData;
     setIntake(parsed);
 
-    const abort = new AbortController();
-    streamAnalyze(parsed, abort.signal, {
-      onProgress: (programId) => {
-        setState((s) =>
-          s.kind === 'loading'
-            ? { ...s, progress: { evaluated: [...s.progress.evaluated, programId] } }
-            : s
-        );
-      },
-      onComplete: (output) => setState({ kind: 'ok', data: output }),
-      onError: (message) => setState({ kind: 'error', message }),
-    });
+    if (!apiKey) {
+      setState({ kind: 'needs-key' });
+      return;
+    }
 
-    return () => abort.abort();
-  }, [router]);
+    let cancelled = false;
+    (async () => {
+      for await (const event of analyzeEligibilityStream(apiKey, parsed)) {
+        if (cancelled) return;
+        if (event.type === 'progress') {
+          setState((s) =>
+            s.kind === 'loading'
+              ? { ...s, progress: { evaluated: [...s.progress.evaluated, event.programId] } }
+              : s
+          );
+        } else if (event.type === 'complete') {
+          setState({ kind: 'ok', data: event.output });
+        } else {
+          setState({ kind: 'error', message: event.message });
+        }
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [router, apiKey, hydrated]);
 
   const originalData = state.kind === 'ok' ? state.data : null;
 
@@ -84,25 +155,27 @@ export default function ResultsPage() {
         return;
       }
       if (!originalData) return;
+      if (next !== 'es' && next !== 'vi') return;
+      if (!apiKey) {
+        setTranslateError(
+          'Translation requires an Anthropic API key. Click the key indicator above to add one.'
+        );
+        return;
+      }
 
       setPendingLang(next);
       try {
-        const res = await fetch('/api/translate', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            payload: { output: originalData, chrome: CHROME_EN },
-            language: next,
-          }),
-        });
-        const json = await res.json();
-        if (!res.ok || json.error) throw new Error(json.error ?? `HTTP ${res.status}`);
-        if (!json.translated?.output || !json.translated?.chrome) {
+        const translated = await translatePayload(
+          apiKey,
+          { output: originalData, chrome: CHROME_EN },
+          next
+        );
+        if (!translated?.output || !translated?.chrome) {
           throw new Error('Translation response missing fields');
         }
         setTranslations((prev) => ({
           ...prev,
-          [next]: json.translated as TranslatedBundle,
+          [next]: translated as TranslatedBundle,
         }));
         setLang(next);
       } catch (e) {
@@ -111,7 +184,7 @@ export default function ResultsPage() {
         setPendingLang(null);
       }
     },
-    [lang, pendingLang, translations, originalData]
+    [lang, pendingLang, translations, originalData, apiKey]
   );
 
   if (state.kind === 'loading') {
@@ -119,6 +192,14 @@ export default function ResultsPage() {
       <>
         <AppBar />
         <LoadingView progress={state.progress} />
+      </>
+    );
+  }
+  if (state.kind === 'needs-key') {
+    return (
+      <>
+        <AppBar />
+        <NeedsKeyView />
       </>
     );
   }
@@ -257,70 +338,76 @@ function LoadingView({ progress }: { progress: LoadingProgress }) {
   );
 }
 
-/* ─────────────────────── Stream ─────────────────────── */
+/* ─────────────────────── Needs-key view ─────────────────────── */
 
-async function streamAnalyze(
-  intake: IntakeData,
-  signal: AbortSignal,
-  handlers: {
-    onProgress: (programId: string) => void;
-    onComplete: (output: AnalysisOutput) => void;
-    onError: (message: string) => void;
-  }
-): Promise<void> {
-  try {
-    const res = await fetch('/api/analyze', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(intake),
-      signal,
-    });
-    if (!res.ok) {
-      const errBody = await res.json().catch(() => ({}));
-      handlers.onError(errBody.error ?? `HTTP ${res.status}`);
-      return;
-    }
-    if (!res.body) {
-      handlers.onError('No response body');
-      return;
-    }
-    const reader = res.body.getReader();
-    const decoder = new TextDecoder();
-    let buffer = '';
-    while (true) {
-      const { value, done } = await reader.read();
-      if (done) break;
-      buffer += decoder.decode(value, { stream: true });
-      let idx: number;
-      while ((idx = buffer.indexOf('\n\n')) !== -1) {
-        const rawEvent = buffer.slice(0, idx);
-        buffer = buffer.slice(idx + 2);
-        const dataLine = rawEvent.split('\n').find((l) => l.startsWith('data: '));
-        if (!dataLine) continue;
-        let payload: {
-          type: string;
-          programId?: string;
-          output?: AnalysisOutput;
-          message?: string;
-        };
-        try {
-          payload = JSON.parse(dataLine.slice(6));
-        } catch {
-          continue;
-        }
-        if (payload.type === 'progress' && payload.programId) {
-          handlers.onProgress(payload.programId);
-        } else if (payload.type === 'complete' && payload.output) {
-          handlers.onComplete(payload.output);
-        } else if (payload.type === 'error') {
-          handlers.onError(payload.message ?? 'Unknown error');
-        }
-      }
-    }
-  } catch (e) {
-    if (e instanceof Error && e.name === 'AbortError') return;
-    handlers.onError(e instanceof Error ? e.message : 'Unknown error');
-  }
+function NeedsKeyView() {
+  return (
+    <main
+      className="rc-container"
+      style={{
+        maxWidth: 620,
+        paddingTop: 80,
+        paddingBottom: 80,
+        textAlign: 'center',
+      }}
+    >
+      <div className="flex items-center justify-center mb-5">
+        <span
+          style={{
+            width: 56,
+            height: 56,
+            borderRadius: 999,
+            background: 'var(--rose-soft)',
+            color: 'var(--rose)',
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <KeyRound size={22} />
+        </span>
+      </div>
+      <div className="eyebrow mb-3" style={{ color: 'var(--moss-2)' }}>
+        Bring your own key
+      </div>
+      <h1
+        className="font-display"
+        style={{
+          fontSize: '2rem',
+          lineHeight: 1.1,
+          margin: '0 0 12px',
+          fontWeight: 500,
+          letterSpacing: '-0.02em',
+        }}
+      >
+        We need your Anthropic API key
+      </h1>
+      <p
+        style={{
+          color: 'var(--ink-2)',
+          margin: '0 0 24px',
+          fontSize: '1rem',
+          lineHeight: 1.55,
+        }}
+      >
+        Personalized results call Claude directly from your browser using your
+        own key — it&rsquo;s never sent to our server. Tap the{' '}
+        <strong style={{ color: 'var(--ink)' }}>key indicator</strong> in the
+        top right to paste yours, then your results will appear here.
+      </p>
+      <div
+        className="flex items-center justify-center flex-wrap"
+        style={{ gap: 10 }}
+      >
+        <Link href="/" className="rc-btn rc-btn-outline">
+          <ArrowLeft size={14} /> Back to landing
+        </Link>
+        <Link href="/demo/maria" className="rc-btn rc-btn-rose">
+          Or try a demo with no key
+        </Link>
+      </div>
+    </main>
+  );
 }
 
 function ErrorView({ message }: { message: string }) {
@@ -438,6 +525,11 @@ function Dashboard({
     });
   }, [data, sortMode]);
 
+  const handleExportCalendar = useCallback(() => {
+    const ics = buildIcsCalendar(eligible);
+    downloadIcsFile(ics);
+  }, [eligible]);
+
   const gemCount = eligible.filter((e) => e.program.hidden_gem).length;
   const programsHeading = chrome.programsCountTemplate.replace(
     '{count}',
@@ -476,7 +568,12 @@ function Dashboard({
             )}
             {packetState === 'loading' ? chrome.buildingPacket : chrome.downloadPacket}
           </button>
-          <button type="button" className="rc-btn rc-btn-outline rc-btn-sm">
+          <button
+            type="button"
+            onClick={handleExportCalendar}
+            disabled={eligible.length === 0}
+            className="rc-btn rc-btn-outline rc-btn-sm"
+          >
             <Calendar size={13} /> {chrome.exportCalendar}
           </button>
         </div>

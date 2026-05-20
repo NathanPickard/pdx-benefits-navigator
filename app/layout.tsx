@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Lora, Plus_Jakarta_Sans } from "next/font/google";
+import { ApiKeyProvider } from "@/lib/userKey";
 import "./globals.css";
 
 const jakarta = Plus_Jakarta_Sans({
@@ -31,7 +32,9 @@ export default function RootLayout({
       lang="en"
       className={`${jakarta.variable} ${lora.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        <ApiKeyProvider>{children}</ApiKeyProvider>
+      </body>
     </html>
   );
 }

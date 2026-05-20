@@ -1,16 +1,13 @@
-import Anthropic from '@anthropic-ai/sdk';
 import programs from '@/data/programs.json';
-import type { IntakeData, AnalysisOutput, Program } from '@/types/program';
+import type { AnalysisOutput, Program } from '@/types/program';
 
 const JURISDICTION_BY_ID: Record<string, Program['jurisdiction']> = Object.fromEntries(
   (programs as Program[]).map((p) => [p.id, p.jurisdiction])
 );
 
-const anthropic = new Anthropic();
+export const ELIGIBILITY_MODEL = 'claude-haiku-4-5-20251001';
 
-const MODEL = 'claude-haiku-4-5-20251001';
-
-const SYSTEM_PROMPT = `You are the eligibility engine for PDX Benefits Navigator, helping Portland, Oregon residents identify every benefit program they qualify for.
+export const ELIGIBILITY_SYSTEM_PROMPT = `You are the eligibility engine for PDX Benefits Navigator, helping Portland, Oregon residents identify every benefit program they qualify for.
 
 You have complete knowledge of 20 programs covering federal, Oregon state, Multnomah County, and City of Portland benefits. Your job is to analyze a person's intake data and return rigorous, well-reasoned eligibility matches.
 
@@ -78,102 +75,8 @@ ${JSON.stringify(programs, null, 2)}
   "warnings": [string]
 }`;
 
-export async function analyzeEligibility(intake: IntakeData): Promise<AnalysisOutput> {
-  const response = await anthropic.messages.create({
-    model: MODEL,
-    max_tokens: 8000,
-    system: [
-      {
-        type: 'text',
-        text: SYSTEM_PROMPT,
-        cache_control: { type: 'ephemeral' },
-      },
-    ],
-    messages: [
-      {
-        role: 'user',
-        content: `Analyze eligibility for this Portland resident:\n\n${JSON.stringify(intake, null, 2)}`,
-      },
-    ],
-  });
-
-  const text = response.content
-    .filter((b) => b.type === 'text')
-    .map((b) => (b as { type: 'text'; text: string }).text)
-    .join('');
-
-  if (process.env.NODE_ENV !== 'production') {
-    const u = response.usage as {
-      input_tokens?: number;
-      cache_creation_input_tokens?: number;
-      cache_read_input_tokens?: number;
-      output_tokens?: number;
-    };
-    console.log(
-      `[claude] in=${u.input_tokens} cache_write=${u.cache_creation_input_tokens ?? 0} cache_read=${u.cache_read_input_tokens ?? 0} out=${u.output_tokens}`
-    );
-  }
-
-  const parsed = parseJsonObject<AnalysisOutput>(text);
-  return recomputeTotals(parsed);
-}
-
-export type AnalyzeStreamEvent =
-  | { type: 'progress'; programId: string }
-  | { type: 'complete'; output: AnalysisOutput }
-  | { type: 'error'; message: string };
-
-export async function* analyzeEligibilityStream(
-  intake: IntakeData
-): AsyncGenerator<AnalyzeStreamEvent> {
-  try {
-    const stream = anthropic.messages.stream({
-      model: MODEL,
-      max_tokens: 8000,
-      system: [
-        {
-          type: 'text',
-          text: SYSTEM_PROMPT,
-          cache_control: { type: 'ephemeral' },
-        },
-      ],
-      messages: [
-        {
-          role: 'user',
-          content: `Analyze eligibility for this Portland resident:\n\n${JSON.stringify(intake, null, 2)}`,
-        },
-      ],
-    });
-
-    let buffer = '';
-    const seenIds = new Set<string>();
-    const programIdRegex = /"program_id"\s*:\s*"([^"]+)"/g;
-
-    for await (const event of stream) {
-      if (event.type === 'content_block_delta' && event.delta.type === 'text_delta') {
-        buffer += event.delta.text;
-        programIdRegex.lastIndex = 0;
-        let match: RegExpExecArray | null;
-        while ((match = programIdRegex.exec(buffer)) !== null) {
-          const id = match[1];
-          if (!seenIds.has(id)) {
-            seenIds.add(id);
-            yield { type: 'progress', programId: id };
-          }
-        }
-      }
-    }
-
-    const parsed = parseJsonObject<AnalysisOutput>(buffer);
-    const finalOutput = recomputeTotals(parsed);
-    yield { type: 'complete', output: finalOutput };
-  } catch (e) {
-    const message = e instanceof Error ? e.message : 'Unknown error';
-    yield { type: 'error', message };
-  }
-}
-
-function recomputeTotals(output: AnalysisOutput): AnalysisOutput {
+/** Recompute total / federal / PDX dollar buckets from the matches array. */
+export function recomputeTotals(output: AnalysisOutput): AnalysisOutput {
   let total = 0;
   let federal = 0;
   let pdx = 0;
@@ -193,7 +96,8 @@ function recomputeTotals(output: AnalysisOutput): AnalysisOutput {
   };
 }
 
-function parseJsonObject<T>(raw: string): T {
+/** Extract the first complete top-level JSON object from a model response. */
+export function parseJsonObject<T>(raw: string): T {
   const stripped = raw.replace(/```json\n?|```\n?/g, '').trim();
   const start = stripped.indexOf('{');
   if (start === -1) throw new Error('No JSON object found in model response');
@@ -225,26 +129,4 @@ function parseJsonObject<T>(raw: string): T {
     }
   }
   throw new Error('Unterminated JSON object in model response');
-}
-
-export async function translatePayload<T>(
-  payload: T,
-  targetLanguage: 'es' | 'vi' | 'ru' | 'zh'
-): Promise<T> {
-  const response = await anthropic.messages.create({
-    model: MODEL,
-    max_tokens: 16000,
-    messages: [
-      {
-        role: 'user',
-        content: `Translate the human-readable STRING VALUES in this JSON to ${targetLanguage}. Keep all JSON keys, numbers, IDs (e.g. snake_case program_ids like "snap", "pdx-renter-relocation"), URLs, dates, and the object structure exactly as given. Do not translate proper-noun program names (SNAP, WIC, OHP, ERDC, LIHEAP, PCEF, ADVSD, SUN, PGE), but DO translate descriptive phrases. Return ONLY the translated JSON object — no markdown, no preamble, no trailing prose.\n\n${JSON.stringify(payload)}`,
-      },
-    ],
-  });
-
-  const text = response.content
-    .filter((b) => b.type === 'text')
-    .map((b) => (b as { type: 'text'; text: string }).text)
-    .join('');
-  return parseJsonObject<T>(text);
 }

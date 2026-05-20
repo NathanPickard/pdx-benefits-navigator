@@ -1,3 +1,4 @@
+import { ApiKeyControl } from "./ApiKeyControl";
 import { Wordmark } from "./Wordmark";
 
 export function AppBar({ children }: { children?: React.ReactNode }) {
@@ -18,7 +19,10 @@ export function AppBar({ children }: { children?: React.ReactNode }) {
         className="rc-container rc-appbar-pad flex items-center justify-between gap-3"
       >
         <Wordmark />
-        <div className="flex items-center gap-2">{children}</div>
+        <div className="flex items-center gap-2">
+          {children}
+          <ApiKeyControl />
+        </div>
       </div>
     </header>
   );

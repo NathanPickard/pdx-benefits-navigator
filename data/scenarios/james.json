@@ -1,0 +1,351 @@
+{
+  "matches": [
+    {
+      "program_id": "snap",
+      "eligible": true,
+      "confidence": "high",
+      "estimated_annual_value": 9000,
+      "reasoning": "Single-person household with $0 annual income is well below 200% FPL ($31,300). U.S. citizen meets citizenship requirement. Unemployed status does not disqualify from SNAP.",
+      "next_steps": [
+        "Visit https://one.oregon.gov/ and apply online for SNAP",
+        "Gather proof of Oregon residency (utility bill, lease, or ID with address)",
+        "Have your Social Security number ready",
+        "Prepare documentation of zero income (letter from employer, unemployment denial, or signed statement)"
+      ],
+      "required_documents": [
+        "Photo ID",
+        "Proof of Oregon residency",
+        "Social Security number",
+        "Documentation of zero/minimal income"
+      ],
+      "application_deadline": null,
+      "urgency_note": "High priority given zero income. SNAP provides immediate food assistance."
+    },
+    {
+      "program_id": "ohp",
+      "eligible": true,
+      "confidence": "high",
+      "estimated_annual_value": 4000,
+      "reasoning": "$0 income is well below 138% FPL for adults ($21,597). U.S. citizen qualifies. Oregon resident in Portland (97203).",
+      "next_steps": [
+        "Apply at https://one.oregon.gov/ for Oregon Health Plan",
+        "Gather proof of residency and Social Security number",
+        "Processing takes ~45 days; you can begin using coverage upon approval",
+        "Call 1-800-699-9075 for questions during application"
+      ],
+      "required_documents": [
+        "Photo ID",
+        "Proof of Oregon residency",
+        "Social Security number",
+        "Proof of zero income (optional but helpful)"
+      ],
+      "application_deadline": null,
+      "urgency_note": "Critical. Free health insurance for unemployed, uninsured individuals."
+    },
+    {
+      "program_id": "pge-iqbd",
+      "eligible": true,
+      "confidence": "high",
+      "estimated_annual_value": 600,
+      "reasoning": "$0 income is at 0% FPL, well below 200% threshold. As homeowner in Portland using utilities, likely has PGE account. Can qualify by proof of enrollment in SNAP or OHP once approved.",
+      "next_steps": [
+        "Visit https://portlandgeneral.com/help/financial-assistance/income-qualified-bill-discount",
+        "Once enrolled in SNAP or OHP, use enrollment letter as proof instead of income documentation",
+        "Provide PGE account number and proof of income eligibility",
+        "Discount applies automatically to next billing cycle"
+      ],
+      "required_documents": [
+        "PGE account number (from bill)",
+        "Proof of enrollment in SNAP, OHP, or other qualifying program",
+        "Photo ID"
+      ],
+      "application_deadline": null,
+      "urgency_note": "Apply after SNAP/OHP approval for streamlined process."
+    },
+    {
+      "program_id": "pdx-water-fa",
+      "eligible": true,
+      "confidence": "high",
+      "estimated_annual_value": 400,
+      "reasoning": "$0 income is well below 60% State Median Income threshold (~$53,000 for 1-person). Homeowner in Portland (97203 is within city limits) with water service. As account holder, no landlord verification needed.",
+      "next_steps": [
+        "Visit https://www.portland.gov/water/financial-assistance",
+        "Submit application online with water bill and proof of income (zero income statement)",
+        "Processing takes ~30 days",
+        "Up to 80% discount on combined water/sewer bill once approved"
+      ],
+      "required_documents": [
+        "Portland water bill",
+        "Proof of income (letter confirming zero income or unemployment documentation)",
+        "Photo ID"
+      ],
+      "application_deadline": null,
+      "urgency_note": "Essential utility assistance for homeowner. Up to 80% reduction possible."
+    },
+    {
+      "program_id": "nw-natural-gap",
+      "eligible": true,
+      "confidence": "medium",
+      "estimated_annual_value": 400,
+      "reasoning": "$0 income is at 0% FPL, well below 200% threshold. Eligibility depends on being NW Natural Gas customer — not confirmed from intake but likely as Portland homeowner. One-time annual credit up to $700.",
+      "next_steps": [
+        "Check if you have an NW Natural gas bill (account number visible on bill)",
+        "If customer, call 1-800-422-4012 to apply for GAP assistance",
+        "Have account number, proof of income (zero income documentation), and photo ID ready",
+        "Assistance typically processed within 2 weeks"
+      ],
+      "required_documents": [
+        "NW Natural account number",
+        "Proof of income",
+        "Photo ID"
+      ],
+      "application_deadline": null,
+      "urgency_note": "Confirm you are NW Natural customer first before applying."
+    },
+    {
+      "program_id": "liheap-energy-trust",
+      "eligible": true,
+      "confidence": "high",
+      "estimated_annual_value": 700,
+      "reasoning": "$0 income is at 0% FPL, well below 200% threshold. Oregon resident. Covers both heating bill assistance (LIHEAP) and free or subsidized home weatherization (insulation, windows, heat pumps) through Energy Trust. Homeowner likely to benefit from efficiency upgrades.",
+      "next_steps": [
+        "Call 211 (Oregon's unified helpline) to apply for LIHEAP and Energy Trust weatherization",
+        "Have proof of zero income, utility bill, and photo ID ready",
+        "LIHEAP processes within 4-8 weeks; weatherization projects can take 2-6 months",
+        "Energy Trust may offer free heat pump installation or insulation upgrades to reduce heating costs"
+      ],
+      "required_documents": [
+        "Proof of income (zero income letter or unemployment documentation)",
+        "Current utility bill (gas or electric)",
+        "Photo ID",
+        "Social Security number"
+      ],
+      "application_deadline": null,
+      "urgency_note": "Heating season critical in Oregon. Weatherization can reduce bills long-term."
+    },
+    {
+      "program_id": "pcef-home-energy",
+      "eligible": true,
+      "confidence": "high",
+      "estimated_annual_value": 5000,
+      "reasoning": "$0 income is well below 200% FPL. Portland resident (97203 confirmed in Portland city limits). Homeowner eligible for free weatherization, heat pumps, air conditioning, and efficiency upgrades funded by Portland Clean Energy Fund.",
+      "next_steps": [
+        "Visit https://www.portland.gov/bps/cleanenergy to access application portal",
+        "Submit proof of zero income and proof of Portland residency (utility bill, lease, or ID)",
+        "Project completion timeline: 2-6 months from approval",
+        "Free upgrades may include insulation, windows, heat pumps, or air conditioning"
+      ],
+      "required_documents": [
+        "Proof of income (zero income statement or unemployment letter)",
+        "Proof of Portland residency (utility bill or ID with current address)",
+        "Current utility bill"
+      ],
+      "application_deadline": null,
+      "urgency_note": "HIGH-VALUE hidden gem. Up to $15k in free home upgrades. Apply immediately."
+    },
+    {
+      "program_id": "senior-prop-tax-deferral",
+      "eligible": false,
+      "confidence": "high",
+      "estimated_annual_value": 0,
+      "reasoning": "Applicant is not yet 62 years old (no senior in household, no age provided but implies younger). Program requires age 62+. Homeowner status and income would otherwise qualify.",
+      "next_steps": [],
+      "required_documents": [],
+      "application_deadline": null,
+      "urgency_note": null
+    },
+    {
+      "program_id": "veterans-prop-tax-exempt",
+      "eligible": true,
+      "confidence": "medium",
+      "estimated_annual_value": 300,
+      "reasoning": "Applicant is veteran and homeowner in Oregon (97203, Portland). Eligibility depends on VA service-connected disability rating — applicant has disability status but VA rating not confirmed. If rating exists, exemption applies to $25,489-$30,587 of assessed home value, saving ~$300-600 annually.",
+      "next_steps": [
+        "Locate your DD-214 (discharge papers) and VA disability rating letter",
+        "If you have a VA rating, visit https://www.oregon.gov/dor/programs/property/Pages/exemptions-veterans.aspx",
+        "Mail application with DD-214, VA rating letter, property deed, and photo ID to Oregon DOR",
+        "Processing takes 60-90 days; one-time application (no renewal needed)"
+      ],
+      "required_documents": [
+        "DD-214 (discharge papers)",
+        "VA service-connected disability rating letter",
+        "Property deed or tax assessment",
+        "Photo ID"
+      ],
+      "application_deadline": null,
+      "urgency_note": "Requires VA disability rating confirmation. Contact VA at 1-800-827-1000 if rating letter unavailable."
+    },
+    {
+      "program_id": "acp",
+      "eligible": true,
+      "confidence": "high",
+      "estimated_annual_value": 360,
+      "reasoning": "$0 income is at 0% FPL, well below 200% threshold. Automatically qualifies. U.S. citizen. Once enrolled in SNAP/OHP (both approved above), can use enrollment as proof of eligibility.",
+      "next_steps": [
+        "Visit https://www.affordableconnectivity.gov/ to apply online",
+        "Provide photo ID and proof of income (zero income statement) or enrollment letter from SNAP/OHP",
+        "Select internet provider (Comcast Internet Essentials, T-Mobile, or others)",
+        "Some plans become FREE with ACP discount; processing takes 7-10 days"
+      ],
+      "required_documents": [
+        "Photo ID",
+        "Proof of income OR proof of SNAP/OHP enrollment letter",
+        "Internet service provider account info (if applying mid-service)"
+      ],
+      "application_deadline": null,
+      "urgency_note": "Free or $0 internet possible with ACP. Essential for job search while unemployed."
+    },
+    {
+      "program_id": "erdc",
+      "eligible": false,
+      "confidence": "high",
+      "estimated_annual_value": 0,
+      "reasoning": "No children under 13 in household (num_children = 0). Program requires dependent children to provide childcare subsidies. Ineligible.",
+      "next_steps": [],
+      "required_documents": [],
+      "application_deadline": null,
+      "urgency_note": null
+    },
+    {
+      "program_id": "oregon-eitc",
+      "eligible": false,
+      "confidence": "high",
+      "estimated_annual_value": 0,
+      "reasoning": "No employment income (unemployed status). Oregon EITC requires earned income. $0 annual income from wages/self-employment disqualifies. Children's credit also requires children under 6.",
+      "next_steps": [],
+      "required_documents": [],
+      "application_deadline": null,
+      "urgency_note": null
+    },
+    {
+      "program_id": "wic",
+      "eligible": false,
+      "confidence": "high",
+      "estimated_annual_value": 0,
+      "reasoning": "No children under 5, not pregnant, not postpartum/breastfeeding. WIC requires pregnant women, new mothers, breastfeeding individuals, or children under 5. Ineligible.",
+      "next_steps": [],
+      "required_documents": [],
+      "application_deadline": null,
+      "urgency_note": null
+    },
+    {
+      "program_id": "free-reduced-meals",
+      "eligible": false,
+      "confidence": "high",
+      "estimated_annual_value": 0,
+      "reasoning": "No school-age children (num_children = 0). Program requires children under 18 enrolled in school. Ineligible.",
+      "next_steps": [],
+      "required_documents": [],
+      "application_deadline": null,
+      "urgency_note": null
+    },
+    {
+      "program_id": "pdx-renter-relocation",
+      "eligible": false,
+      "confidence": "high",
+      "estimated_annual_value": 0,
+      "reasoning": "Homeowner, not renter (housing_status = 'own'). Program restricted to renters facing no-cause eviction or rent increases >10%. Ineligible.",
+      "next_steps": [],
+      "required_documents": [],
+      "application_deadline": null,
+      "urgency_note": null
+    },
+    {
+      "program_id": "multco-eviction-prev",
+      "eligible": false,
+      "confidence": "high",
+      "estimated_annual_value": 0,
+      "reasoning": "Homeowner, not renter (housing_status = 'own'). Program limited to renters facing eviction or housing instability with unpaid rent. No eviction notice received. Ineligible.",
+      "next_steps": [],
+      "required_documents": [],
+      "application_deadline": null,
+      "urgency_note": null
+    },
+    {
+      "program_id": "transportation-wallet",
+      "eligible": true,
+      "confidence": "high",
+      "estimated_annual_value": 100,
+      "reasoning": "$0 income well below 200% FPL. Portland resident (97203). Eligible for up to $308 in annual transportation credits (TriMet transit, BIKETOWN, scooter, parking). Can apply once SNAP or OHP enrollment confirmed.",
+      "next_steps": [
+        "Visit https://www.portland.gov/transportation/transportationwallet",
+        "Apply online with proof of Portland residency (utility bill or ID) and proof of income OR SNAP/OHP enrollment",
+        "Credits typically load within 2-3 weeks",
+        "Use for TriMet passes, BIKETOWN bike share, e-scooter services, or parking"
+      ],
+      "required_documents": [
+        "Proof of Portland residency (utility bill, lease, or ID)",
+        "Proof of zero income OR enrollment letter from SNAP/OHP",
+        "Photo ID"
+      ],
+      "application_deadline": null,
+      "urgency_note": "Useful for job search transportation. Can combine with transit benefits."
+    },
+    {
+      "program_id": "inclusionary-housing",
+      "eligible": false,
+      "confidence": "high",
+      "estimated_annual_value": 0,
+      "reasoning": "Homeowner, not renter (housing_status = 'own'). Program restricted to renters seeking below-market apartments in new Portland buildings. Ineligible.",
+      "next_steps": [],
+      "required_documents": [],
+      "application_deadline": null,
+      "urgency_note": null
+    },
+    {
+      "program_id": "sun-service-system",
+      "eligible": false,
+      "confidence": "high",
+      "estimated_annual_value": 0,
+      "reasoning": "No children under 18 (num_children = 0). SUN Schools wraparound services are family-centered and require children in household. Ineligible.",
+      "next_steps": [],
+      "required_documents": [],
+      "application_deadline": null,
+      "urgency_note": null
+    },
+    {
+      "program_id": "advsd",
+      "eligible": true,
+      "confidence": "high",
+      "estimated_annual_value": 2400,
+      "reasoning": "Applicant has disability (has_disability = true). Multnomah County resident (97203, Portland). ADVSD serves adults with disabilities age 18+. Free case management, benefits navigation, in-home care coordination, transportation, and other support available.",
+      "next_steps": [
+        "Call Multnomah County ADVSD at 503-988-3646 for initial assessment",
+        "Have photo ID, insurance cards, and current medication list ready",
+        "Initial assessment takes 1-2 weeks; services may include benefits navigation, housing support, care coordination",
+        "No income limits; free services for all eligible adults with disabilities"
+      ],
+      "required_documents": [
+        "Photo ID",
+        "Insurance card(s) if applicable",
+        "Medication list or recent medical information"
+      ],
+      "application_deadline": null,
+      "urgency_note": "Essential resource for disabled adults. Can help coordinate other benefits and access case management."
+    }
+  ],
+  "total_estimated_annual_value": 23260,
+  "federal_only_value": 15360,
+  "pdx_specific_value": 7900,
+  "priority_application_order": [
+    "snap",
+    "ohp",
+    "pcef-home-energy",
+    "liheap-energy-trust",
+    "pdx-water-fa",
+    "pge-iqbd",
+    "advsd",
+    "acp",
+    "transportation-wallet",
+    "nw-natural-gap",
+    "veterans-prop-tax-exempt"
+  ],
+  "warnings": [
+    "URGENT: Zero income with no clear income source. Prioritize SNAP (food) and OHP (healthcare) immediately for basic needs stabilization.",
+    "HIDDEN GEM: Portland Clean Energy Fund (PCEF) offers up to $15,000 in FREE home upgrades (heat pumps, insulation, windows). This is high-value — apply ASAP.",
+    "Veterans Tax Exemption requires VA service-connected disability rating letter. Contact VA at 1-800-827-1000 if you do not have current rating.",
+    "Once SNAP and OHP are approved, use enrollment letters to streamline applications for PGE Bill Discount, Water Bureau FA, Transportation Wallet, and ACP Internet Discount.",
+    "Employment status is unemployed: Consider prioritizing Transportation Wallet ($308/year) and ACP Internet ($360/year) to support job search activities.",
+    "ADVSD case management is free and available immediately — can help coordinate all other benefits and provide ongoing support navigation for your disability."
+  ]
+}

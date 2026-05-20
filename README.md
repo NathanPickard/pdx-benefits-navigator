@@ -1,88 +1,111 @@
-# PDX Benefits Navigator
+# 🌹 PDX Benefits Navigator
 
-> A friendly AI navigator that helps Portland residents find every federal, Oregon, Multnomah County, and City of Portland benefit program they qualify for — in about three minutes, in seven languages, with a downloadable application packet.
+> An AI navigator that helps Portland residents discover every federal, Oregon, Multnomah County, and City of Portland benefit program they qualify for — in about three minutes, with a downloadable application packet.
 
-Built for the **2026 AI Portland Build Challenge**.
+<p align="center">
+  <a href="https://pdx-benefits-navigator.vercel.app/"><strong>🚀 Try the live demo →</strong></a>
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Next.js-16-black?logo=next.js" alt="Next.js 16">
+  <img src="https://img.shields.io/badge/React-19-61dafb?logo=react" alt="React 19">
+  <img src="https://img.shields.io/badge/TypeScript-5-3178c6?logo=typescript" alt="TypeScript">
+  <img src="https://img.shields.io/badge/Claude-Sonnet%204.6-d97757?logo=anthropic" alt="Claude Sonnet 4.6">
+  <img src="https://img.shields.io/badge/Deployed%20on-Vercel-black?logo=vercel" alt="Vercel">
+  <img src="https://img.shields.io/badge/license-MIT-green" alt="MIT License">
+</p>
+
+<p align="center">
+  <em>Built for the 2026 AI Portland Build Challenge.</em>
+</p>
 
 ---
 
-## The problem
+<!-- TODO: drop your own screenshots into public/screenshots/ -->
+<p align="center">
+  <img src="public/screenshots/landing.png" alt="Landing page" width="32%">
+  <img src="public/screenshots/results.png" alt="Results dashboard" width="32%">
+  <img src="public/screenshots/demo-hub.png" alt="Demo hub" width="32%">
+</p>
 
-Oregon families leave roughly **$1.2 billion** in unclaimed benefits on the table every year. Most national benefit-screening tools only check **federal** programs (SNAP, Medicaid, WIC). They miss the layer of **state, county, and city** programs where Portland actually invests — programs like Renter Relocation Assistance, the Portland Clean Energy Fund, the SUN Service System, and the Water Bureau Discount.
+---
+
+## 💸 The problem
+
+Oregon families leave roughly **$1.2 billion** in unclaimed benefits on the table every year.
+
+Most national benefit-screening tools only check **federal** programs (SNAP, Medicaid, WIC). They miss the layer of **state, county, and city** programs where Portland actually invests — programs like Renter Relocation Assistance, the Portland Clean Energy Fund, the SUN Service System, and the Water Bureau Discount.
 
 For a typical Portland family, that gap is **$10,000–$25,000 per year**.
 
-## What this does
-
-PDX Benefits Navigator asks twelve gentle questions about a household, then uses Claude to evaluate the household against **all 20** programs in our database — federal, Oregon, Multnomah, and Portland — at the same time. It returns:
-
-- A personalized dollar estimate, broken out per program
-- Plain-language reasoning for each match
-- Numbered next-step instructions per program
-- A document checklist
-- A renewal calendar (exportable as `.ics`)
-- A downloadable PDF "application packet" you can take into a 211 office or a caseworker meeting
-- Live translation into Spanish or Vietnamese
-
-Three demo families ship with the app and showcase the breadth of coverage:
-
-| Family | Situation | What we find |
-|---|---|---|
-| **María & family** | Single parent, 2 kids, part-time at Fred Meyer, renter in Cully, Spanish-speaking, 12% rent increase | ~$24,000+/yr across 13 programs |
-| **James** | Single, disabled veteran, unemployed, owns home in St. Johns | ~$18,000+/yr across 12 programs |
-| **Rose** | Senior widow, Social Security only, owns home in Lents, Vietnamese-speaking | ~$9,000+/yr across 11 programs |
-
-For comparison, a federal-only tool would find ~$9,200/yr for María's family. **2.5× the dollars.**
+> A federal-only screener finds **~$9,200/yr** for María's family.
+> PDX Benefits Navigator finds **~$24,000+/yr** — 2.5× the dollars.
 
 ---
 
-## Quick start
+## ✨ What it does
 
-```bash
-# 1. Install dependencies
-npm install
+- 🤖 **Evaluates all 20 programs at once** — federal + state + county + city, in a single Claude call
+- 🌍 **Speaks 3 languages** — English, Spanish, and Vietnamese, with AI-generated translation of the full results page
+- 📋 **Conversational intake** — 12 gentle questions, mobile-first, takes ~3 minutes
+- 💰 **Per-program dollar estimates** — grounded in official program ranges, with plain-language reasoning
+- 📄 **Printable application packet** — server-rendered PDF you can take to a 211 office or a caseworker
+- 📅 **Renewal calendar** — `.ics` export so you never miss a re-enrollment deadline
+- 🔑 **Bring your own Anthropic key** — the app server never sees your data or your bill
 
-# 2. Set the Anthropic API key
-echo "ANTHROPIC_API_KEY=sk-ant-..." > .env.local
+---
 
-# 3. Run the dev server
-npm run dev
+## 🚀 Try it in 30 seconds
+
+**No install required.** The three demo personas are pre-baked and load instantly — no API key needed:
+
+- 👉 **[Open the app](https://pdx-benefits-navigator.vercel.app/)**
+- 👉 [María — single parent, 2 kids, 12% rent increase](https://pdx-benefits-navigator.vercel.app/demo/maria)
+- 👉 [James — disabled veteran, unemployed homeowner](https://pdx-benefits-navigator.vercel.app/demo/james)
+- 👉 [Rose — senior on Social Security, Vietnamese-speaking](https://pdx-benefits-navigator.vercel.app/demo/rose)
+
+To run the full intake with your own answers, click the **key icon** in the top right and paste an [Anthropic API key](https://console.anthropic.com/settings/keys). Your key is stored only in your browser.
+
+---
+
+## 👨‍👩‍👧 The three demo families
+
+| Family | Situation | Federal-only tool | PDX Benefits Navigator |
+|---|---|---|---|
+| **María & family** | Single parent, 2 kids, part-time at Fred Meyer, renter in Cully, Spanish-speaking, 12% rent increase | ~$9,200/yr | **~$24,000+/yr** across 13 programs |
+| **James** | Single, disabled veteran, unemployed, owns home in St. Johns | ~$7,800/yr | **~$18,000+/yr** across 12 programs |
+| **Rose** | Senior widow, Social Security only, owns home in Lents, Vietnamese-speaking | ~$3,400/yr | **~$9,000+/yr** across 11 programs |
+
+The gap comes from **hidden-gem** programs — 8 of our 20 are flagged this way, and no national tool surfaces them.
+
+---
+
+## 🔐 The BYOK trust model
+
+```
+   ┌───────────────┐                       ┌──────────────┐
+   │  Your browser │  ──── direct ─────▶  │ Anthropic API │
+   │  (your key)   │                       └──────────────┘
+   └───────────────┘
+        ▲  │
+        │  │ stored in localStorage only
+        │  ▼
+   ┌───────────────┐
+   │ This app's    │  ⛔ never sees your key
+   │ server        │  ⛔ never sees your intake
+   └───────────────┘
 ```
 
-Then open [http://localhost:3000](http://localhost:3000).
+Personalized analyses run **client-side** with a key you provide. The browser-side Claude client uses `dangerouslyAllowBrowser: true` — which is safe here because the key belongs to the end user, not the app operator.
 
-You can also jump straight to a demo scenario without filling out the intake:
-
-- [/demo/maria](http://localhost:3000/demo/maria)
-- [/demo/james](http://localhost:3000/demo/james)
-- [/demo/rose](http://localhost:3000/demo/rose)
-
-### Environment variables
-
-| Variable | Required | Used by |
-|---|---|---|
-| `ANTHROPIC_API_KEY` | yes | `/api/analyze`, `/api/translate` |
-| `FIRECRAWL_API_KEY` | only for re-scraping program data | `scripts/scrape-programs.ts` |
+- ✅ Your API key never leaves your browser (`localStorage`)
+- ✅ Your intake answers never leave your browser (`sessionStorage`)
+- ✅ No database, no logging of your responses
+- ✅ The only server route is `/api/packet`, which renders the PDF from data you POST back — it isn't stored
 
 ---
 
-## Stack
-
-- **[Next.js 16](https://nextjs.org/)** App Router, deployed to Vercel
-- **[React 19](https://react.dev/)** + **TypeScript**
-- **[Anthropic Claude](https://www.anthropic.com/api)** — Haiku 4.5 for fast iteration, Sonnet 4.6 for the demo (swap the constant in [`lib/claude.ts`](lib/claude.ts))
-- **[Tailwind CSS v4](https://tailwindcss.com/)** + custom **Rose City** design tokens (OKLCH palette, Lora + Plus Jakarta Sans pairing)
-- **[shadcn/ui](https://ui.shadcn.com/)** + **[Base UI](https://base-ui.com/)** primitives where helpful
-- **[react-hook-form](https://react-hook-form.com/)** + **[Zod](https://zod.dev/)** for the intake form
-- **[framer-motion](https://www.framer.com/motion/)** for the count-up + bar animations
-- **[@react-pdf/renderer](https://react-pdf.org/)** for server-side PDF packets
-- **[Firecrawl](https://www.firecrawl.dev/)** for the (optional) program-data scrape pipeline
-
-No vector DB. No external workflow engine. Programs data is stuffed into the system prompt — Claude has the whole eligibility picture in context for every request.
-
----
-
-## Architecture
+## 🏗️ How it works
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -90,143 +113,216 @@ No vector DB. No external workflow engine. Programs data is stuffed into the sys
 │                                                                 │
 │  /            ── landing                                        │
 │  /intake      ── 5-step wizard ──┐                              │
-│  /demo/[id]   ── prefill scenario ┘                             │
+│  /demo/[id]   ── load pre-baked fixture from data/scenarios/    │
 │                            │                                    │
 │                            ▼ sessionStorage                     │
-│  /results     ── streams /api/analyze, renders dashboard        │
-│                            │           │           │            │
-└────────────────────────────┼───────────┼───────────┼────────────┘
-                             ▼           ▼           ▼
-                    ┌────────────┐ ┌──────────┐ ┌──────────┐
-                    │ /api/      │ │ /api/    │ │ /api/    │
-                    │ analyze    │ │ translate│ │ packet   │
-                    └─────┬──────┘ └────┬─────┘ └────┬─────┘
-                          │             │            │
-                          ▼             ▼            ▼
-                  ┌──────────────────────────────────────┐
-                  │ Anthropic API  ·  Claude Haiku 4.5   │
-                  │ (system prompt = all 20 programs +   │
-                  │  2026 FPL tables + PDX ZIP map)      │
-                  └──────────────────────────────────────┘
+│  /results     ── streams analysis (via user's key) OR           │
+│                  loads pre-baked fixture                        │
+│                            │                       │            │
+│                            ▼                       │            │
+│                   Anthropic API                    │            │
+│                   (streamed directly               │            │
+│                    from browser)                   │            │
+│                                                    │            │
+└────────────────────────────────────────────────────┼────────────┘
+                                                     │
+                                                     ▼
+                                            ┌──────────────┐
+                                            │ /api/packet  │
+                                            │ (PDF render, │
+                                            │  no AI)      │
+                                            └──────────────┘
 ```
 
-### `/api/analyze` (streaming)
+### Eligibility engine
 
-The hot path. Server-Sent Events stream `progress` events as Claude evaluates each program, then a final `complete` event with the full `AnalysisOutput`. Implementation in [`app/api/analyze/route.ts`](app/api/analyze/route.ts) and [`lib/claude.ts`](lib/claude.ts).
-
-The system prompt encodes:
+[`lib/claudeBrowser.ts`](lib/claudeBrowser.ts) wraps the official Anthropic SDK and streams a structured analysis. The system prompt (in [`lib/eligibility.ts`](lib/eligibility.ts)) encodes:
 
 - 2026 Federal Poverty Level tables
-- Portland ZIP-code map (so Claude knows 97203 = St. Johns, not Gresham)
-- All 20 program rules (income limits, jurisdiction requirements, event triggers)
+- Portland ZIP-code map (so Claude knows `97203` = St. Johns, not Gresham)
+- All 20 program rules — income limits, jurisdiction requirements, event triggers
 - Confidence-level guidance (`high` / `medium` / `low`)
 
-### `/api/translate`
+Prompt caching (`cache_control: { type: 'ephemeral' }`) is applied to the system prompt, so subsequent requests on the same key are cheap.
 
-On-demand translation. Takes the assembled `AnalysisOutput` + UI chrome strings and returns a fully-translated bundle for ES or VI. Cached per-language on the client. The English bundle is the source of truth and is never overwritten.
+### No vector DB. No workflow engine.
 
-### `/api/packet`
+The full programs database is stuffed into the system prompt. Claude has the entire eligibility picture in context for every request — which means we iterate on rules by editing JSON, not retraining pipelines.
 
-Renders a multi-page PDF using `@react-pdf/renderer`. Includes the dollar summary, every eligible program, next steps, document checklists, and a calendar of renewals. Designed to be printable and shareable with caseworkers.
+### Pre-baked demo fixtures
 
-### Optional: program data scrape
-
-[`scripts/scrape-programs.ts`](scripts/scrape-programs.ts) uses Firecrawl to refresh the program database from official agency pages, then [`scripts/merge-scraped.ts`](scripts/merge-scraped.ts) reconciles updates against the curated seed file. Output lands in [`data/programs.json`](data/programs.json). The seed file is the source of truth — scraping is opportunistic enrichment.
+[`data/scenarios/maria.json`](data/scenarios/maria.json), `james.json`, and `rose.json` contain pre-computed `AnalysisOutput` payloads. The `/demo/[scenario]` route loads the matching fixture into `sessionStorage`, then redirects to `/results`, which skips the API call when it sees the fixture key. **Demos work for everyone, with no key required and no API spend.**
 
 ---
 
-## Project structure
+## 🛠️ Tech stack
+
+- **[Next.js 16](https://nextjs.org/)** App Router on **[Vercel](https://vercel.com/)**
+- **[React 19](https://react.dev/)** + **TypeScript**
+- **[Anthropic Claude](https://www.anthropic.com/api)** — Haiku 4.5 for iteration, Sonnet 4.6 for production
+- **[Tailwind CSS v4](https://tailwindcss.com/)** + custom **Rose City** design tokens (OKLCH palette, Lora + Plus Jakarta Sans pairing)
+- **[shadcn/ui](https://ui.shadcn.com/)** + **[Base UI](https://base-ui.com/)** primitives
+- **[react-hook-form](https://react-hook-form.com/)** + **[Zod](https://zod.dev/)** for the intake wizard
+- **[framer-motion](https://www.framer.com/motion/)** for the money counter + bar animations
+- **[@react-pdf/renderer](https://react-pdf.org/)** for the printable application packet
+- **[Firecrawl](https://www.firecrawl.dev/)** for the optional program-data scrape pipeline
+
+---
+
+## 📋 The 20 programs
+
+| Jurisdiction | Programs |
+|---|---|
+| **Federal** | SNAP · OHP/Medicaid · WIC · School Meals · ACP Internet |
+| **Oregon** | ERDC childcare · Oregon EITC + Kids' Credit · PGE Income Discount · NW Natural GAP · LIHEAP + Energy Trust · Senior/Disabled Property Tax Deferral · Veterans Property Tax Exemption |
+| **Multnomah County** | Eviction Prevention Funds · SUN Service System · ADVSD case management |
+| **City of Portland** | 💎 Renter Relocation Assistance · 💎 Water Bureau Discount · 💎 PCEF Home Energy · 💎 Transportation Wallet · 💎 Inclusionary Housing |
+
+💎 = **hidden gem** — 8 of the 20 programs are flagged this way. They're the ones no national tool surfaces, and they drive most of the dollar gap.
+
+---
+
+## 💻 Local development
+
+```bash
+git clone https://github.com/NathanPickard/pdx-benefits-navigator.git
+cd pdx-benefits-navigator
+npm install
+npm run dev
+```
+
+Then open [http://localhost:3000](http://localhost:3000). Click the **key icon** in the top right to paste your Anthropic API key, or jump straight to a `/demo/*` route (no key required).
+
+### Environment variables
+
+| Variable | Required? | Used by |
+|---|---|---|
+| `FIRECRAWL_API_KEY` | Only for re-scraping program data | [`scripts/scrape-programs.ts`](scripts/scrape-programs.ts) |
+
+No server-side `ANTHROPIC_API_KEY` is needed for normal operation. The personalized analysis path uses a key the user provides in their browser.
+
+<details>
+<summary><strong>Advanced: re-baking the demo fixtures</strong></summary>
+
+If you change the system prompt or the program data, you'll want to regenerate `data/scenarios/*.json`. The precompute script ([`scripts/precompute-scenarios.ts`](scripts/precompute-scenarios.ts)) was written against an earlier server-side route; to use it, either:
+
+1. Restore `app/api/analyze/route.ts` from git history and run `npx tsx scripts/precompute-scenarios.ts`, **or**
+2. Update the script to call `analyzeEligibility()` from [`lib/claudeBrowser.ts`](lib/claudeBrowser.ts) directly (with `ANTHROPIC_API_KEY` from env, in a Node context).
+
+The seed file [`data/programs.seed.json`](data/programs.seed.json) is the source of truth for program rules — `data/programs.json` is the live build artifact.
+</details>
+
+---
+
+## 🚢 Deploy your own
+
+The app is built for Vercel with zero configuration. Because AI calls happen client-side with user-provided keys, you can deploy publicly without any AI-related env vars — your account never pays for visitor analyses.
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FNathanPickard%2Fpdx-benefits-navigator)
+
+The only server route is `/api/packet` (PDF generation), which has no AI cost. Demo scenarios are served from static JSON bundled with the build.
+
+---
+
+## 📂 Project structure
 
 ```
 app/
 ├── page.tsx                  # Landing
-├── layout.tsx                # Root layout (fonts + theme class)
-├── globals.css               # Rose City design tokens + utilities
+├── layout.tsx                # Root layout (fonts + ApiKeyProvider)
+├── globals.css               # Rose City design tokens
 ├── intake/                   # 5-step intake wizard
-├── results/                  # Loading view + dashboard
+├── results/                  # Loading + needs-key + dashboard views
 ├── demo/
 │   ├── page.tsx              # Demo hub
-│   └── [scenario]/page.tsx   # Prefill scenario → /results
-└── api/
-    ├── analyze/route.ts      # SSE-streamed eligibility check
-    ├── translate/route.ts    # ES / VI translation
-    └── packet/route.ts       # PDF generation
+│   └── [scenario]/page.tsx   # Loads fixture → sessionStorage → /results
+└── api/packet/route.ts       # PDF generation (only server route)
 
 components/
-├── brand/                    # Wordmark, RoseStamp, AppBar, JurisdictionPill
-├── intake/ConversationalForm.tsx
-├── landing/StatReveal.tsx
-├── results/                  # MoneyCounter, BenefitCard, ComparisonChart,
-│                             # UrgencyBanner, RenewalCalendar, LanguageToggle
+├── brand/                    # Wordmark, RoseStamp, AppBar, ApiKeyControl
+├── intake/                   # ConversationalForm
+├── landing/                  # StatReveal
+├── results/                  # MoneyCounter, BenefitCard, ComparisonChart, etc.
 └── ui/                       # shadcn primitives
 
 data/
-├── programs.json             # 20 programs (the live database)
+├── programs.json             # 20 programs (live database)
 ├── programs.seed.json        # Hand-curated source of truth
-└── programs.scraped.json     # Last Firecrawl pass
+└── scenarios/                # Pre-baked demo AnalysisOutput JSON
 
 lib/
-├── claude.ts                 # Anthropic client + system prompt
+├── eligibility.ts            # Shared system prompt + JSON parsing + totals
+├── claudeBrowser.ts          # Browser-side Anthropic client (BYOK)
+├── userKey.tsx               # localStorage helpers + ApiKeyProvider
 ├── scenarios.ts              # María / James / Rose intake fixtures
 ├── i18n.ts                   # Chrome strings + language list
 ├── packet.tsx                # PDF document
 └── calendar.ts               # .ics export
-
-types/
-└── program.ts                # Program, IntakeData, MatchResult, AnalysisOutput
 ```
 
 ---
 
-## Design system
+## ❓ FAQ
 
-The visual identity lives in [`app/globals.css`](app/globals.css) and [`components/brand/`](components/brand/).
+<details>
+<summary><strong>Is this an official Portland or Multnomah County tool?</strong></summary>
 
-- **Palette** — OKLCH-based; warm peach default, with `.theme-forest` (cool greens) and `.theme-sunset` (deep blush) variants you can apply to `<html>`
-- **Type** — Lora for display, Plus Jakarta Sans for body, both via `next/font`
-- **Components** — `.rc-card`, `.rc-card-soft`, `.rc-btn-rose`, `.rc-btn-outline`, `.rc-choice`, `.pill-rose`, `.pill-moss`, `.pill-sun`, `.pill-clay`, `.pill-sky`
-- **Mark** — A friendly geometric "rose stamp" (`<RoseStamp />`) instead of a civic seal
+No. This is an independent project built for the AI Portland Build Challenge. It's a discovery aid — always verify eligibility through the official program or a caseworker before applying.
+</details>
 
-Tailwind v4 + shadcn coexist with the namespaced `.rc-*` classes — the design system was added without disrupting the existing component library.
+<details>
+<summary><strong>Is it free to use?</strong></summary>
 
----
+The hosted app is free. Personalized analyses use an Anthropic API key you provide — Claude API calls typically cost a fraction of a cent per analysis. The three demo scenarios are pre-baked and cost nothing.
+</details>
 
-## The 20 programs
+<details>
+<summary><strong>Is my information private?</strong></summary>
 
-| Jurisdiction | Programs |
-|---|---|
-| **Federal** | SNAP, OHP/Medicaid (federal funding), WIC, School Meals, ACP Internet |
-| **Oregon** | ERDC childcare, Oregon EITC + Kids' Credit, PGE Income Discount, NW Natural GAP, LIHEAP + Energy Trust, Senior/Disabled Property Tax Deferral, Veterans Property Tax Exemption |
-| **Multnomah County** | Eviction Prevention Funds, SUN Service System, ADVSD case management |
-| **City of Portland** | Renter Relocation Assistance, Water Bureau Discount, PCEF Home Energy, Transportation Wallet, Inclusionary Housing |
+Yes. Your intake answers live in your browser's `sessionStorage` only — they never reach our server, and there's no database. Your Anthropic API key is stored in `localStorage` and used to call Anthropic directly from your browser.
+</details>
 
-Eight of these are flagged `hidden_gem: true` — programs that no national tool surfaces and that drive the bulk of the dollar gap.
+<details>
+<summary><strong>How accurate are the dollar estimates?</strong></summary>
 
----
+Every estimate comes from the official benefit range published by the administering agency. Actual amounts depend on caseworker review and current funding cycles. Treat the results as a starting point, not a guarantee.
+</details>
 
-## Deploying
+<details>
+<summary><strong>Can I add a program?</strong></summary>
 
-The app is designed for **Vercel**. No special config needed beyond the env vars above.
+Yes — please! Open a PR against [`data/programs.seed.json`](data/programs.seed.json). The schema is in [`types/program.ts`](types/program.ts). New programs should include a citation to the official program page.
+</details>
 
-```bash
-vercel
-```
+<details>
+<summary><strong>Why "bring your own key"?</strong></summary>
 
-Set `ANTHROPIC_API_KEY` in the Vercel project settings (Production + Preview). The streaming `/api/analyze` route runs on Fluid Compute by default.
-
----
-
-## Hard rules and known limitations
-
-- **Estimates only — not legal advice.** Every dollar value comes from official program ranges, but actual benefits depend on case-worker review. Always verify before applying.
-- **Nothing is stored.** Intake answers live in `sessionStorage` only — they never hit our server, and there is no database. PDF generation happens server-side from posted-back data, not from a stored record.
-- **Programs database is a snapshot.** Federal Poverty Levels update annually; Portland and county programs change funding cycles. The scrape pipeline is the long-term answer; today, refresh the JSON when rules change.
-- **Translation is AI-generated.** ES and VI bundles are produced live by Claude on first request. They are good but not professionally certified.
-- **Eligibility logic is in the prompt.** This is a deliberate hackathon trade-off — it makes the engine fast to iterate on, but means rules are encoded in natural language rather than a deterministic engine.
+Three reasons: (1) it keeps the project free for me to host, (2) visitor data never touches my server, and (3) it scales — any number of people can use the tool concurrently without rate-limit collisions.
+</details>
 
 ---
 
-## Credits & data sources
+## ⚠️ Limitations
+
+- **Estimates only — not legal advice.** Verify with the program before applying.
+- **Programs database is a snapshot.** Federal Poverty Levels update annually; local programs change funding cycles. Refresh `data/programs.seed.json` when rules change.
+- **Eligibility logic is in the prompt.** A deliberate hackathon trade-off — makes the engine fast to iterate on, but rules are encoded in natural language rather than a deterministic engine.
+- **AI-generated translations.** Spanish and Vietnamese bundles are produced live by Claude. Good, but not professionally certified.
+
+---
+
+## 🤝 Contributing
+
+PRs welcome, especially:
+
+- New programs to add to the database
+- Corrections to program rules or income thresholds
+- Additional curated (non-AI) language translations
+- Accessibility improvements
+
+---
+
+## 🙏 Credits & data sources
 
 - **2026 Federal Poverty Level** tables (HHS)
 - **Oregon Revised Statutes** for state-program rules
@@ -234,3 +330,9 @@ Set `ANTHROPIC_API_KEY` in the Vercel project settings (Production + Preview). T
 - **211info**, **Multnomah County DCHS**, and **Oregon Food Bank** for community context
 
 Built in Portland with a lot of coffee and gratitude for the people who actually run these programs day to day.
+
+---
+
+## 📄 License
+
+[MIT](LICENSE) © 2026 Nathan Pickard

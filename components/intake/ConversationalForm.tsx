@@ -6,8 +6,9 @@ import Link from 'next/link';
 import { useForm, Controller, type UseFormReturn } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { ArrowLeft, ArrowRight, Check, Sparkles } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Check, KeyRound, Sparkles } from 'lucide-react';
 
+import { useApiKey } from '@/lib/userKey';
 import type { IntakeData } from '@/types/program';
 
 const schema = z.object({
@@ -91,6 +92,9 @@ export function ConversationalForm() {
   const onSubmit = (values: FormValues) => {
     setSubmitting(true);
     sessionStorage.setItem('pdx_intake', JSON.stringify(values as IntakeData));
+    // Clear any leftover demo state so a prior demo run doesn't hijack this scan.
+    sessionStorage.removeItem('pdx_prebaked');
+    sessionStorage.removeItem('pdx_demo_simulate');
     router.push('/results');
   };
 
@@ -102,6 +106,8 @@ export function ConversationalForm() {
       <Link href="/" className="rc-btn rc-btn-ghost rc-btn-sm mb-6" style={{ marginBottom: 24 }}>
         <ArrowLeft size={14} /> Back to navigator
       </Link>
+
+      <NoKeyBanner />
 
       <header style={{ marginBottom: 32 }}>
         <div className="flex items-center justify-between flex-wrap mb-5" style={{ gap: 12 }}>
@@ -879,5 +885,75 @@ function Review({ values }: { values: FormValues }) {
         </dl>
       </div>
     </>
+  );
+}
+
+function NoKeyBanner() {
+  const { apiKey, hydrated } = useApiKey();
+  // Don't flash the banner on SSR / before hydration, or when key is already set
+  if (!hydrated || apiKey) return null;
+
+  return (
+    <div
+      className="rc-card rc-enter"
+      style={{
+        padding: '14px 18px',
+        marginBottom: 20,
+        background: 'var(--rose-soft)',
+        borderColor: 'oklch(0.85 0.05 150)',
+        display: 'flex',
+        alignItems: 'flex-start',
+        gap: 12,
+      }}
+    >
+      <span
+        style={{
+          width: 30,
+          height: 30,
+          borderRadius: 999,
+          background: 'var(--rose)',
+          color: 'oklch(0.99 0.01 150)',
+          display: 'inline-flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          flexShrink: 0,
+        }}
+      >
+        <KeyRound size={15} />
+      </span>
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div
+          style={{
+            fontWeight: 600,
+            fontSize: '0.95rem',
+            color: 'var(--ink)',
+            marginBottom: 2,
+          }}
+        >
+          Bring your own Anthropic API key to get personalized results
+        </div>
+        <div
+          style={{
+            fontSize: '0.85rem',
+            color: 'var(--ink-2)',
+            lineHeight: 1.5,
+          }}
+        >
+          Click the key indicator in the top right to paste yours. It&rsquo;s
+          stored only in your browser — never sent to us. Or{' '}
+          <Link
+            href="/demo/maria"
+            style={{
+              color: 'oklch(0.40 0.10 150)',
+              fontWeight: 600,
+              textDecoration: 'underline',
+            }}
+          >
+            try a demo first
+          </Link>
+          .
+        </div>
+      </div>
+    </div>
   );
 }

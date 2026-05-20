@@ -182,7 +182,7 @@ export default function HomePage() {
                     Find what you&rsquo;re owed
                     <ArrowRight size={16} />
                   </Link>
-                  <Link href="/demo/maria" className="rc-btn rc-btn-outline">
+                  <Link href="/demo" className="rc-btn rc-btn-outline">
                     <Play size={13} />
                     Try a demo first
                   </Link>
