@@ -69,7 +69,7 @@ const SCENARIO_SUMMARIES = [
     zip: "97218 · Cully",
     blurb:
       "Single parent · 2 kids · part-time at Fred Meyer · rent went up 12%.",
-    total: 40308,
+    total: 46568,
     eligibleCount: 13,
     accent: "rose" as const,
   },
@@ -79,8 +79,8 @@ const SCENARIO_SUMMARIES = [
     short: "James",
     zip: "97203 · St. Johns",
     blurb: "Single · disabled vet · unemployed · owns home in St. Johns.",
-    total: 24448,
-    eligibleCount: 12,
+    total: 23260,
+    eligibleCount: 11,
     accent: "moss" as const,
   },
   {
@@ -89,8 +89,8 @@ const SCENARIO_SUMMARIES = [
     short: "Rose",
     zip: "97266 · Lents",
     blurb: "Senior · widow · Social Security only · owns home in Lents.",
-    total: 19620,
-    eligibleCount: 11,
+    total: 19860,
+    eligibleCount: 10,
     accent: "sun" as const,
   },
 ];
@@ -130,7 +130,7 @@ export default function HomePage() {
                   <span className="pill pill-rose">
                     <Heart size={12} /> Made in Portland · 2026 Hackathon
                   </span>
-                  <span className="pill pill-sky">7 languages</span>
+                  <span className="pill pill-sky">3 languages</span>
                   <span className="pill pill-moss">Nothing stored</span>
                 </div>
 
@@ -269,7 +269,7 @@ export default function HomePage() {
                         fontWeight: 500,
                       }}
                     >
-                      $40,308
+                      $46,568
                     </div>
                     <div
                       className="flex items-center gap-2 mt-3"
@@ -634,10 +634,10 @@ export default function HomePage() {
                     letterSpacing: "-0.02em",
                   }}
                 >
-                  Federal tools find{" "}
-                  <span style={{ color: "var(--ink-3)" }}>$9,200</span>.
+                  Federal &amp; state tools find{" "}
+                  <span style={{ color: "var(--ink-3)" }}>$24,360</span>.
                   <br />
-                  We find <span style={{ color: "var(--rose)" }}>$24,400</span>.
+                  We find <span style={{ color: "var(--rose)" }}>$46,568</span>.
                 </h3>
                 <p
                   style={{

@@ -3,14 +3,16 @@
 > An AI navigator that helps Portland residents discover every federal, Oregon, Multnomah County, and City of Portland benefit program they qualify for — in about three minutes, with a downloadable application packet.
 
 <p align="center">
-  <a href="https://pdx-benefits-navigator.vercel.app/"><strong>🚀 Try the live demo →</strong></a>
+  <a href="https://pdx-benefits-navigator.vercel.app/"><strong>🚀 Try the live demo</strong></a>
+  &nbsp;·&nbsp;
+  <a href="https://pdx-benefits-navigator-hackathon.vercel.app/"><strong>🏁 Hackathon v1.0 snapshot</strong></a>
 </p>
 
 <p align="center">
   <img src="https://img.shields.io/badge/Next.js-16-black?logo=next.js" alt="Next.js 16">
   <img src="https://img.shields.io/badge/React-19-61dafb?logo=react" alt="React 19">
   <img src="https://img.shields.io/badge/TypeScript-5-3178c6?logo=typescript" alt="TypeScript">
-  <img src="https://img.shields.io/badge/Claude-Sonnet%204.6-d97757?logo=anthropic" alt="Claude Sonnet 4.6">
+  <img src="https://img.shields.io/badge/Claude-Haiku%204.5-d97757?logo=anthropic" alt="Claude Haiku 4.5">
   <img src="https://img.shields.io/badge/Deployed%20on-Vercel-black?logo=vercel" alt="Vercel">
   <img src="https://img.shields.io/badge/license-MIT-green" alt="MIT License">
 </p>
@@ -21,12 +23,34 @@
 
 ---
 
-<!-- TODO: drop your own screenshots into public/screenshots/ -->
-<p align="center">
-  <img src="public/screenshots/landing.png" alt="Landing page" width="32%">
-  <img src="public/screenshots/results.png" alt="Results dashboard" width="32%">
-  <img src="public/screenshots/demo-hub.png" alt="Demo hub" width="32%">
-</p>
+## 📸 A quick look
+
+<table>
+  <tr>
+    <td width="50%" align="center" valign="top">
+      <img src="public/screenshots/landing.png" alt="Landing page" />
+      <br/>
+      <sub><b>Landing</b> — the $1.2B opening hook, a live preview showing what's possible for María's family, and a three-step explainer of how the navigator works.</sub>
+    </td>
+    <td width="50%" align="center" valign="top">
+      <img src="public/screenshots/demo-hub.png" alt="Demo hub" />
+      <br/>
+      <sub><b>Demo hub</b> — three pre-baked personas with their hero programs and expected annual benefits, all explorable without an API key.</sub>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" align="center" valign="top">
+      <img src="public/screenshots/results.png" alt="Results overview" />
+      <br/>
+      <sub><b>Results overview</b> — total annual benefits found, side-by-side comparison vs. federal-only tools, time-sensitive urgency banners, priority briefs, and one-click PDF/calendar export.</sub>
+    </td>
+    <td width="50%" align="center" valign="top">
+      <img src="public/screenshots/results2.png" alt="Results detail" />
+      <br/>
+      <sub><b>Results detail</b> — per-program cards with confidence labels, plain-language eligibility reasoning, numbered application steps, document checklist, and the relevant city/state code citation.</sub>
+    </td>
+  </tr>
+</table>
 
 ---
 
@@ -38,8 +62,8 @@ Most national benefit-screening tools only check **federal** programs (SNAP, Med
 
 For a typical Portland family, that gap is **$10,000–$25,000 per year**.
 
-> A federal-only screener finds **~$9,200/yr** for María's family.
-> PDX Benefits Navigator finds **~$24,000+/yr** — 2.5× the dollars.
+> A federal-and-state screener gets María's family to **$24,360/yr**.
+> PDX Benefits Navigator adds the local layer — Multnomah County + City of Portland — and brings the total to **$46,568/yr**. That's **$22,208 more** her family is owed but most tools never surface.
 
 ---
 
@@ -59,7 +83,7 @@ For a typical Portland family, that gap is **$10,000–$25,000 per year**.
 
 **No install required.** The three demo personas are pre-baked and load instantly — no API key needed:
 
-- 👉 **[Open the app](https://pdx-benefits-navigator.vercel.app/)**
+- 👉 **[Open the app](https://pdx-benefits-navigator.vercel.app/)** (latest) · **[Hackathon snapshot](https://pdx-benefits-navigator-hackathon.vercel.app/)** (frozen at v1.0)
 - 👉 [María — single parent, 2 kids, 12% rent increase](https://pdx-benefits-navigator.vercel.app/demo/maria)
 - 👉 [James — disabled veteran, unemployed homeowner](https://pdx-benefits-navigator.vercel.app/demo/james)
 - 👉 [Rose — senior on Social Security, Vietnamese-speaking](https://pdx-benefits-navigator.vercel.app/demo/rose)
@@ -70,13 +94,13 @@ To run the full intake with your own answers, click the **key icon** in the top 
 
 ## 👨‍👩‍👧 The three demo families
 
-| Family | Situation | Federal-only tool | PDX Benefits Navigator |
+| Family | Situation | Federal & state programs | PDX Benefits Navigator (full local layer) |
 |---|---|---|---|
-| **María & family** | Single parent, 2 kids, part-time at Fred Meyer, renter in Cully, Spanish-speaking, 12% rent increase | ~$9,200/yr | **~$24,000+/yr** across 13 programs |
-| **James** | Single, disabled veteran, unemployed, owns home in St. Johns | ~$7,800/yr | **~$18,000+/yr** across 12 programs |
-| **Rose** | Senior widow, Social Security only, owns home in Lents, Vietnamese-speaking | ~$3,400/yr | **~$9,000+/yr** across 11 programs |
+| **María & family** | Single parent, 2 kids, part-time at Fred Meyer, renter in Cully, Spanish-speaking, 12% rent increase | $24,360/yr | **$46,568/yr** across 13 programs |
+| **James** | Single, disabled veteran, unemployed, owns home in St. Johns | $15,360/yr | **$23,260/yr** across 11 programs |
+| **Rose** | Senior widow, Social Security only, owns home in Lents, Vietnamese-speaking | $11,960/yr | **$19,860/yr** across 10 programs |
 
-The gap comes from **hidden-gem** programs — 8 of our 20 are flagged this way, and no national tool surfaces them.
+The gap comes from **hidden-gem** programs — 8 of our 20 are flagged this way, and no national tool surfaces them. Numbers are pulled directly from the [`data/scenarios/*.json`](data/scenarios/) fixtures; the source of truth for ranges is [`data/programs.seed.json`](data/programs.seed.json).
 
 ---
 
@@ -159,7 +183,7 @@ The full programs database is stuffed into the system prompt. Claude has the ent
 
 - **[Next.js 16](https://nextjs.org/)** App Router on **[Vercel](https://vercel.com/)**
 - **[React 19](https://react.dev/)** + **TypeScript**
-- **[Anthropic Claude](https://www.anthropic.com/api)** — Haiku 4.5 for iteration, Sonnet 4.6 for production
+- **[Anthropic Claude](https://www.anthropic.com/api)** — `claude-haiku-4-5-20251001` for eligibility analysis (configurable in [`lib/eligibility.ts`](lib/eligibility.ts))
 - **[Tailwind CSS v4](https://tailwindcss.com/)** + custom **Rose City** design tokens (OKLCH palette, Lora + Plus Jakarta Sans pairing)
 - **[shadcn/ui](https://ui.shadcn.com/)** + **[Base UI](https://base-ui.com/)** primitives
 - **[react-hook-form](https://react-hook-form.com/)** + **[Zod](https://zod.dev/)** for the intake wizard
@@ -329,7 +353,7 @@ PRs welcome, especially:
 - **Portland City Code** + **Multnomah County** ordinances for local programs
 - **211info**, **Multnomah County DCHS**, and **Oregon Food Bank** for community context
 
-Built in Portland with a lot of coffee and gratitude for the people who actually run these programs day to day.
+Built in Portland with **[Claude Code](https://claude.com/claude-code)** (Opus 4.7) as a pair-programmer, a lot of coffee, and gratitude for the people who actually run these programs day to day.
 
 ---
 

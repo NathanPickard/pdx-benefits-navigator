@@ -16,10 +16,28 @@ const lora = Lora({
   style: ["normal", "italic"],
 });
 
+const SITE_URL = "https://pdx-benefits-navigator.vercel.app";
+const SITE_TITLE = "PDX Benefits Navigator — Find what you're owed";
+const SITE_DESCRIPTION =
+  "A friendly Portland-built navigator for federal, Oregon, Multnomah County, and City of Portland benefits. Three minutes, no login, nothing stored.";
+
 export const metadata: Metadata = {
-  title: "PDX Benefits Navigator — Find what you're owed",
-  description:
-    "A friendly Portland-built navigator for federal, Oregon, Multnomah County, and City of Portland benefits. Three minutes, no login, nothing stored.",
+  metadataBase: new URL(SITE_URL),
+  title: SITE_TITLE,
+  description: SITE_DESCRIPTION,
+  openGraph: {
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
+    url: SITE_URL,
+    siteName: "PDX Benefits Navigator",
+    type: "website",
+    locale: "en_US",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
+  },
 };
 
 export default function RootLayout({
