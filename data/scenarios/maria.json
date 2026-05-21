@@ -123,7 +123,7 @@
       "urgency_note": null
     },
     {
-      "program_id": "nw-natural-gap",
+      "program_id": "nw-natural-bill-discount",
       "eligible": false,
       "confidence": "high",
       "estimated_annual_value": 0,
@@ -183,7 +183,7 @@
       "urgency_note": null
     },
     {
-      "program_id": "free-reduced-meals",
+      "program_id": "school-meals",
       "eligible": true,
       "confidence": "high",
       "estimated_annual_value": 1500,
@@ -242,7 +242,7 @@
       "urgency_note": "EVENT-TRIGGERED: You have a 12% rent increase. Demand letter must be sent within 45 days. $2,900-$4,500 payment is legally required."
     },
     {
-      "program_id": "pcef-home-energy",
+      "program_id": "cep-weatherization",
       "eligible": true,
       "confidence": "high",
       "estimated_annual_value": 5000,
@@ -356,25 +356,6 @@
       "required_documents": [],
       "application_deadline": null,
       "urgency_note": null
-    },
-    {
-      "program_id": "acp",
-      "eligible": true,
-      "confidence": "high",
-      "estimated_annual_value": 360,
-      "reasoning": "Household at 149% FPL qualifies (threshold 200%). $30/month ($360/year) discount on home internet. Some providers (Comcast, T-Mobile) offer free plans with ACP subsidy. Critical for work-from-home and children's education.",
-      "next_steps": [
-        "Visit https://www.affordableconnectivity.gov/ to apply",
-        "Provide photo ID and proof of income OR SNAP/OHP enrollment",
-        "Choose a participating internet provider (Comcast, T-Mobile, etc.)",
-        "Subsidy activates in 7-10 days"
-      ],
-      "required_documents": [
-        "Photo ID",
-        "Proof of income OR proof of SNAP/OHP enrollment"
-      ],
-      "application_deadline": null,
-      "urgency_note": null
     }
   ],
   "total_estimated_annual_value": 46568,
@@ -387,14 +368,13 @@
     "ohp",
     "erdc",
     "sun-service-system",
-    "pcef-home-energy",
+    "cep-weatherization",
     "pdx-water-fa",
     "liheap-energy-trust",
-    "free-reduced-meals",
+    "school-meals",
     "inclusionary-housing",
     "transportation-wallet",
-    "oregon-eitc",
-    "acp"
+    "oregon-eitc"
   ],
   "warnings": [
     "⚠️ EVENT-TRIGGERED BENEFIT: You received a 12% rent increase. Portland law (PCC 30.01.085) requires your landlord to pay you $2,900-$4,500. You must send a written demand letter within 45 days of the increase notice. Contact Portland Housing Bureau (503-823-1303) immediately if your landlord refuses.",

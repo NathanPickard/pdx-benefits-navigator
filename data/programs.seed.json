@@ -16,7 +16,8 @@
       "citizenship_status": "lpr_or_citizen",
       "other_requirements": ["Resource limit applies in some cases"]
     },
-    "application_url": "https://one.oregon.gov/",
+    "application_url": "https://www.oregon.gov/odhs/food/Pages/snap.aspx",
+    "info_urls": ["https://www.usda.gov/sites/default/files/guidance-documents/fns.snap-cola-fy26memo.pdf"],
     "application_method": "online",
     "documents_required": ["Photo ID", "Proof of income (last 30 days)", "Proof of housing costs", "Social Security numbers for all household members"],
     "processing_time": "30 days (7 days if expedited)",
@@ -41,7 +42,7 @@
       "citizenship_status": "lpr_or_citizen",
       "other_requirements": ["Adults: 138% FPL", "Children: 305% FPL", "Pregnant: 190% FPL"]
     },
-    "application_url": "https://one.oregon.gov/",
+    "application_url": "https://www.oregon.gov/oha/hsd/ohp/pages/eligibility.aspx",
     "application_method": "online",
     "documents_required": ["Photo ID", "Proof of income", "Proof of Oregon residency", "Social Security numbers"],
     "processing_time": "45 days",
@@ -90,13 +91,14 @@
       "employment_required": true,
       "must_reside_in": ["oregon"]
     },
-    "application_url": "https://one.oregon.gov/",
+    "application_url": "https://www.oregon.gov/delc/programs/pages/erdc.aspx",
+    "info_urls": ["https://www.oregon.gov/delc/programs/pages/copays-billing.aspx"],
     "application_method": "online",
     "documents_required": ["Proof of employment", "Pay stubs", "Child's birth certificate", "Child care provider information"],
     "processing_time": "30-45 days",
     "renewal_cycle": "Annual",
     "contact_phone": "1-800-699-9075",
-    "contact_org": "Oregon Office of Child Care"
+    "contact_org": "Oregon Department of Early Learning and Care (DELC)"
   },
   {
     "id": "oregon-eitc",
@@ -115,7 +117,8 @@
       "employment_required": true,
       "other_requirements": ["Must file Oregon state tax return", "Kids' Credit: children under 6"]
     },
-    "application_url": "https://www.oregon.gov/dor/programs/individuals/Pages/EIC.aspx",
+    "application_url": "https://www.oregon.gov/dor/programs/individuals/pages/credits.aspx",
+    "info_urls": ["https://www.irs.gov/credits-deductions/individuals/earned-income-tax-credit/earned-income-and-earned-income-tax-credit-eitc-tables"],
     "application_method": "online",
     "documents_required": ["W-2s", "1099s", "Social Security cards", "Children's birth certificates"],
     "processing_time": "Refund within 2-6 weeks",
@@ -137,7 +140,7 @@
       "income_max_pct_fpl": 200,
       "other_requirements": ["Must be PGE customer", "Account holder name match required"]
     },
-    "application_url": "https://portlandgeneral.com/help/financial-assistance/income-qualified-bill-discount",
+    "application_url": "https://portlandgeneral.com/income-qualified-bill-discount",
     "application_method": "online",
     "documents_required": ["PGE account number", "Proof of income OR proof of enrollment in qualifying program (SNAP, OHP, etc.)"],
     "processing_time": "1-2 billing cycles",
@@ -161,7 +164,7 @@
       "must_reside_in": ["portland"],
       "other_requirements": ["Must be account holder OR have landlord verification"]
     },
-    "application_url": "https://www.portland.gov/water/financial-assistance",
+    "application_url": "https://www.portland.gov/water/customer-service/apply-financial-assistance",
     "application_method": "online",
     "documents_required": ["Water bill", "Proof of income (last 30 days)", "Photo ID"],
     "processing_time": "30 days",
@@ -170,27 +173,27 @@
     "contact_org": "Portland Water Bureau"
   },
   {
-    "id": "nw-natural-gap",
-    "name": "NW Natural Gas Assistance Program (GAP)",
-    "short_name": "NW Natural GAP",
+    "id": "nw-natural-bill-discount",
+    "name": "NW Natural Bill Discount Program",
+    "short_name": "NW Natural Bill Discount",
     "category": "utility",
     "jurisdiction": "oregon",
     "hidden_gem": false,
     "urgency": "standard",
-    "description": "One-time annual bill credit up to $700 for income-qualified NW Natural customers, administered through community action agencies.",
+    "description": "Formal regulated monthly discount on NW Natural gas bills for income-qualified Oregon customers. Replaces (and is distinct from) the older donor-funded GAP program.",
     "legal_basis": "OPUC Order",
     "estimated_annual_value": { "min": 200, "max": 700, "median": 400 },
     "eligibility": {
       "income_max_pct_fpl": 200,
       "other_requirements": ["Must be NW Natural customer"]
     },
-    "application_url": "https://www.nwnatural.com/residential/billing-and-payment/financial-assistance",
-    "application_method": "phone",
+    "application_url": "https://www.nwnatural.com/account/bill-discount-program",
+    "application_method": "online",
     "documents_required": ["NW Natural account number", "Proof of income", "Photo ID"],
     "processing_time": "Same-day to 2 weeks",
     "renewal_cycle": "Annual",
     "contact_phone": "1-800-422-4012",
-    "contact_org": "NW Natural / Community Action Partnership"
+    "contact_org": "NW Natural"
   },
   {
     "id": "liheap-energy-trust",
@@ -207,7 +210,7 @@
       "income_max_pct_fpl": 200,
       "must_reside_in": ["oregon"]
     },
-    "application_url": "https://www.oregon.gov/ohcs/energy-weatherization/Pages/index.aspx",
+    "application_url": "https://www.oregon.gov/ohcs/energy-weatherization/pages/utility-bill-payment-assistance.aspx",
     "application_method": "phone",
     "documents_required": ["Proof of income (last 30 days)", "Utility bill", "Social Security numbers", "Photo ID"],
     "processing_time": "4-8 weeks",
@@ -231,7 +234,8 @@
       "must_reside_in": ["oregon"],
       "other_requirements": ["Pregnant, postpartum, breastfeeding, OR child under 5"]
     },
-    "application_url": "https://www.oregon.gov/oha/PH/HealthyPeopleFamilies/wic/Pages/index.aspx",
+    "application_url": "https://www.oregon.gov/oha/ph/healthypeoplefamilies/wic/pages/income.aspx",
+    "info_urls": ["https://www.fns.usda.gov/wic/wic-food-packages"],
     "application_method": "in_person",
     "documents_required": ["Proof of income", "Photo ID", "Proof of residency", "Medical card for each family member"],
     "processing_time": "Same day",
@@ -240,14 +244,14 @@
     "contact_org": "Oregon WIC"
   },
   {
-    "id": "free-reduced-meals",
-    "name": "Free/Reduced Price School Meals",
+    "id": "school-meals",
+    "name": "School Meals (Free and Reduced-Price)",
     "short_name": "School Meals",
     "category": "food",
     "jurisdiction": "federal",
     "hidden_gem": false,
     "urgency": "standard",
-    "description": "Free or low-cost breakfast and lunch for school-age children. Portland Public Schools currently offers universal free meals to all students.",
+    "description": "Federal National School Lunch Program covers free meals (≤130% FPL) and reduced-price meals (≤185% FPL) for school-age children. Portland Public Schools currently offers universal free meals to all enrolled students (2025-26) with no application required; families in other Multnomah districts (Centennial, Reynolds, David Douglas, Parkrose, etc.) apply through their district.",
     "legal_basis": "42 U.S.C. § 1751 (NSLA)",
     "estimated_annual_value": { "min": 1000, "max": 2500, "median": 1500 },
     "eligibility": {
@@ -255,12 +259,12 @@
       "must_have_children_under": 18,
       "must_reside_in": ["oregon"]
     },
-    "application_url": "https://www.pps.net/Page/2156",
+    "application_url": "https://www.fns.usda.gov/school-meals/income-eligibility-guidelines",
     "application_method": "online",
     "documents_required": ["Household income information", "Child's school enrollment"],
     "processing_time": "1-2 weeks",
     "renewal_cycle": "Annual",
-    "contact_org": "Portland Public Schools"
+    "contact_org": "USDA Food and Nutrition Service"
   },
   {
     "id": "multco-eviction-prev",
@@ -279,7 +283,7 @@
       "must_be_renter": true,
       "triggered_by_event": "eviction_notice"
     },
-    "application_url": "https://www.multco.us/dchs/eviction-prevention",
+    "application_url": "https://multco.us/info/eviction-prevention-and-energy-bill-assistance",
     "application_method": "phone",
     "documents_required": ["Eviction notice OR notice of non-payment", "Lease agreement", "Proof of income", "Photo ID"],
     "processing_time": "3-14 days",
@@ -287,26 +291,26 @@
     "contact_org": "Multnomah County Department of County Human Services"
   },
   {
-    "id": "pcef-home-energy",
-    "name": "Portland Clean Energy Fund Home Energy Programs",
-    "short_name": "PCEF Weatherization",
+    "id": "cep-weatherization",
+    "name": "Community Energy Project Home Weatherization",
+    "short_name": "CEP Weatherization",
     "category": "utility",
     "jurisdiction": "portland",
     "hidden_gem": true,
     "urgency": "standard",
-    "description": "Free home weatherization, heat pumps, air conditioning, and energy efficiency upgrades for income-qualified Portland households — funded by city tax on large retailers.",
-    "legal_basis": "Portland City Code 7.07 (PCEF)",
+    "description": "Free home weatherization, heat pumps, energy efficiency upgrades, and home repairs for income-qualified Portland-area residents. Delivered by Community Energy Project (CEP), a nonprofit funded by the Portland Clean Energy Fund (PCEF) and other sources.",
+    "legal_basis": "Portland City Code 7.07 (PCEF funding source)",
     "estimated_annual_value": { "min": 2000, "max": 15000, "median": 5000 },
     "eligibility": {
       "income_max_pct_fpl": 200,
       "must_reside_in": ["portland"]
     },
-    "application_url": "https://www.portland.gov/bps/cleanenergy",
-    "application_method": "online",
+    "application_url": "https://www.communityenergyproject.org/",
+    "application_method": "phone",
     "documents_required": ["Proof of income", "Proof of Portland residency", "Utility bill"],
     "processing_time": "2-6 months for project completion",
-    "contact_phone": "503-823-7700",
-    "contact_org": "Portland Bureau of Planning and Sustainability"
+    "contact_phone": "503-284-6827",
+    "contact_org": "Community Energy Project"
   },
   {
     "id": "senior-prop-tax-deferral",
@@ -349,7 +353,7 @@
       "income_max_pct_fpl": 200,
       "must_reside_in": ["portland"]
     },
-    "application_url": "https://www.portland.gov/transportation/transportationwallet",
+    "application_url": "https://www.portland.gov/transportation/wallet/access-all",
     "application_method": "online",
     "documents_required": ["Proof of Portland residency", "Proof of income OR enrollment in qualifying program"],
     "processing_time": "2-3 weeks",
@@ -395,7 +399,7 @@
       "must_reside_in": ["multnomah"],
       "other_requirements": ["Child must attend or live near a SUN school"]
     },
-    "application_url": "https://www.multco.us/sun",
+    "application_url": "https://multco.us/programs/sun-community-schools",
     "application_method": "in_person",
     "documents_required": ["Child's school enrollment", "Photo ID"],
     "processing_time": "Same day for most programs",
@@ -417,7 +421,7 @@
       "must_reside_in": ["multnomah"],
       "other_requirements": ["Age 60+, OR adult with disability, OR veteran"]
     },
-    "application_url": "https://www.multco.us/ads",
+    "application_url": "https://multco.us/info/aging-and-disability-resource-connection-helpline",
     "application_method": "phone",
     "documents_required": ["Photo ID", "Insurance cards", "Medication list"],
     "processing_time": "1-2 weeks for initial assessment",
@@ -441,7 +445,8 @@
       "must_reside_in": ["oregon"],
       "other_requirements": ["Service-connected disability rating, OR surviving spouse of veteran"]
     },
-    "application_url": "https://www.oregon.gov/dor/programs/property/Pages/exemptions-veterans.aspx",
+    "application_url": "https://www.oregon.gov/odva/benefits/pages/taxes.aspx",
+    "info_urls": ["https://www.oregon.gov/dor/forms/FormsPubs/veteran-spouse-exemption_310-676.pdf"],
     "application_method": "mail",
     "documents_required": ["DD-214", "VA disability rating letter", "Property deed", "Photo ID"],
     "processing_time": "60-90 days",
@@ -449,26 +454,26 @@
     "contact_org": "Oregon Department of Revenue"
   },
   {
-    "id": "acp",
-    "name": "Affordable Connectivity Program",
-    "short_name": "ACP Internet Discount",
+    "id": "lifeline",
+    "name": "Lifeline",
+    "short_name": "Lifeline Phone/Internet",
     "category": "connectivity",
     "jurisdiction": "federal",
     "hidden_gem": false,
     "urgency": "standard",
-    "description": "$30/month discount on home internet service for income-qualified households. Some providers (Comcast Internet Essentials, T-Mobile) offer plans that become free with ACP.",
-    "legal_basis": "Infrastructure Investment and Jobs Act § 60502",
-    "estimated_annual_value": { "min": 360, "max": 360, "median": 360 },
+    "description": "Federal monthly discount of $9.25 on broadband or bundled phone+internet service ($5.25 voice-only, $34.25 on Tribal lands) for income-qualified households. Successor program to the discontinued Affordable Connectivity Program (ACP).",
+    "legal_basis": "47 U.S.C. § 254(j); 47 CFR Part 54, Subpart E",
+    "estimated_annual_value": { "min": 111, "max": 411, "median": 111 },
     "eligibility": {
-      "income_max_pct_fpl": 200,
-      "other_requirements": ["OR enrolled in qualifying program (SNAP, OHP, Pell Grant, etc.)"]
+      "income_max_pct_fpl": 135,
+      "other_requirements": ["OR enrolled in qualifying program (SNAP, Medicaid, SSI, Federal Public Housing, Veterans Pension, Tribal programs)"]
     },
-    "application_url": "https://www.affordableconnectivity.gov/",
+    "application_url": "https://www.usac.org/lifeline/",
     "application_method": "online",
     "documents_required": ["Photo ID", "Proof of income OR proof of enrollment in qualifying program"],
     "processing_time": "7-10 days",
     "renewal_cycle": "Annual",
-    "contact_phone": "1-877-384-2575",
-    "contact_org": "FCC"
+    "contact_phone": "1-800-234-9473",
+    "contact_org": "USAC (Universal Service Administrative Company)"
   }
 ]

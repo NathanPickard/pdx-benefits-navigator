@@ -25,6 +25,20 @@ export interface Program {
     median: number;
   };
 
+  /**
+   * Optional verified benefit schedule extracted from official sources.
+   * Present when a page publishes amounts as a table (by household size,
+   * by tier, by location) or a small set of discrete amounts. When present,
+   * this is the authoritative ground truth — the seed-derived
+   * estimated_annual_value range is a coarser hint that should be used as
+   * fallback only.
+   */
+  benefit_schedule?: {
+    description: string;
+    unit: 'usd_monthly' | 'usd_annual' | 'usd_one_time' | 'percent_discount';
+    amounts: Array<{ condition: string; value: number }>;
+  };
+
   eligibility: {
     income_max_pct_fpl?: number;
     income_max_annual?: number;
@@ -52,6 +66,12 @@ export interface Program {
   };
 
   application_url: string;
+  /**
+   * Additional source URLs the scraper should consult alongside application_url.
+   * Used when key data (e.g., federal benefit tables) lives on a separate page
+   * from the program's application/info page.
+   */
+  info_urls?: string[];
   application_method: 'online' | 'phone' | 'in_person' | 'mail';
   documents_required: string[];
   processing_time: string;

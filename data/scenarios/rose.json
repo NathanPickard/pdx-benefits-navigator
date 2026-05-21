@@ -82,7 +82,7 @@
       "urgency_note": null
     },
     {
-      "program_id": "nw-natural-gap",
+      "program_id": "nw-natural-bill-discount",
       "eligible": true,
       "confidence": "medium",
       "estimated_annual_value": 400,
@@ -123,7 +123,7 @@
       "urgency_note": null
     },
     {
-      "program_id": "pcef-home-energy",
+      "program_id": "cep-weatherization",
       "eligible": true,
       "confidence": "high",
       "estimated_annual_value": 5000,
@@ -183,25 +183,6 @@
       "urgency_note": null
     },
     {
-      "program_id": "acp",
-      "eligible": true,
-      "confidence": "high",
-      "estimated_annual_value": 360,
-      "reasoning": "Income $21,600 is 137.8% FPL, well below 200% FPL threshold. U.S. citizen. Qualifies for $30/month Affordable Connectivity Program internet discount. With some providers (Comcast Internet Essentials, T-Mobile), this makes broadband essentially free.",
-      "next_steps": [
-        "Visit https://www.affordableconnectivity.gov/ to apply",
-        "Provide photo ID and proof of income (or SNAP/OHP enrollment letter)",
-        "Select a participating internet provider",
-        "Receive discount within 7-10 days"
-      ],
-      "required_documents": [
-        "Photo ID",
-        "Proof of income (last 30 days or SNAP/OHP approval letter)"
-      ],
-      "application_deadline": null,
-      "urgency_note": null
-    },
-    {
       "program_id": "advsd",
       "eligible": true,
       "confidence": "high",
@@ -256,7 +237,7 @@
       "urgency_note": null
     },
     {
-      "program_id": "free-reduced-meals",
+      "program_id": "school-meals",
       "eligible": false,
       "confidence": "high",
       "estimated_annual_value": 0,
@@ -329,14 +310,13 @@
     "snap",
     "senior-prop-tax-deferral",
     "ohp",
-    "pcef-home-energy",
+    "cep-weatherization",
     "pdx-water-fa",
     "liheap-energy-trust",
     "advsd",
-    "nw-natural-gap",
+    "nw-natural-bill-discount",
     "pge-iqbd",
-    "transportation-wallet",
-    "acp"
+    "transportation-wallet"
   ],
   "warnings": [
     "PRIORITY: As a senior homeowner with low income, you qualify for property tax deferral which could save $3,500/year. Apply soon at Oregon DOR.",

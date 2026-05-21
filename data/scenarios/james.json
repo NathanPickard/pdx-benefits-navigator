@@ -83,7 +83,7 @@
       "urgency_note": "Essential utility assistance for homeowner. Up to 80% reduction possible."
     },
     {
-      "program_id": "nw-natural-gap",
+      "program_id": "nw-natural-bill-discount",
       "eligible": true,
       "confidence": "medium",
       "estimated_annual_value": 400,
@@ -124,7 +124,7 @@
       "urgency_note": "Heating season critical in Oregon. Weatherization can reduce bills long-term."
     },
     {
-      "program_id": "pcef-home-energy",
+      "program_id": "cep-weatherization",
       "eligible": true,
       "confidence": "high",
       "estimated_annual_value": 5000,
@@ -176,26 +176,6 @@
       "urgency_note": "Requires VA disability rating confirmation. Contact VA at 1-800-827-1000 if rating letter unavailable."
     },
     {
-      "program_id": "acp",
-      "eligible": true,
-      "confidence": "high",
-      "estimated_annual_value": 360,
-      "reasoning": "$0 income is at 0% FPL, well below 200% threshold. Automatically qualifies. U.S. citizen. Once enrolled in SNAP/OHP (both approved above), can use enrollment as proof of eligibility.",
-      "next_steps": [
-        "Visit https://www.affordableconnectivity.gov/ to apply online",
-        "Provide photo ID and proof of income (zero income statement) or enrollment letter from SNAP/OHP",
-        "Select internet provider (Comcast Internet Essentials, T-Mobile, or others)",
-        "Some plans become FREE with ACP discount; processing takes 7-10 days"
-      ],
-      "required_documents": [
-        "Photo ID",
-        "Proof of income OR proof of SNAP/OHP enrollment letter",
-        "Internet service provider account info (if applying mid-service)"
-      ],
-      "application_deadline": null,
-      "urgency_note": "Free or $0 internet possible with ACP. Essential for job search while unemployed."
-    },
-    {
       "program_id": "erdc",
       "eligible": false,
       "confidence": "high",
@@ -229,7 +209,7 @@
       "urgency_note": null
     },
     {
-      "program_id": "free-reduced-meals",
+      "program_id": "school-meals",
       "eligible": false,
       "confidence": "high",
       "estimated_annual_value": 0,
@@ -330,14 +310,13 @@
   "priority_application_order": [
     "snap",
     "ohp",
-    "pcef-home-energy",
+    "cep-weatherization",
     "liheap-energy-trust",
     "pdx-water-fa",
     "pge-iqbd",
     "advsd",
-    "acp",
     "transportation-wallet",
-    "nw-natural-gap",
+    "nw-natural-bill-discount",
     "veterans-prop-tax-exempt"
   ],
   "warnings": [

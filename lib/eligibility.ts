@@ -39,6 +39,13 @@ ${JSON.stringify(programs, null, 2)}
 
 3. Estimate dollar value based on household composition. For programs with per-child or per-household-member benefits, multiply correctly.
 
+   When a program has a "benefit_schedule" field (present on programs where official sources publish a benefit table), USE IT as authoritative — pick the row whose "condition" best matches the user's intake (their household_size, income tier, etc.) and convert to an annual estimate based on "unit":
+     - usd_monthly → row value × 12
+     - usd_annual → row value
+     - usd_one_time → row value (it's a single payment, not annual; still report this number)
+     - percent_discount → estimate annual discount using the relevant base bill if you can reason about it; otherwise note the discount tier in reasoning and use a conservative midpoint
+   Prefer benefit_schedule over the program's coarser "estimated_annual_value" range whenever both are present. If no schedule, fall back to estimated_annual_value, scaled by household composition.
+
 4. PRIORITIZE hyperlocal Portland and Multnomah County programs (hidden_gem: true). These are our differentiator. Always evaluate them — never skip because the user didn't mention housing/utilities/etc.
 
 5. Urgency handling:

@@ -7,24 +7,36 @@
     "jurisdiction": "oregon",
     "hidden_gem": false,
     "urgency": "standard",
-    "description": "Monthly food benefits loaded onto an Oregon Trail Card (EBT) for qualifying households.",
-    "legal_basis": "7 U.S.C. § 2011 et seq.",
+    "description": "SNAP provides monthly food benefits to help individuals and families buy healthy food.",
+    "legal_basis": "Food and Nutrition Act of 2008",
     "estimated_annual_value": {
       "min": 1200,
       "max": 9000,
       "median": 3000
     },
     "eligibility": {
-      "income_max_pct_fpl": 200,
+      "income_max_pct_fpl": 130,
       "must_reside_in": [
         "oregon"
       ],
       "citizenship_status": "lpr_or_citizen",
       "other_requirements": [
-        "Resource limit applies in some cases"
-      ]
+        "Able-bodied adults without dependent children must meet SNAP work requirements (ABAWD status) to receive benefits for more than three months in a 36-month period",
+        "Students ages 18-49 enrolled more than half-time in college or higher education must meet special conditions related to work, work-study, TANF receipt, unemployment compensation, employer-sponsored training, or caring for children",
+        "House, car, or money in the bank do not usually count against eligibility"
+      ],
+      "must_be_renter": false,
+      "must_be_homeowner": false,
+      "must_be_pregnant": false,
+      "must_be_disabled": false,
+      "must_be_veteran": false,
+      "must_be_senior": false,
+      "employment_required": false
     },
-    "application_url": "https://one.oregon.gov/",
+    "application_url": "https://www.oregon.gov/odhs/food/Pages/snap.aspx",
+    "info_urls": [
+      "https://www.usda.gov/sites/default/files/guidance-documents/fns.snap-cola-fy26memo.pdf"
+    ],
     "application_method": "online",
     "documents_required": [
       "Photo ID",
@@ -33,9 +45,47 @@
       "Social Security numbers for all household members"
     ],
     "processing_time": "30 days (7 days if expedited)",
-    "renewal_cycle": "Every 6-12 months",
-    "contact_phone": "1-800-699-9075",
-    "contact_org": "Oregon DHS"
+    "renewal_cycle": "Renewal packets sent 45 days before renewal due date; periodic reports required halfway through benefit period",
+    "contact_phone": "211",
+    "contact_org": "Oregon Department of Human Services (ODHS)",
+    "benefit_schedule": {
+      "description": "Maximum monthly SNAP allotments for 48 States and D.C., FY 2026 (October 1, 2025 - September 30, 2026)",
+      "unit": "usd_monthly",
+      "amounts": [
+        {
+          "condition": "Household of 1",
+          "value": 298
+        },
+        {
+          "condition": "Household of 2",
+          "value": 546
+        },
+        {
+          "condition": "Household of 3",
+          "value": 785
+        },
+        {
+          "condition": "Household of 4",
+          "value": 994
+        },
+        {
+          "condition": "Household of 5",
+          "value": 1183
+        },
+        {
+          "condition": "Household of 6",
+          "value": 1421
+        },
+        {
+          "condition": "Household of 7",
+          "value": 1571
+        },
+        {
+          "condition": "Household of 8",
+          "value": 1789
+        }
+      ]
+    }
   },
   {
     "id": "ohp",
@@ -64,7 +114,7 @@
         "Pregnant: 190% FPL"
       ]
     },
-    "application_url": "https://one.oregon.gov/",
+    "application_url": "https://www.oregon.gov/oha/hsd/ohp/pages/eligibility.aspx",
     "application_method": "online",
     "documents_required": [
       "Photo ID",
@@ -73,19 +123,19 @@
       "Social Security numbers"
     ],
     "processing_time": "45 days",
-    "renewal_cycle": "Annual",
-    "contact_phone": "1-800-699-9075",
+    "renewal_cycle": "every two years",
+    "contact_phone": "1-800-273-0557",
     "contact_org": "Oregon Health Authority"
   },
   {
     "id": "pdx-renter-relocation",
     "name": "Portland Mandatory Renter Relocation Assistance",
-    "short_name": "Renter Relocation",
+    "short_name": "Mandatory Renter Relocation Assistance",
     "category": "housing",
     "jurisdiction": "portland",
     "hidden_gem": true,
     "urgency": "event_triggered",
-    "description": "Portland landlords must pay tenants $2,900-$4,500 for no-cause evictions, qualifying lease terminations, or rent increases over 10% in a 12-month period.",
+    "description": "Renters in Portland who are served a no-cause eviction or encounter triggering events may have the right to be paid relocation assistance from their landlord.",
     "legal_basis": "Portland City Code 30.01.085",
     "estimated_annual_value": {
       "min": 2900,
@@ -97,12 +147,13 @@
         "portland"
       ],
       "must_be_renter": true,
-      "triggered_by_event": "rent_increase_10pct",
+      "triggered_by_event": "eviction_notice",
       "other_requirements": [
-        "Landlord owns 2+ rental units in Portland",
-        "Rent increase >10% in 12 months OR no-cause termination",
-        "Tenant must demand payment in writing within 45 days"
-      ]
+        "Renter does not live with their landlord",
+        "Tenancy is not week-to-week",
+        "Not for-cause terminations"
+      ],
+      "must_be_homeowner": false
     },
     "application_url": "https://www.portland.gov/phb/rental-services/mandatory-renter-relocation-assistance",
     "application_method": "mail",
@@ -113,17 +164,39 @@
     ],
     "processing_time": "Payment due within 45 days of demand",
     "contact_phone": "503-823-1303",
-    "contact_org": "Portland Housing Bureau Rental Services"
+    "contact_org": "City of Portland Rental Services Helpdesk",
+    "benefit_schedule": {
+      "description": "Relocation assistance amounts by rental unit size (one-time payment)",
+      "unit": "usd_one_time",
+      "amounts": [
+        {
+          "condition": "Studio or Single Room Occupancy (SRO)",
+          "value": 2900
+        },
+        {
+          "condition": "1-Bedroom",
+          "value": 3300
+        },
+        {
+          "condition": "2-Bedroom",
+          "value": 4200
+        },
+        {
+          "condition": "3-Bedroom or larger",
+          "value": 4500
+        }
+      ]
+    }
   },
   {
     "id": "erdc",
     "name": "Employment Related Day Care (ERDC)",
-    "short_name": "ERDC Childcare",
+    "short_name": "ERDC",
     "category": "childcare",
     "jurisdiction": "oregon",
     "hidden_gem": false,
     "urgency": "standard",
-    "description": "Subsidized child care for working families with children under 13, often covering most or all of monthly child care costs.",
+    "description": "A child care subsidy program that helps families pay for child care and registration fees. Families may qualify if they are working, attending school, receiving cash assistance (TANF), on medical leave, or participating in certain Child Welfare programs.",
     "legal_basis": "ORS 329A",
     "estimated_annual_value": {
       "min": 8000,
@@ -131,35 +204,212 @@
       "median": 12000
     },
     "eligibility": {
-      "income_max_pct_fpl": 200,
+      "income_max_pct_fpl": 250,
       "must_have_children_under": 13,
       "employment_required": true,
       "must_reside_in": [
         "oregon"
+      ],
+      "age_max": 17,
+      "citizenship_status": "any",
+      "other_requirements": [
+        "Children must meet immunization requirements or qualify for medical or non-medical exemption",
+        "Child care provider must be approved to receive ERDC payments",
+        "In two-parent families, both parents must be working or in school, with exceptions for TANF receipt, Child Welfare participation, or medical/mental health conditions"
       ]
     },
-    "application_url": "https://one.oregon.gov/",
+    "application_url": "https://www.oregon.gov/delc/programs/pages/erdc.aspx",
+    "info_urls": [
+      "https://www.oregon.gov/delc/programs/pages/copays-billing.aspx"
+    ],
     "application_method": "online",
     "documents_required": [
-      "Proof of employment",
-      "Pay stubs",
-      "Child's birth certificate",
-      "Child care provider information"
+      "Pay stubs or proof of income"
     ],
     "processing_time": "30-45 days",
     "renewal_cycle": "Annual",
-    "contact_phone": "1-800-699-9075",
-    "contact_org": "Oregon Office of Child Care"
+    "contact_phone": "800-699-9075",
+    "contact_org": "Department of Early Learning and Care (DELC)",
+    "benefit_schedule": {
+      "description": "Monthly copay amounts by family size and countable monthly income",
+      "unit": "usd_monthly",
+      "amounts": [
+        {
+          "condition": "Family of 2, income $0–$1,803.99",
+          "value": 0
+        },
+        {
+          "condition": "Family of 2, income $1,804–$2,704.99",
+          "value": 5
+        },
+        {
+          "condition": "Family of 2, income $2,705–$3,606.99",
+          "value": 10
+        },
+        {
+          "condition": "Family of 2, income $3,607–$4,057.99",
+          "value": 40
+        },
+        {
+          "condition": "Family of 2, income $4,058–$5,925.99",
+          "value": 100
+        },
+        {
+          "condition": "Family of 3, income $0–$2,276.99",
+          "value": 0
+        },
+        {
+          "condition": "Family of 3, income $2,277–$3,414.99",
+          "value": 5
+        },
+        {
+          "condition": "Family of 3, income $3,415–$3,984.99",
+          "value": 10
+        },
+        {
+          "condition": "Family of 3, income $3,985–$4,553.99",
+          "value": 15
+        },
+        {
+          "condition": "Family of 3, income $4,554–$5,122.99",
+          "value": 50
+        },
+        {
+          "condition": "Family of 3, income $5,123–$7,320.99",
+          "value": 110
+        },
+        {
+          "condition": "Family of 4, income $0–$2,749.99",
+          "value": 0
+        },
+        {
+          "condition": "Family of 4, income $2,750–$4,124.99",
+          "value": 5
+        },
+        {
+          "condition": "Family of 4, income $4,125–$4,812.99",
+          "value": 10
+        },
+        {
+          "condition": "Family of 4, income $4,813–$5,499.99",
+          "value": 20
+        },
+        {
+          "condition": "Family of 4, income $5,500–$6,187.99",
+          "value": 60
+        },
+        {
+          "condition": "Family of 4, income $6,188–$8,714.99",
+          "value": 120
+        },
+        {
+          "condition": "Family of 5, income $0–$3,223.99",
+          "value": 0
+        },
+        {
+          "condition": "Family of 5, income $3,224–$4,834.99",
+          "value": 5
+        },
+        {
+          "condition": "Family of 5, income $4,835–$5,640.99",
+          "value": 10
+        },
+        {
+          "condition": "Family of 5, income $5,641–$6,446.99",
+          "value": 25
+        },
+        {
+          "condition": "Family of 5, income $6,447–$7,252.99",
+          "value": 70
+        },
+        {
+          "condition": "Family of 5, income $7,253–$10,108.99",
+          "value": 130
+        },
+        {
+          "condition": "Family of 6, income $0–$3,696.99",
+          "value": 0
+        },
+        {
+          "condition": "Family of 6, income $3,697–$5,544.99",
+          "value": 5
+        },
+        {
+          "condition": "Family of 6, income $5,545–$6,469.99",
+          "value": 10
+        },
+        {
+          "condition": "Family of 6, income $6,470–$7,393.99",
+          "value": 25
+        },
+        {
+          "condition": "Family of 6, income $7,394–$8,317.99",
+          "value": 70
+        },
+        {
+          "condition": "Family of 6, income $8,318–$11,503.99",
+          "value": 130
+        },
+        {
+          "condition": "Family of 7, income $0–$4,169.99",
+          "value": 0
+        },
+        {
+          "condition": "Family of 7, income $4,170–$6,254.99",
+          "value": 5
+        },
+        {
+          "condition": "Family of 7, income $6,255–$7,297.99",
+          "value": 10
+        },
+        {
+          "condition": "Family of 7, income $7,298–$8,339.99",
+          "value": 25
+        },
+        {
+          "condition": "Family of 7, income $8,340–$9,382.99",
+          "value": 70
+        },
+        {
+          "condition": "Family of 7, income $9,383–$11,764.99",
+          "value": 130
+        },
+        {
+          "condition": "Family of 8 or more, income $0–$4,643.99",
+          "value": 0
+        },
+        {
+          "condition": "Family of 8 or more, income $4,644–$6,964.99",
+          "value": 5
+        },
+        {
+          "condition": "Family of 8 or more, income $6,965–$8,125.99",
+          "value": 10
+        },
+        {
+          "condition": "Family of 8 or more, income $8,126–$9,286.99",
+          "value": 25
+        },
+        {
+          "condition": "Family of 8 or more, income $9,287–$10,447.99",
+          "value": 70
+        },
+        {
+          "condition": "Family of 8 or more, income $10,448–$12,025.99",
+          "value": 130
+        }
+      ]
+    }
   },
   {
     "id": "oregon-eitc",
-    "name": "Oregon Earned Income Tax Credit + Kids' Credit",
-    "short_name": "Oregon EITC + Kids' Credit",
+    "name": "Oregon Earned Income Tax Credit (EIC) and Oregon Kids Credit",
+    "short_name": "Oregon EITC & Kids Credit",
     "category": "tax",
     "jurisdiction": "oregon",
     "hidden_gem": false,
     "urgency": "standard",
-    "description": "Refundable state tax credits for working families. Oregon EITC is 9-12% of federal EITC; Kids' Credit is $1,000 per child under 5 for low-income families.",
+    "description": "Oregon offers two refundable tax credits: (1) the Oregon Earned Income Credit, which is 9% or 12% of the federal EITC depending on whether you have a dependent under age 3; and (2) the Oregon Kids Credit, a refundable credit for people with dependent children ages 0–5.",
     "legal_basis": "ORS 315.266, ORS 315.282",
     "estimated_annual_value": {
       "min": 500,
@@ -167,18 +417,25 @@
       "median": 1800
     },
     "eligibility": {
-      "income_max_annual": 30000,
+      "income_max_annual": 31550,
       "must_reside_in": [
         "oregon"
       ],
       "employment_required": true,
       "other_requirements": [
-        "Must file Oregon state tax return",
-        "Kids' Credit: children under 6"
-      ]
+        "Must file an Oregon personal income tax return",
+        "For Oregon Kids Credit, dependent must live with you for more than half the year",
+        "For Oregon EIC, must qualify for federal EITC or be ITIN filer meeting Oregon EIC requirements"
+      ],
+      "age_max": 5,
+      "must_have_children_under": 5,
+      "citizenship_status": "any"
     },
-    "application_url": "https://www.oregon.gov/dor/programs/individuals/Pages/EIC.aspx",
-    "application_method": "online",
+    "application_url": "https://www.oregon.gov/dor/programs/individuals/pages/credits.aspx",
+    "info_urls": [
+      "https://www.irs.gov/credits-deductions/individuals/earned-income-tax-credit/earned-income-and-earned-income-tax-credit-eitc-tables"
+    ],
+    "application_method": "mail",
     "documents_required": [
       "W-2s",
       "1099s",
@@ -186,18 +443,45 @@
       "Children's birth certificates"
     ],
     "processing_time": "Refund within 2-6 weeks",
-    "renewal_cycle": "Annual (with tax filing)",
-    "contact_org": "Oregon Department of Revenue"
+    "renewal_cycle": "Annually (tax year basis)",
+    "contact_org": "Oregon Department of Revenue",
+    "benefit_schedule": {
+      "description": "Oregon Kids Credit amount for 2025 tax year by modified AGI",
+      "unit": "usd_annual",
+      "amounts": [
+        {
+          "condition": "Modified AGI $0–$26,550, per child ages 0–5, up to 5 children",
+          "value": 1050
+        },
+        {
+          "condition": "Modified AGI $26,551–$31,549, per child ages 0–5 (reduced)",
+          "value": null
+        },
+        {
+          "condition": "Modified AGI $31,550 or more",
+          "value": 0
+        },
+        {
+          "condition": "Oregon EIC (dependent under 3 years old)",
+          "value": null
+        },
+        {
+          "condition": "Oregon EIC (no dependent under 3 years old)",
+          "value": null
+        }
+      ]
+    },
+    "contact_phone": "503-378-4988 or 800-356-4222"
   },
   {
     "id": "pge-iqbd",
-    "name": "PGE Income Qualified Bill Discount",
-    "short_name": "PGE Bill Discount",
+    "name": "Income-Qualified Bill Discount",
+    "short_name": "IQBD",
     "category": "utility",
     "jurisdiction": "oregon",
     "hidden_gem": false,
     "urgency": "standard",
-    "description": "Portland General Electric customers below 200% FPL receive 15-60% off their monthly electric bill, sliding scale based on income.",
+    "description": "A monthly bill discount program for qualifying residential PGE customers based on household size and combined annual gross income, providing ongoing discounts between 15% and 80% off energy use.",
     "legal_basis": "OPUC Order No. 21-187",
     "estimated_annual_value": {
       "min": 300,
@@ -207,20 +491,39 @@
     "eligibility": {
       "income_max_pct_fpl": 200,
       "other_requirements": [
-        "Must be PGE customer",
-        "Account holder name match required"
-      ]
+        "Must be a current PGE residential customer",
+        "Household income calculation based on combined annual gross income of household members 18 years and older"
+      ],
+      "age_min": 18,
+      "must_reside_in": [
+        "oregon"
+      ],
+      "employment_required": false
     },
-    "application_url": "https://portlandgeneral.com/help/financial-assistance/income-qualified-bill-discount",
+    "application_url": "https://portlandgeneral.com/income-qualified-bill-discount",
     "application_method": "online",
     "documents_required": [
       "PGE account number",
       "Proof of income OR proof of enrollment in qualifying program (SNAP, OHP, etc.)"
     ],
     "processing_time": "1-2 billing cycles",
-    "renewal_cycle": "Annual",
+    "renewal_cycle": "Two years",
     "contact_phone": "503-228-6322",
-    "contact_org": "Portland General Electric"
+    "contact_org": "Portland General Electric (PGE)",
+    "benefit_schedule": {
+      "description": "Monthly discount percentage by household size and annual gross income",
+      "unit": "percent_discount",
+      "amounts": [
+        {
+          "condition": "15% discount tier (lower income threshold)",
+          "value": 15
+        },
+        {
+          "condition": "80% discount tier (higher income threshold)",
+          "value": 80
+        }
+      ]
+    }
   },
   {
     "id": "pdx-water-fa",
@@ -230,7 +533,7 @@
     "jurisdiction": "portland",
     "hidden_gem": true,
     "urgency": "standard",
-    "description": "Portland water/sewer customers below 60% State Median Income receive up to 80% off their water and sewer bill.",
+    "description": "Financial assistance program provides bill discounts and other forms of assistance to income-qualified single-family residential customers for sewer, stormwater, and water bills.",
     "legal_basis": "Portland City Code 21.03",
     "estimated_annual_value": {
       "min": 200,
@@ -243,30 +546,49 @@
         "portland"
       ],
       "other_requirements": [
-        "Must be account holder OR have landlord verification"
-      ]
+        "Must be single-family residential customer",
+        "Must live at service address",
+        "Proof of income required",
+        "Must reapply every two years"
+      ],
+      "income_max_pct_fpl": 60,
+      "household_size_min": 1,
+      "must_be_renter": false,
+      "triggered_by_event": "job_loss"
     },
-    "application_url": "https://www.portland.gov/water/financial-assistance",
+    "application_url": "https://www.portland.gov/water/customer-service/apply-financial-assistance",
     "application_method": "online",
     "documents_required": [
-      "Water bill",
-      "Proof of income (last 30 days)",
-      "Photo ID"
+      "Service address",
+      "Names of all household members and birthdates for anyone 60 and over",
+      "Total gross monthly income by source for all household members over 18",
+      "Accepted proof of income for all income listed in application",
+      "Pay stubs or earnings statements for wages",
+      "Profit/loss statement for self-employment income",
+      "Benefit verification letter from Social Security Administration for Social Security benefits",
+      "Bank statement showing deposit or dividend statement for pensions, annuities, dividends, or interest",
+      "Court order for alimony or child support",
+      "Copy of check issued by agency or award letter for public assistance",
+      "Benefit letter for unemployment or veterans benefits",
+      "Profit/loss statement or dated lease for rental property",
+      "Benefit letter or court order for adoption assistance",
+      "Check or benefit letter for workers' compensation",
+      "Record with note indicating purchase for monthly payments from sale of property"
     ],
     "processing_time": "30 days",
-    "renewal_cycle": "Annual",
+    "renewal_cycle": "Every two years",
     "contact_phone": "503-823-7770",
     "contact_org": "Portland Water Bureau"
   },
   {
-    "id": "nw-natural-gap",
-    "name": "NW Natural Gas Assistance Program (GAP)",
-    "short_name": "NW Natural GAP",
+    "id": "nw-natural-bill-discount",
+    "name": "NW Natural Bill Discount Program",
+    "short_name": "Bill Discount Program",
     "category": "utility",
     "jurisdiction": "oregon",
     "hidden_gem": false,
     "urgency": "standard",
-    "description": "One-time annual bill credit up to $700 for income-qualified NW Natural customers, administered through community action agencies.",
+    "description": "An income-qualified bill discount program that can save customers money every month on their gas bill with discounts of 15% to 85% depending on state and income level.",
     "legal_basis": "OPUC Order",
     "estimated_annual_value": {
       "min": 200,
@@ -274,22 +596,63 @@
       "median": 400
     },
     "eligibility": {
-      "income_max_pct_fpl": 200,
+      "income_max_pct_fpl": 60,
       "other_requirements": [
         "Must be NW Natural customer"
+      ],
+      "must_reside_in": [
+        "oregon"
       ]
     },
-    "application_url": "https://www.nwnatural.com/residential/billing-and-payment/financial-assistance",
-    "application_method": "phone",
+    "application_url": "https://www.nwnatural.com/account/bill-discount-program",
+    "application_method": "online",
     "documents_required": [
       "NW Natural account number",
       "Proof of income",
       "Photo ID"
     ],
-    "processing_time": "Same-day to 2 weeks",
-    "renewal_cycle": "Annual",
-    "contact_phone": "1-800-422-4012",
-    "contact_org": "NW Natural / Community Action Partnership"
+    "processing_time": "30 days",
+    "renewal_cycle": "2 years",
+    "contact_phone": "800-422-4012",
+    "contact_org": "NW Natural",
+    "benefit_schedule": {
+      "description": "Monthly bill discount percentage by household income level for Oregon and Washington",
+      "unit": "percent_discount",
+      "amounts": [
+        {
+          "condition": "Oregon: Household income $18,454 or less",
+          "value": 85
+        },
+        {
+          "condition": "Oregon: Household income $18,455 to $36,908",
+          "value": 50
+        },
+        {
+          "condition": "Oregon: Household income $36,909 to $55,362",
+          "value": 30
+        },
+        {
+          "condition": "Oregon: Household income $55,363 to $73,817",
+          "value": 15
+        },
+        {
+          "condition": "Washington: Household income $19,290 or less",
+          "value": 80
+        },
+        {
+          "condition": "Washington: Household income $19,291 to $38,580",
+          "value": 40
+        },
+        {
+          "condition": "Washington: Household income $38,581 to $48,225",
+          "value": 20
+        },
+        {
+          "condition": "Washington: Household income $48,226 to $99,300",
+          "value": 15
+        }
+      ]
+    }
   },
   {
     "id": "liheap-energy-trust",
@@ -299,7 +662,7 @@
     "jurisdiction": "oregon",
     "hidden_gem": false,
     "urgency": "standard",
-    "description": "Federal LIHEAP covers heating bills; Energy Trust provides free or discounted weatherization (insulation, windows, heat pumps) for income-qualified households.",
+    "description": "OHCS provides funding to local community agencies that provide bill payment assistance programs. These programs assist low-income households to make their energy costs more affordable. They also help prevent the loss and the restoration of home energy service. Payments are made to the utility company on the customer's behalf.",
     "legal_basis": "42 U.S.C. § 8621",
     "estimated_annual_value": {
       "min": 300,
@@ -307,12 +670,17 @@
       "median": 700
     },
     "eligibility": {
-      "income_max_pct_fpl": 200,
+      "income_max_pct_fpl": 60,
       "must_reside_in": [
         "oregon"
+      ],
+      "must_be_renter": false,
+      "must_be_homeowner": false,
+      "other_requirements": [
+        "A household must have documented energy costs"
       ]
     },
-    "application_url": "https://www.oregon.gov/ohcs/energy-weatherization/Pages/index.aspx",
+    "application_url": "https://www.oregon.gov/ohcs/energy-weatherization/pages/utility-bill-payment-assistance.aspx",
     "application_method": "phone",
     "documents_required": [
       "Proof of income (last 30 days)",
@@ -322,8 +690,8 @@
     ],
     "processing_time": "4-8 weeks",
     "renewal_cycle": "Annual",
-    "contact_phone": "211",
-    "contact_org": "Oregon Housing and Community Services"
+    "contact_phone": "1-800-453-5511, option 1",
+    "contact_org": "Oregon Housing and Community Services (OHCS)"
   },
   {
     "id": "wic",
@@ -333,7 +701,7 @@
     "jurisdiction": "federal",
     "hidden_gem": false,
     "urgency": "standard",
-    "description": "Nutritious food benefits, breastfeeding support, and health referrals for pregnant women, new mothers, and children under 5.",
+    "description": "WIC serves lower-income pregnant, postpartum and breastfeeding women, infants and children under age 5 who have health or nutrition risks.",
     "legal_basis": "42 U.S.C. § 1786",
     "estimated_annual_value": {
       "min": 500,
@@ -346,10 +714,17 @@
         "oregon"
       ],
       "other_requirements": [
-        "Pregnant, postpartum, breastfeeding, OR child under 5"
-      ]
+        "Have a nutritional need or risk",
+        "Be a pregnant, postpartum or breastfeeding woman, an infant or a child under 5 years old"
+      ],
+      "age_min": 0,
+      "age_max": 5,
+      "must_have_children_under": 5
     },
-    "application_url": "https://www.oregon.gov/oha/PH/HealthyPeopleFamilies/wic/Pages/index.aspx",
+    "application_url": "https://www.oregon.gov/oha/ph/healthypeoplefamilies/wic/pages/income.aspx",
+    "info_urls": [
+      "https://www.fns.usda.gov/wic/wic-food-packages"
+    ],
     "application_method": "in_person",
     "documents_required": [
       "Proof of income",
@@ -359,19 +734,37 @@
     ],
     "processing_time": "Same day",
     "renewal_cycle": "Every 6-12 months",
-    "contact_phone": "1-800-723-3638",
-    "contact_org": "Oregon WIC"
+    "contact_phone": "211 toll-free; TTY relay 711 or 1-800-735-2900",
+    "contact_org": "Oregon Health Authority WIC Program",
+    "benefit_schedule": {
+      "description": "WIC cash-value benefit (CVB) for fruits and vegetables, maximum monthly allowances by participant category, FY 2024",
+      "unit": "usd_monthly",
+      "amounts": [
+        {
+          "condition": "Children",
+          "value": 26
+        },
+        {
+          "condition": "Pregnant, postpartum",
+          "value": 47
+        },
+        {
+          "condition": "Breastfeeding",
+          "value": 52
+        }
+      ]
+    }
   },
   {
-    "id": "free-reduced-meals",
-    "name": "Free/Reduced Price School Meals",
+    "id": "school-meals",
+    "name": "Child Nutrition Programs Income Eligibility Guidelines",
     "short_name": "School Meals",
     "category": "food",
     "jurisdiction": "federal",
     "hidden_gem": false,
     "urgency": "standard",
-    "description": "Free or low-cost breakfast and lunch for school-age children. Portland Public Schools currently offers universal free meals to all students.",
-    "legal_basis": "42 U.S.C. § 1751 (NSLA)",
+    "description": "Annual adjustments to income eligibility guidelines used to determine eligibility for free and reduced price meals or free milk in school nutrition programs",
+    "legal_basis": "Section 9 of the National School Lunch Act",
     "estimated_annual_value": {
       "min": 1000,
       "max": 2500,
@@ -384,25 +777,25 @@
         "oregon"
       ]
     },
-    "application_url": "https://www.pps.net/Page/2156",
+    "application_url": "https://www.fns.usda.gov/school-meals/income-eligibility-guidelines",
     "application_method": "online",
     "documents_required": [
       "Household income information",
       "Child's school enrollment"
     ],
     "processing_time": "1-2 weeks",
-    "renewal_cycle": "Annual",
-    "contact_org": "Portland Public Schools"
+    "renewal_cycle": "Annual, effective July 1 through June 30",
+    "contact_org": "Food and Nutrition Service (FNS), USDA"
   },
   {
     "id": "multco-eviction-prev",
-    "name": "Multnomah County Eviction Prevention Funds",
+    "name": "Multnomah County Eviction Prevention and Energy Bill Assistance",
     "short_name": "Eviction Prevention",
     "category": "housing",
     "jurisdiction": "multnomah",
     "hidden_gem": true,
     "urgency": "time_sensitive",
-    "description": "Emergency rental assistance for Multnomah County residents facing eviction or housing instability. Pays past-due rent directly to landlords.",
+    "description": "Short Term Rent Assistance (STRA) is a unified countywide program that provides limited housing assistance to households in Multnomah County that are experiencing homelessness or at risk of homelessness. Also provides energy assistance to households with low incomes to supplement home heating and electric costs.",
     "legal_basis": "Multnomah County DCHS programs",
     "estimated_annual_value": {
       "min": 500,
@@ -417,7 +810,7 @@
       "must_be_renter": true,
       "triggered_by_event": "eviction_notice"
     },
-    "application_url": "https://www.multco.us/dchs/eviction-prevention",
+    "application_url": "https://multco.us/info/eviction-prevention-and-energy-bill-assistance",
     "application_method": "phone",
     "documents_required": [
       "Eviction notice OR notice of non-payment",
@@ -427,18 +820,18 @@
     ],
     "processing_time": "3-14 days",
     "contact_phone": "211",
-    "contact_org": "Multnomah County Department of County Human Services"
+    "contact_org": "211info"
   },
   {
-    "id": "pcef-home-energy",
-    "name": "Portland Clean Energy Fund Home Energy Programs",
-    "short_name": "PCEF Weatherization",
+    "id": "cep-weatherization",
+    "name": "Community Energy Project Home Weatherization",
+    "short_name": "CEP Weatherization",
     "category": "utility",
     "jurisdiction": "portland",
     "hidden_gem": true,
     "urgency": "standard",
-    "description": "Free home weatherization, heat pumps, air conditioning, and energy efficiency upgrades for income-qualified Portland households — funded by city tax on large retailers.",
-    "legal_basis": "Portland City Code 7.07 (PCEF)",
+    "description": "Community Energy Project partners with low-income communities on the frontlines of climate change to create more resilient, efficient, and healthy homes.",
+    "legal_basis": "Portland City Code 7.07 (PCEF funding source)",
     "estimated_annual_value": {
       "min": 2000,
       "max": 15000,
@@ -450,16 +843,16 @@
         "portland"
       ]
     },
-    "application_url": "https://www.portland.gov/bps/cleanenergy",
-    "application_method": "online",
+    "application_url": "https://www.communityenergyproject.org/",
+    "application_method": "phone",
     "documents_required": [
       "Proof of income",
       "Proof of Portland residency",
       "Utility bill"
     ],
     "processing_time": "2-6 months for project completion",
-    "contact_phone": "503-823-7700",
-    "contact_org": "Portland Bureau of Planning and Sustainability"
+    "contact_phone": "503-284-6827",
+    "contact_org": "Community Energy Project"
   },
   {
     "id": "senior-prop-tax-deferral",
@@ -469,7 +862,7 @@
     "jurisdiction": "oregon",
     "hidden_gem": false,
     "urgency": "standard",
-    "description": "Oregon homeowners 62+ or disabled can defer property taxes until home is sold or estate is settled. Effectively eliminates current property tax obligation.",
+    "description": "As a disabled or senior homeowner, you can borrow from the State of Oregon to pay your property taxes to the county. If you qualify for the program, Oregon Department of Revenue will pay your county property taxes on November 15 of each year.",
     "legal_basis": "ORS 311.666 - 311.701",
     "estimated_annual_value": {
       "min": 1500,
@@ -484,34 +877,33 @@
         "oregon"
       ],
       "other_requirements": [
-        "Home must be primary residence",
-        "Equity requirements apply",
-        "Real market value minimum cap of $301,000 for 2026",
-        "Homeowners with less than 17 years residency may qualify if homestead RMV is less than 150% of county median value"
-      ]
+        "Real market value (RMV) minimum cap amount for 2026 increased to $301,000",
+        "Homeowners that owned and lived in their home less than 17 years may qualify if homestead RMV is less than 150 percent of the county's median value of residential improved property",
+        "If reverse mortgage entered into on or after July 1, 2011 and before January 1, 2017, must have equity in home of at least 40 percent as of date of deferral application"
+      ],
+      "must_be_renter": false,
+      "must_be_disabled": true,
+      "must_be_senior": true
     },
     "application_url": "https://www.oregon.gov/dor/programs/property/Pages/Deferral.aspx",
-    "application_method": "mail",
+    "application_method": "online",
     "documents_required": [
-      "Property tax statement",
-      "Proof of age",
-      "Proof of income",
-      "Property deed information"
+      "Online application"
     ],
     "processing_time": "60-90 days",
-    "renewal_cycle": "Biennial recertification",
-    "contact_phone": "503-945-8348",
+    "renewal_cycle": "Every two years after initial approval",
+    "contact_phone": "503-945-8348 or 800-356-4222",
     "contact_org": "Oregon Department of Revenue"
   },
   {
     "id": "transportation-wallet",
-    "name": "Portland Transportation Wallet for Residents",
-    "short_name": "Transportation Wallet",
+    "name": "Portland Transportation Wallet: Access for All",
+    "short_name": "Access for All",
     "category": "transportation",
     "jurisdiction": "portland",
     "hidden_gem": true,
     "urgency": "standard",
-    "description": "Portland gives income-qualified residents up to $308 in transportation credits (TriMet, BIKETOWN, parking, scooter) per year.",
+    "description": "A program offering free transportation resources (funds or credits) to eligible low-income Portlanders, helping pay for transit, e-bike and e-scooter-share, ride-share, taxi services, and more.",
     "legal_basis": "PBOT Resolution",
     "estimated_annual_value": {
       "min": 100,
@@ -522,27 +914,34 @@
       "income_max_pct_fpl": 200,
       "must_reside_in": [
         "portland"
+      ],
+      "age_min": 18,
+      "other_requirements": [
+        "Must meet low-income criteria",
+        "Must be referred by a participating community-based organization",
+        "Available once per calendar year"
       ]
     },
-    "application_url": "https://www.portland.gov/transportation/transportationwallet",
+    "application_url": "https://www.portland.gov/transportation/wallet/access-all",
     "application_method": "online",
     "documents_required": [
       "Proof of Portland residency",
       "Proof of income OR enrollment in qualifying program"
     ],
     "processing_time": "2-3 weeks",
-    "renewal_cycle": "Annual",
-    "contact_org": "PBOT"
+    "renewal_cycle": "Calendar year (once per calendar year)",
+    "contact_org": "Portland Bureau of Transportation (PBOT)",
+    "contact_phone": "311"
   },
   {
     "id": "inclusionary-housing",
     "name": "Portland Inclusionary Housing Program",
-    "short_name": "Inclusionary Housing",
+    "short_name": "IH Program",
     "category": "housing",
     "jurisdiction": "portland",
     "hidden_gem": true,
     "urgency": "standard",
-    "description": "Below-market rental units in new Portland apartment buildings, restricted to households at 60-80% Median Family Income. Significant rent savings — often $500-$1,500/month below market.",
+    "description": "A program requiring that all residential buildings proposing 20 or more new units provide a percentage of the new units at rents or sale prices affordable to households at 80% of the median family income or below.",
     "legal_basis": "Portland City Code 30.01.120",
     "estimated_annual_value": {
       "min": 3000,
@@ -554,6 +953,10 @@
       "must_be_renter": true,
       "must_reside_in": [
         "portland"
+      ],
+      "income_max_pct_fpl": 80,
+      "other_requirements": [
+        "Residential buildings must propose 20 or more new units"
       ]
     },
     "application_url": "https://www.portland.gov/phb/inclusionary-housing",
@@ -570,13 +973,13 @@
   },
   {
     "id": "sun-service-system",
-    "name": "SUN Service System (Schools Uniting Neighborhoods)",
-    "short_name": "SUN Schools",
+    "name": "SUN Community Schools",
+    "short_name": "SUN",
     "category": "education",
     "jurisdiction": "multnomah",
     "hidden_gem": true,
     "urgency": "standard",
-    "description": "Wraparound services at SUN Community Schools and locations throughout Multnomah County: free after-school programs, summer programs, family meals, mental health support, parenting classes, basic needs assistance, case management, energy assistance, and educational support for youth and families.",
+    "description": "We ensure that the future is in good hands by making sure young people have access to a full range of opportunities throughout their childhood. SUN Community Schools offer after school programs, quality instruction, enrichment, and extra-curricular activities, links to food, shelter, and help with energy bills, connection to health and mental health services, and adult education and recreation.",
     "legal_basis": "Multnomah County program",
     "estimated_annual_value": {
       "min": 1000,
@@ -589,29 +992,28 @@
         "multnomah"
       ],
       "other_requirements": [
-        "Most services open to everyone; some basic needs services (rent and energy assistance) have income eligibility requirements",
-        "Child must attend or live near a SUN school or service location"
+        "Child must attend or live near a SUN school"
       ]
     },
-    "application_url": "https://www.multco.us/sun",
-    "application_method": "in_person",
+    "application_url": "https://multco.us/programs/sun-community-schools",
+    "application_method": "online",
     "documents_required": [
       "Child's school enrollment",
       "Photo ID"
     ],
     "processing_time": "Same day for most programs",
     "contact_phone": "503-988-6295",
-    "contact_org": "Multnomah County SUN"
+    "contact_org": "Department of County Human Services"
   },
   {
     "id": "advsd",
-    "name": "Aging, Disability and Veterans Services (ADVSD)",
-    "short_name": "ADVSD Case Management",
+    "name": "Aging and Disability Resource Connection Helpline",
+    "short_name": "ADRC Helpline",
     "category": "healthcare",
     "jurisdiction": "multnomah",
     "hidden_gem": true,
     "urgency": "standard",
-    "description": "Free case management, in-home care, transportation, meal delivery, and benefits navigation for adults 60+, adults with disabilities, and veterans in Multnomah County.",
+    "description": "The ADRC helps people of all ages, incomes and abilities learn about long-term support options and other programs and services in their communities.",
     "legal_basis": "Older Americans Act + Multnomah County",
     "estimated_annual_value": {
       "min": 0,
@@ -620,13 +1022,13 @@
     },
     "eligibility": {
       "must_reside_in": [
-        "multnomah"
+        "oregon"
       ],
       "other_requirements": [
         "Age 60+, OR adult with disability, OR veteran"
       ]
     },
-    "application_url": "https://www.multco.us/ads",
+    "application_url": "https://multco.us/info/aging-and-disability-resource-connection-helpline",
     "application_method": "phone",
     "documents_required": [
       "Photo ID",
@@ -635,18 +1037,18 @@
     ],
     "processing_time": "1-2 weeks for initial assessment",
     "contact_phone": "503-988-3646",
-    "contact_org": "Multnomah County ADVSD"
+    "contact_org": "Multnomah County Aging and Disability Resource Connection"
   },
   {
     "id": "veterans-prop-tax-exempt",
-    "name": "Oregon Veterans Property Tax Exemption",
-    "short_name": "Veterans Tax Exemption",
+    "name": "Oregon Property Tax Exemption for Disabled Veterans",
+    "short_name": "Oregon Veterans Property Tax Exemption",
     "category": "tax",
     "jurisdiction": "oregon",
     "hidden_gem": false,
     "urgency": "standard",
-    "description": "Disabled veterans and surviving spouses receive a property tax exemption on the assessed value of their home, currently $25,489 or $30,587 depending on disability rating.",
-    "legal_basis": "ORS 307.250",
+    "description": "A property tax exemption program for disabled veterans and surviving spouses of veterans that exempts a portion of homestead property's assessed value from property taxes.",
+    "legal_basis": "Oregon Revised Statute (ORS) 307.250–307.283",
     "estimated_annual_value": {
       "min": 200,
       "max": 600,
@@ -659,43 +1061,70 @@
         "oregon"
       ],
       "other_requirements": [
-        "Service-connected disability rating, OR surviving spouse of veteran"
-      ]
+        "Must be discharged or released under honorable conditions",
+        "Must meet military service duration requirements (at least 91 consecutive days beginning on or before January 31, 1955; or at least 179 consecutive days beginning after January 31, 1955; or 178 days or less if discharged due to service-connected disability; or at least one day in a combat zone)",
+        "Must have disabilities of 40% or more certified by VA, Armed Forces, or licensed physician",
+        "Must own and live on homestead property",
+        "Surviving spouses/partners must not have entered into new marriage or partnership"
+      ],
+      "income_max_pct_fpl": 185,
+      "must_be_renter": false,
+      "must_be_disabled": true,
+      "citizenship_status": "citizen"
     },
-    "application_url": "https://www.oregon.gov/dor/programs/property/Pages/exemptions-veterans.aspx",
-    "application_method": "mail",
+    "application_url": "https://www.oregon.gov/odva/benefits/pages/taxes.aspx",
+    "info_urls": [
+      "https://www.oregon.gov/dor/forms/FormsPubs/veteran-spouse-exemption_310-676.pdf"
+    ],
+    "application_method": "in_person",
     "documents_required": [
-      "DD-214",
-      "VA disability rating letter",
-      "Property deed",
-      "Photo ID"
+      "DD-214 or other military-issued documentation showing discharge/release under honorable conditions and period of active service",
+      "Certificate of disability (40% or more) issued by U.S. Department of Veterans Affairs, branch of Armed Forces, or licensed physician",
+      "For surviving spouse/partner: marriage certificate or certificate of registered domestic partnership",
+      "For surviving spouse/partner: veteran's death certificate"
     ],
     "processing_time": "60-90 days",
-    "renewal_cycle": "One-time application",
-    "contact_org": "Oregon Department of Revenue"
+    "renewal_cycle": "Annual for physicians' certifications; not required for VA/Armed Forces certifications dated within three years or after age 65 with permanent disability certification",
+    "contact_org": "Oregon Department of Revenue",
+    "benefit_schedule": {
+      "description": "Property tax exemption amounts by disability/service status",
+      "unit": "usd_annual",
+      "amounts": [
+        {
+          "condition": "Disabled veteran certified by VA/Armed Forces with 40% or more disabilities, or veteran certified by licensed physician as 40% or more disabled (with income limit of 185% FPL), or active duty service members including National Guard and Reserve members",
+          "value": 27092
+        },
+        {
+          "condition": "Veteran certified by VA/Armed Forces with service-connected disabilities of 40% or more, or surviving spouse/partner of veteran who died from service-connected injury/illness or received at least one year of maximum exemption",
+          "value": 32512
+        }
+      ]
+    },
+    "contact_phone": "800-692-9666"
   },
   {
-    "id": "acp",
-    "name": "Affordable Connectivity Program",
-    "short_name": "ACP Internet Discount",
+    "id": "lifeline",
+    "name": "Lifeline",
+    "short_name": "Lifeline",
     "category": "connectivity",
     "jurisdiction": "federal",
     "hidden_gem": false,
     "urgency": "standard",
-    "description": "$30/month discount on home internet service for income-qualified households. Some providers (Comcast Internet Essentials, T-Mobile) offer plans that become free with ACP.",
-    "legal_basis": "Infrastructure Investment and Jobs Act § 60502",
+    "description": "A federal program that offers a monthly benefit towards phone or internet services for eligible subscribers",
+    "legal_basis": "47 U.S.C. § 254(j); 47 CFR Part 54, Subpart E",
     "estimated_annual_value": {
-      "min": 360,
-      "max": 360,
-      "median": 360
+      "min": 111,
+      "max": 411,
+      "median": 111
     },
     "eligibility": {
-      "income_max_pct_fpl": 200,
+      "income_max_pct_fpl": 135,
       "other_requirements": [
-        "OR enrolled in qualifying program (SNAP, OHP, Pell Grant, etc.)"
+        "Participation in SNAP, Medicaid, or other federal programs (alternative qualification criteria)",
+        "Must be eligible subscriber for phone or internet service"
       ]
     },
-    "application_url": "https://www.affordableconnectivity.gov/",
+    "application_url": "https://www.usac.org/lifeline/",
     "application_method": "online",
     "documents_required": [
       "Photo ID",
@@ -703,7 +1132,21 @@
     ],
     "processing_time": "7-10 days",
     "renewal_cycle": "Annual",
-    "contact_phone": "1-877-384-2575",
-    "contact_org": "FCC"
+    "contact_phone": "1-800-234-9473",
+    "contact_org": "USAC (Universal Service Administrative Company)",
+    "benefit_schedule": {
+      "description": "Monthly benefit amount by residential status",
+      "unit": "usd_monthly",
+      "amounts": [
+        {
+          "condition": "Non-Tribal lands",
+          "value": 9.25
+        },
+        {
+          "condition": "Tribal lands",
+          "value": 34.25
+        }
+      ]
+    }
   }
 ]
