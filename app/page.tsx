@@ -10,6 +10,16 @@ import {
 } from "@/components/brand/RoseStamp";
 import { JurisdictionPill } from "@/components/brand/JurisdictionPill";
 import { StatReveal } from "@/components/landing/StatReveal";
+import mariaFixture from "@/data/scenarios/maria.json";
+import jamesFixture from "@/data/scenarios/james.json";
+import roseFixture from "@/data/scenarios/rose.json";
+
+const eligibleCount = (f: { matches: { eligible: boolean }[] }) =>
+  f.matches.filter((m) => m.eligible).length;
+
+const MARIA_TOTAL = mariaFixture.total_estimated_annual_value;
+const MARIA_FEDERAL = mariaFixture.federal_only_value;
+const MARIA_ELIGIBLE = eligibleCount(mariaFixture);
 
 const HIDDEN_GEMS = [
   {
@@ -69,8 +79,8 @@ const SCENARIO_SUMMARIES = [
     zip: "97218 · Cully",
     blurb:
       "Single parent · 2 kids · part-time at Fred Meyer · rent went up 12%.",
-    total: 46568,
-    eligibleCount: 13,
+    total: MARIA_TOTAL,
+    eligibleCount: MARIA_ELIGIBLE,
     accent: "rose" as const,
   },
   {
@@ -79,8 +89,8 @@ const SCENARIO_SUMMARIES = [
     short: "James",
     zip: "97203 · St. Johns",
     blurb: "Single · disabled vet · unemployed · owns home in St. Johns.",
-    total: 23260,
-    eligibleCount: 11,
+    total: jamesFixture.total_estimated_annual_value,
+    eligibleCount: eligibleCount(jamesFixture),
     accent: "moss" as const,
   },
   {
@@ -89,8 +99,8 @@ const SCENARIO_SUMMARIES = [
     short: "Rose",
     zip: "97266 · Lents",
     blurb: "Senior · widow · Social Security only · owns home in Lents.",
-    total: 19860,
-    eligibleCount: 10,
+    total: roseFixture.total_estimated_annual_value,
+    eligibleCount: eligibleCount(roseFixture),
     accent: "sun" as const,
   },
 ];
@@ -269,7 +279,7 @@ export default function HomePage() {
                         fontWeight: 500,
                       }}
                     >
-                      $46,568
+                      ${MARIA_TOTAL.toLocaleString()}
                     </div>
                     <div
                       className="flex items-center gap-2 mt-3"
@@ -279,7 +289,7 @@ export default function HomePage() {
                         className="pill pill-sun"
                         style={{ fontSize: "0.72rem" }}
                       >
-                        <Sparkles size={11} /> 13 programs
+                        <Sparkles size={11} /> {MARIA_ELIGIBLE} programs
                       </span>
                       <span style={{ color: "var(--ink-3)" }}>·</span>
                       <span>5 only Portland tools find</span>
@@ -635,9 +645,16 @@ export default function HomePage() {
                   }}
                 >
                   Federal &amp; state tools find{" "}
-                  <span style={{ color: "var(--ink-3)" }}>$24,360</span>.
+                  <span style={{ color: "var(--ink-3)" }}>
+                    ${MARIA_FEDERAL.toLocaleString()}
+                  </span>
+                  .
                   <br />
-                  We find <span style={{ color: "var(--rose)" }}>$46,568</span>.
+                  We find{" "}
+                  <span style={{ color: "var(--rose)" }}>
+                    ${MARIA_TOTAL.toLocaleString()}
+                  </span>
+                  .
                 </h3>
                 <p
                   style={{

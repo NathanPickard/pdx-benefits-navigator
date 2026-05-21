@@ -2,163 +2,176 @@
   "matches": [
     {
       "program_id": "snap",
-      "eligible": true,
+      "eligible": false,
       "confidence": "high",
-      "estimated_annual_value": 3600,
-      "reasoning": "4-person household at $48,000/year is 149% FPL (threshold: 200%). LPR status qualifies. Income well below SNAP limit. Household with children is priority.",
+      "estimated_annual_value": 0,
+      "reasoning": "Household of 4 with $48,000 annual income ($4,000/month). The SNAP gross income limit for a 4-person household is 130% FPL = $32,150 × 1.30 = $41,795/year (~$3,483/month). At $48,000/year, this household exceeds the gross income threshold for SNAP. No elderly or disabled member is present to exempt them from the gross test. Ineligible.",
       "next_steps": [
-        "Visit https://one.oregon.gov/ and apply online for SNAP",
-        "Gather last 30 days of pay stubs to verify income",
-        "Collect proof of housing costs (lease or rent payment documentation)",
-        "Submit Social Security numbers for all 4 household members"
+        "If household income drops or you gain significant allowable deductions (childcare, medical), recheck eligibility at oregon.gov/odhs/food",
+        "Call 211 to ask about other food assistance programs that may have higher income limits",
+        "Ask about Double Up Food Bucks at farmers markets, which has no income test"
       ],
       "required_documents": [
-        "Photo ID",
-        "Last 30 days of pay stubs",
-        "Proof of housing costs",
-        "Social Security numbers for all household members"
+        "Proof of income",
+        "Photo ID"
       ],
       "application_deadline": null,
       "urgency_note": null
     },
     {
       "program_id": "ohp",
-      "eligible": true,
+      "eligible": false,
       "confidence": "high",
-      "estimated_annual_value": 4000,
-      "reasoning": "Household income $48,000 is 149% FPL. OHP covers adults at 138% FPL and children at 305% FPL. Children definitely qualify; at least one adult likely qualifies at this income. LPR status meets requirement.",
+      "estimated_annual_value": 0,
+      "reasoning": "OHP eligibility varies by member type. For adults, the limit is 138% FPL for a 4-person household = $44,367/year; the household's $48,000 income exceeds this, so adults are ineligible for OHP. For children, the limit is 305% FPL = ~$98,058 for a 4-person household — both children ages 5 and 8 qualify comfortably. The two children can receive free OHP coverage. Estimated value based on ~$4,000/year per child in avoided healthcare costs.",
       "next_steps": [
-        "Apply at https://one.oregon.gov/ for Oregon Health Plan",
-        "Provide proof of Oregon residency (utility bill, lease, or driver's license)",
-        "Include last 30 days of pay stubs for income verification",
-        "Have Social Security numbers ready for all household members"
+        "Visit oregon.gov/oha/hsd/ohp/pages/eligibility.aspx to apply for OHP for both children",
+        "Apply online at ONE.Oregon.gov — Spanish-language application is available (note primary language is Spanish)",
+        "Gather proof of income, children's Social Security numbers, and proof of Oregon residency",
+        "Adults should explore HealthCare.gov for marketplace plans with premium tax credits at this income level"
       ],
       "required_documents": [
-        "Photo ID",
+        "Children's Social Security numbers",
+        "Proof of income",
         "Proof of Oregon residency",
-        "Last 30 days of pay stubs",
-        "Social Security numbers for all household members"
+        "Photo ID"
       ],
       "application_deadline": null,
       "urgency_note": null
+    },
+    {
+      "program_id": "pdx-renter-relocation",
+      "eligible": true,
+      "confidence": "high",
+      "estimated_annual_value": 4200,
+      "reasoning": "Household resides in ZIP 97218, which is inside Portland city limits (Cully neighborhood). The household is a renter and received a 12% rent increase, which exceeds the 10% threshold that triggers Portland's Mandatory Renter Relocation Assistance under Portland City Code 30.01.085. The landlord must pay relocation assistance when they raise rent by more than 10% within a 12-month period or issue a no-cause termination. The household does not appear to live with their landlord and is not on a week-to-week tenancy. With a household of 4 and 2 children, they likely occupy a 2-bedroom or 3-bedroom unit. Using $4,200 for a 2-bedroom as the conservative estimate.",
+      "next_steps": [
+        "Send a written demand letter to your landlord requesting relocation assistance under Portland City Code 30.01.085 — payment is due within 45 days",
+        "Call the Portland Rental Services Helpdesk at 503-823-1303 (Spanish interpretation available) to confirm your rights and get help drafting the demand letter",
+        "Visit portland.gov/phb/rental-services/mandatory-renter-relocation-assistance for the official demand letter template",
+        "Gather your rent increase notice and current lease agreement as documentation"
+      ],
+      "required_documents": [
+        "Rent increase notice showing 12% increase",
+        "Current lease agreement",
+        "Written demand letter to landlord"
+      ],
+      "application_deadline": "Demand must be made — contact Rental Services for applicable deadlines",
+      "urgency_note": "EVENT TRIGGERED: Your 12% rent increase exceeds Portland's 10% threshold. You are entitled to relocation assistance from your landlord. Act promptly — contact 503-823-1303 immediately."
     },
     {
       "program_id": "erdc",
       "eligible": true,
-      "confidence": "high",
+      "confidence": "medium",
       "estimated_annual_value": 12000,
-      "reasoning": "Household at 149% FPL qualifies (threshold 200%). Has 2 children under 13. Employed part-time status still qualifies for ERDC. Significant benefit for working families with childcare expenses.",
+      "reasoning": "ERDC subsidizes childcare for working families. Household of 4, income $48,000/year ($4,000/month). Income limit is 250% FPL for family of 4 = $80,375 — well within range. Both children (ages 5 and 8) are under 13. The applicant is employed part-time, meeting the employment requirement. For the family-of-4 income bracket of $4,000/month, the monthly copay from the schedule would be in the $5–$10/month range (income $4,000 falls in '$3,607–$4,057.99' tier = $40/month copay for family of 4, or '$4,058–$5,925.99' = $100/month). At $4,000/month income, copay is $40/month. The subsidy covers the remainder of childcare costs, which can be $1,000–$1,500/month per child. Estimated net annual value of subsidy is ~$12,000. If this is a two-parent household, both adults must be working or in school for eligibility.",
       "next_steps": [
-        "Apply through https://one.oregon.gov/ for ERDC childcare subsidy",
-        "Provide proof of current employment (recent pay stub or employer letter)",
-        "Gather child care provider information (name, address, license number if available)",
-        "Submit children's birth certificates"
+        "Apply online at oregon.gov/delc/programs/pages/erdc.aspx — Spanish-language support available",
+        "Call DELC at 800-699-9075 to confirm eligibility and locate approved childcare providers near 97218",
+        "Gather your last 2 pay stubs as proof of part-time employment income",
+        "If two-parent household, confirm second parent's employment or school enrollment status before applying"
       ],
       "required_documents": [
-        "Proof of employment (pay stub or employer letter)",
-        "Recent pay stubs (last 30 days)",
-        "Children's birth certificates",
-        "Child care provider details (name, address, phone)"
+        "Pay stubs (last 30 days) proving part-time employment",
+        "Children's immunization records",
+        "Photo ID",
+        "Children's birth certificates"
       ],
       "application_deadline": null,
-      "urgency_note": null
+      "urgency_note": "High value program — with two children in care, this could cover thousands in childcare costs annually."
     },
     {
       "program_id": "oregon-eitc",
       "eligible": true,
-      "confidence": "high",
-      "estimated_annual_value": 2200,
-      "reasoning": "Working household with $48,000 annual income qualifies for Oregon EITC (threshold ~$30k for single, higher for families). Has 2 children under 6 (both 5 and 8, so one under 6 qualifies for Kids' Credit at $1,000). Will receive refund via tax filing.",
+      "confidence": "medium",
+      "estimated_annual_value": 400,
+      "reasoning": "Oregon EITC: The applicant is employed part-time with $48,000 household income and is an LPR (qualifying citizenship status). If filing as single or head of household with 2 children, federal EITC income limits for 2025 are approximately $53,502 (single/HOH, 2 children) — $48,000 is within range. Oregon EIC = 9% of federal EITC (or 12% if a dependent under 3 exists — no child under 3 here). The child ages are 5 and 8; neither is under 3. Federal EITC at $48,000 with 2 children (HOH) would be modest — approximately $1,500–$2,500 depending on exact earned income. Oregon EIC at 9% = ~$135–$225. Oregon Kids Credit: income cap is $31,550 — household income of $48,000 exceeds this, so Kids Credit is not available. Note: if this is a two-earner married household, EITC phase-outs may apply differently. Total estimated annual value ~$400 combining Oregon EIC estimate. Confidence is medium due to unknown filing status and whether income is entirely earned by one person.",
       "next_steps": [
-        "File Oregon state income tax return at https://www.oregon.gov/dor/",
-        "Claim both Oregon EITC and Oregon Kids' Credit for child under 6",
-        "Gather all W-2s and 1099s from 2025 tax year",
-        "Have children's birth certificates and Social Security cards available"
+        "File Oregon state income taxes and claim the Oregon Earned Income Credit on your return (Form OR-EIC)",
+        "Use free tax preparation services — call 211 or visit a VITA site (Volunteer Income Tax Assistance) which offers Spanish-language help",
+        "Visit oregon.gov/dor/programs/individuals/pages/credits.aspx for credit information",
+        "Gather all W-2s and 1099s to determine exact earned income for EITC calculation"
       ],
       "required_documents": [
-        "W-2s from all employers",
-        "1099s if applicable",
-        "Children's birth certificates",
-        "Social Security cards for all household members"
+        "W-2s and/or 1099s",
+        "Social Security cards or ITIN documentation",
+        "Children's birth certificates"
       ],
-      "application_deadline": "April 15, 2026 (tax year 2025)",
+      "application_deadline": "Oregon tax filing deadline (typically April 15)",
       "urgency_note": null
     },
     {
       "program_id": "pge-iqbd",
-      "eligible": false,
-      "confidence": "high",
-      "estimated_annual_value": 0,
-      "reasoning": "No indication in intake data that household is a Portland General Electric customer. Program requires PGE account. Without confirmation of PGE service, cannot verify eligibility.",
+      "eligible": true,
+      "confidence": "medium",
+      "estimated_annual_value": 600,
+      "reasoning": "Household income $48,000 is below 200% FPL for a family of 4 ($64,300). ZIP 97218 (Cully, Portland) is within PGE's service territory. Assuming the household is a PGE residential customer, they qualify for the Income-Qualified Bill Discount. At $48,000/$64,300 = approximately 75% of 200% FPL, the household falls in a mid-tier discount bracket. Using the median estimated annual value of $600 as a conservative estimate. Confidence is medium because we cannot confirm PGE (vs. Pacific Power) is the electricity provider without the account.",
       "next_steps": [
-        "Check if your electric bill is from Portland General Electric",
-        "If PGE customer, apply at https://portlandgeneral.com/help/financial-assistance/income-qualified-bill-discount",
-        "Otherwise, identify your actual utility provider"
+        "Visit portlandgeneral.com/income-qualified-bill-discount or call PGE at 503-228-6322 to enroll (Spanish support available)",
+        "Have your PGE account number ready and provide proof of income (pay stubs) or proof of enrollment in OHP or other qualifying program",
+        "Enrollment takes effect within 1–2 billing cycles after approval",
+        "Mark your calendar to renew in 2 years"
       ],
       "required_documents": [
-        "PGE account number (if applicable)",
-        "Proof of income or enrollment in SNAP/OHP"
+        "PGE account number",
+        "Proof of income (pay stubs) OR proof of enrollment in qualifying assistance program",
+        "Photo ID"
       ],
       "application_deadline": null,
-      "urgency_note": "Only eligible if PGE is your provider"
+      "urgency_note": null
     },
     {
       "program_id": "pdx-water-fa",
       "eligible": true,
-      "confidence": "high",
+      "confidence": "medium",
       "estimated_annual_value": 400,
-      "reasoning": "ZIP 97218 is Portland (Cully neighborhood). Annual household income $48,000 is approximately 89% SMI (~54,000 SMI for 4-person household), well below 60% SMI threshold. Portland water/sewer customer qualifies for up to 80% discount.",
+      "reasoning": "ZIP 97218 is within Portland city limits (Cully neighborhood). The household is a renter. Portland Water Bureau Financial Assistance serves single-family residential customers who live at the service address. For renters, eligibility depends on whether the water/sewer bill is in their name. The income threshold is listed as income_max_annual of $53,000 — household income of $48,000 is below $53,000, qualifying on income. Confidence is medium because renter eligibility depends on whether the water bill is in the tenant's name (common in Portland for single-family rentals). Using median estimated annual value of $400.",
       "next_steps": [
-        "Visit https://www.portland.gov/water/financial-assistance to apply online",
-        "Have your water bill account number ready",
-        "Gather proof of income (last 30 days of pay stubs)",
-        "Provide photo ID"
+        "Check whether your water/sewer bill is in your name — if so, apply at portland.gov/water/customer-service/apply-financial-assistance",
+        "Call Portland Water Bureau at 503-823-7770 (Spanish interpretation available via language line)",
+        "Gather proof of income (pay stubs), names and birthdates of all household members, and your service address",
+        "Apply online — approval takes approximately 30 days"
       ],
       "required_documents": [
-        "Water bill (account number)",
-        "Proof of income (last 30 days of pay stubs)",
-        "Photo ID"
+        "Proof of gross monthly income for all household members over 18",
+        "Recent pay stubs or earnings statements",
+        "Names and birthdates of all household members",
+        "Portland Water Bureau account number or service address"
       ],
       "application_deadline": null,
       "urgency_note": null
     },
     {
       "program_id": "nw-natural-bill-discount",
-      "eligible": false,
-      "confidence": "high",
-      "estimated_annual_value": 0,
-      "reasoning": "No confirmation that household uses NW Natural Gas. Program requires active NW Natural customer account. Without verification of service, cannot confirm eligibility.",
+      "eligible": true,
+      "confidence": "medium",
+      "estimated_annual_value": 360,
+      "reasoning": "Household income of $48,000 falls in the NW Natural Oregon tier '$36,909 to $55,362' which provides a 30% monthly discount. ZIP 97218 is in Portland, which is within NW Natural's Oregon service area for gas. Assuming the household uses NW Natural for gas service, they qualify for the 30% discount tier. Average Oregon residential gas bill ~$100/month × 30% = ~$30/month savings = ~$360/year. Confidence is medium as we cannot confirm NW Natural is the gas provider without account verification.",
       "next_steps": [
-        "Check if your gas bill is from NW Natural",
-        "If NW Natural customer, call 1-800-422-4012 to apply",
-        "Otherwise, identify your actual gas provider"
+        "Visit nwnatural.com/account/bill-discount-program or call NW Natural at 800-422-4012 to apply (Spanish support available)",
+        "Have your NW Natural account number and proof of income ready",
+        "Processing takes approximately 30 days",
+        "Renew every 2 years to maintain the discount"
       ],
       "required_documents": [
-        "NW Natural account number (if applicable)",
+        "NW Natural account number",
         "Proof of income",
         "Photo ID"
       ],
       "application_deadline": null,
-      "urgency_note": "Only eligible if NW Natural is your provider"
+      "urgency_note": null
     },
     {
       "program_id": "liheap-energy-trust",
-      "eligible": true,
+      "eligible": false,
       "confidence": "high",
-      "estimated_annual_value": 700,
-      "reasoning": "Household at 149% FPL qualifies (threshold 200%). Oregon resident with children. Eligible for both LIHEAP (heating assistance) and Energy Trust weatherization (insulation, heat pumps, efficiency upgrades). Significant long-term savings.",
+      "estimated_annual_value": 0,
+      "reasoning": "LIHEAP eligibility requires income at or below 60% FPL. For a 4-person household, 60% FPL = $32,150 × 0.60 = $19,290/year. Household income is $48,000, which far exceeds this threshold. Ineligible.",
       "next_steps": [
-        "Call 211 (Oregon) to apply for LIHEAP and weatherization assessment",
-        "Gather proof of income (last 30 days of pay stubs)",
-        "Have utility bill ready to show heating costs",
-        "Provide Social Security numbers for household"
+        "If income drops significantly, contact OHCS at 1-800-453-5511 to apply",
+        "Consider PGE IQBD and NW Natural Bill Discount as accessible alternatives at your current income level"
       ],
-      "required_documents": [
-        "Proof of income (last 30 days of pay stubs)",
-        "Current utility bill",
-        "Social Security numbers",
-        "Photo ID"
-      ],
+      "required_documents": [],
       "application_deadline": null,
       "urgency_note": null
     },
@@ -167,18 +180,11 @@
       "eligible": false,
       "confidence": "high",
       "estimated_annual_value": 0,
-      "reasoning": "WIC requires pregnant woman, postpartum mother, breastfeeding mother, or child under 5. Household has child age 5 (may be ineligible if not still under 5) and child age 8 (too old). No indication of pregnancy or postpartum status. Likely ineligible based on ages.",
+      "reasoning": "WIC serves pregnant women, postpartum/breastfeeding women, infants, and children under age 5. The children in this household are ages 5 and 8 — neither is under 5 (a 5-year-old has already passed the age-5 threshold). The household member is not pregnant. No infant is present. The household does not meet the categorical eligibility requirements for WIC. Ineligible.",
       "next_steps": [
-        "Verify exact age of 5-year-old (must be under 5 to qualify)",
-        "If child is still under 5, call Oregon WIC at 1-800-723-3638",
-        "Otherwise, check if any household member is pregnant or postpartum"
+        "If the family has another child under 5 in the future, apply immediately at oregon.gov/oha/ph/healthypeoplefamilies/wic"
       ],
-      "required_documents": [
-        "Proof of income",
-        "Photo ID",
-        "Proof of residency",
-        "Medical card for family member"
-      ],
+      "required_documents": [],
       "application_deadline": null,
       "urgency_note": null
     },
@@ -187,18 +193,19 @@
       "eligible": true,
       "confidence": "high",
       "estimated_annual_value": 1500,
-      "reasoning": "Household has 2 school-age children (ages 5 and 8). Annual income $48,000 is 149% FPL, below 185% threshold. Portland Public Schools currently offers universal free meals to all students, so children qualify regardless of income. Significant ongoing benefit.",
+      "reasoning": "School Meals (free and reduced price) eligibility at 185% FPL for a family of 4 = $32,150 × 1.85 = $59,478/year. Household income of $48,000 is well below this threshold. Both children (ages 5 and 8) are school-age and enrolled in school. The household resides in Oregon (ZIP 97218). Both children qualify for free or reduced-price school meals. Estimated annual value based on ~$1,500 for two children (approximately $750/child/year in avoided meal costs).",
       "next_steps": [
-        "Visit https://www.pps.net/Page/2156 to apply online or at child's school",
-        "Provide household income information",
-        "Confirm children's school enrollment",
-        "Complete application before school year starts"
+        "Submit a school meal application to both children's schools at the start of each school year — forms are available in Spanish",
+        "Contact Portland Public Schools nutrition services or your school's office directly to apply",
+        "Children may qualify for free meals (at 130% FPL) or reduced-price meals (130–185% FPL); at $48,000 for family of 4 = ~149% FPL, reduced-price meals likely apply — confirm exact calculation with school",
+        "Visit fns.usda.gov/school-meals for federal program information"
       ],
       "required_documents": [
         "Household income information",
-        "Children's school enrollment documentation"
+        "Children's school enrollment confirmation",
+        "Social Security numbers (optional but helpful)"
       ],
-      "application_deadline": "Before school year start (ongoing enrollment)",
+      "application_deadline": "Apply at start of each school year (July 1–June 30 cycle)",
       "urgency_note": null
     },
     {
@@ -206,132 +213,32 @@
       "eligible": false,
       "confidence": "high",
       "estimated_annual_value": 0,
-      "reasoning": "Intake indicates no eviction notice received ('received_eviction_notice': false). Program is time-sensitive and triggered by eviction notice or active housing crisis. Household at 149% FPL would qualify if crisis occurred, but currently not in emergency situation.",
+      "reasoning": "Multnomah County Eviction Prevention (STRA) is triggered by an eviction notice or imminent homelessness risk. The intake data shows received_eviction_notice=false. While the household received a 12% rent increase (which is challenging), they have not received an eviction notice and are not in the eviction prevention eligibility trigger scenario described. Additionally, income of $48,000 is below 200% FPL ($64,300) for 4 persons, which would meet the income test — but the program requires a qualifying crisis event. Ineligible at this time.",
       "next_steps": [
-        "If you receive an eviction notice in the future, call 211 immediately",
-        "Program provides emergency rental assistance up to $5,000",
-        "Keep this resource available for housing emergencies"
+        "If you are unable to pay rent and face eviction in the future, call 211 immediately to access this program",
+        "The 12% rent increase may qualify you for Portland Renter Relocation Assistance instead — prioritize that program"
       ],
-      "required_documents": [
-        "Eviction notice or notice of non-payment",
-        "Lease agreement",
-        "Proof of income",
-        "Photo ID"
-      ],
-      "application_deadline": "Within days of receiving eviction notice",
-      "urgency_note": "Only eligible if eviction notice received; eligibility does not currently apply"
-    },
-    {
-      "program_id": "pdx-renter-relocation",
-      "eligible": true,
-      "confidence": "high",
-      "estimated_annual_value": 4500,
-      "reasoning": "Intake shows 12% rent increase in recent period. Portland Code 30.01.085 requires $2,900-$4,500 payment when rent increases >10% in 12 months. Tenant must demand payment within 45 days. This is a one-time event-triggered benefit.",
-      "next_steps": [
-        "Send written demand letter to landlord within 45 days of receiving rent increase notice",
-        "Include copy of rent increase notice with demand",
-        "Reference Portland City Code 30.01.085",
-        "Contact Portland Housing Bureau at 503-823-1303 if landlord refuses payment"
-      ],
-      "required_documents": [
-        "Lease agreement",
-        "Rent increase notice",
-        "Written demand letter to landlord"
-      ],
-      "application_deadline": "Within 45 days of rent increase notice",
-      "urgency_note": "EVENT-TRIGGERED: You have a 12% rent increase. Demand letter must be sent within 45 days. $2,900-$4,500 payment is legally required."
+      "required_documents": [],
+      "application_deadline": null,
+      "urgency_note": null
     },
     {
       "program_id": "cep-weatherization",
       "eligible": true,
-      "confidence": "high",
-      "estimated_annual_value": 5000,
-      "reasoning": "ZIP 97218 is Portland (Cully). Household at 149% FPL qualifies (threshold 200%). PCEF provides free weatherization, heat pumps, air conditioning, and efficiency upgrades. Significant long-term benefit for renters and homeowners.",
-      "next_steps": [
-        "Visit https://www.portland.gov/bps/cleanenergy to apply",
-        "Gather proof of income (last 30 days of pay stubs)",
-        "Provide proof of Portland residency (utility bill or lease)",
-        "Have current utility bill ready"
-      ],
-      "required_documents": [
-        "Proof of income (last 30 days of pay stubs)",
-        "Proof of Portland residency (utility bill or lease)",
-        "Current utility bill"
-      ],
-      "application_deadline": null,
-      "urgency_note": null
-    },
-    {
-      "program_id": "transportation-wallet",
-      "eligible": true,
-      "confidence": "high",
-      "estimated_annual_value": 308,
-      "reasoning": "ZIP 97218 is Portland. Household at 149% FPL qualifies (threshold 200%). Up to $308 annual credit for TriMet, BIKETOWN, parking, scooter services. Useful for working household.",
-      "next_steps": [
-        "Visit https://www.portland.gov/transportation/transportationwallet",
-        "Apply online with proof of Portland residency",
-        "Provide proof of income or SNAP/OHP enrollment",
-        "Receive credits within 2-3 weeks"
-      ],
-      "required_documents": [
-        "Proof of Portland residency (lease, utility bill, or ID)",
-        "Proof of income OR SNAP/OHP enrollment letter"
-      ],
-      "application_deadline": null,
-      "urgency_note": null
-    },
-    {
-      "program_id": "inclusionary-housing",
-      "eligible": true,
       "confidence": "medium",
-      "estimated_annual_value": 9000,
-      "reasoning": "Household income $48,000 is approximately 88% SMI (60-80% MFI threshold is ~$42,600-$57,500 for 4-person). Renter in Portland (ZIP 97218). Massive benefit if matched to below-market unit ($500-$1,500/month savings). High-value but dependent on waitlist availability.",
+      "estimated_annual_value": 5000,
+      "reasoning": "Household income $48,000 is below 200% FPL ($64,300) for a 4-person household. ZIP 97218 is within Portland city limits. As a renter, the household can apply, though landlord consent for home weatherization work may be required. CEP provides free weatherization (insulation, air sealing, efficient heating) that reduces energy costs. Estimated median value of $5,000 in one-time weatherization improvements that produce ongoing savings. This is a one-time benefit, not annual, but it has lasting value.",
       "next_steps": [
-        "Visit https://www.portland.gov/phb/inclusionary-housing",
-        "Register on inclusionary housing waitlist",
-        "Gather proof of income and rental history",
-        "Contact Portland Housing Bureau at 503-823-9042 for available buildings"
+        "Call Community Energy Project at 503-284-6827 to get on the waitlist (Spanish-language services available)",
+        "Visit communityenergyproject.org to review the program and submit an interest form",
+        "Gather proof of income and proof of Portland residency (utility bill or lease with 97218 address)",
+        "Be aware that as a renter, landlord permission may be needed — discuss with your landlord or ask CEP for guidance"
       ],
       "required_documents": [
-        "Proof of income (tax return or recent pay stubs)",
-        "Photo ID",
-        "Rental history",
-        "Credit information"
+        "Proof of income",
+        "Proof of Portland residency (lease or utility bill at 97218 address)",
+        "Utility bill"
       ],
-      "application_deadline": null,
-      "urgency_note": "HIGH-VALUE: Below-market rent units can save $6,000-$18,000 annually. Waitlists can be long—apply now."
-    },
-    {
-      "program_id": "sun-service-system",
-      "eligible": true,
-      "confidence": "high",
-      "estimated_annual_value": 3000,
-      "reasoning": "Household has 2 children under 18 (ages 5 and 8). Resides in Multnomah County (ZIP 97218 is Portland/Cully). SUN Schools offers free after-school, summer programs, meals, mental health support, parenting classes, and basic needs assistance. Most services open to all; some assistance has income eligibility (household at 149% FPL qualifies).",
-      "next_steps": [
-        "Visit https://www.multco.us/sun to find a SUN school or service location near you",
-        "Contact local SUN coordinator in Cully/northeast Portland area",
-        "Bring child's school enrollment and photo ID to enroll",
-        "Enroll in after-school, summer, and meal programs"
-      ],
-      "required_documents": [
-        "Child's school enrollment",
-        "Photo ID",
-        "Proof of income (for basic needs assistance component)"
-      ],
-      "application_deadline": null,
-      "urgency_note": "PRIORITY: Free after-school and summer programs provide childcare, meals, education support, and family services. Ideal for working families."
-    },
-    {
-      "program_id": "advsd",
-      "eligible": false,
-      "confidence": "high",
-      "estimated_annual_value": 0,
-      "reasoning": "ADVSD serves adults 60+, adults with disabilities, or veterans. Household has no senior (age 60+), no disability indicated, and no veteran. Does not meet eligibility criteria.",
-      "next_steps": [
-        "If anyone in household becomes 60+, develops disability, or is a veteran, contact 503-988-3646",
-        "ADVSD provides free case management and in-home services"
-      ],
-      "required_documents": [],
       "application_deadline": null,
       "urgency_note": null
     },
@@ -340,7 +247,78 @@
       "eligible": false,
       "confidence": "high",
       "estimated_annual_value": 0,
-      "reasoning": "Renter household (not homeowner). Program requires property ownership. Also no senior in household (minimum age 62). Does not qualify.",
+      "reasoning": "This program requires the applicant to be a homeowner AND age 62 or older (senior) OR disabled. The household is a renter (housing_status=rent), has no disability (has_disability=false), and no senior in the household (has_senior_in_household=false). Multiple hard requirements are not met. Ineligible.",
+      "next_steps": [],
+      "required_documents": [],
+      "application_deadline": null,
+      "urgency_note": null
+    },
+    {
+      "program_id": "transportation-wallet",
+      "eligible": true,
+      "confidence": "medium",
+      "estimated_annual_value": 100,
+      "reasoning": "Portland Transportation Wallet (Access for All) requires Portland residency (ZIP 97218 qualifies), income at or below 200% FPL ($64,300 for family of 4 — $48,000 qualifies), and age 18+. The primary constraint is that applicants must be referred by a participating community-based organization. The household's Spanish primary language may align well with Spanish-speaking CBOs in the 97218/Cully corridor that are PBOT partners. Available once per calendar year. Benefit is $100–$308 in transportation credits. Marking medium confidence due to the CBO referral requirement.",
+      "next_steps": [
+        "Contact a Spanish-language community organization in the Cully neighborhood (97218) such as Verde or Hacienda CDC — they may be PBOT referral partners for this program",
+        "Visit portland.gov/transportation/wallet/access-all to see the current list of participating community organizations",
+        "Call 311 and ask in Spanish about the Transportation Wallet Access for All program",
+        "Apply once referred — proof of Portland residency and income or qualifying program enrollment required"
+      ],
+      "required_documents": [
+        "Proof of Portland residency",
+        "Proof of income OR enrollment in qualifying assistance program",
+        "Referral from participating community-based organization"
+      ],
+      "application_deadline": "Once per calendar year",
+      "urgency_note": null
+    },
+    {
+      "program_id": "inclusionary-housing",
+      "eligible": true,
+      "confidence": "medium",
+      "estimated_annual_value": 9000,
+      "reasoning": "Portland Inclusionary Housing Program provides below-market-rate units in new developments of 20+ units. Income limit is 80% AMI (~$71,000/year listed in the program database for eligibility). Household income of $48,000 is well below $71,000. ZIP 97218 is in Portland. The household is currently renting. This program provides access to affordable units in qualifying new buildings — the savings compared to market rent can be $750–$2,000/month. Using median $9,000/year in rent savings. Confidence is medium because this is a waitlist/availability-based program, not a guaranteed benefit.",
+      "next_steps": [
+        "Visit portland.gov/phb/inclusionary-housing to search current available affordable units and waitlists",
+        "Call Portland Housing Bureau at 503-823-9042 (Spanish interpretation available) to learn about current openings in 97218 and surrounding areas",
+        "Prepare rental application documents: proof of income, photo ID, rental history, and references",
+        "Register on the Affordable Housing Waitlist at portlandhousing.org to be notified of new openings"
+      ],
+      "required_documents": [
+        "Proof of income",
+        "Photo ID",
+        "Rental history (past 2 landlords)",
+        "References"
+      ],
+      "application_deadline": null,
+      "urgency_note": null
+    },
+    {
+      "program_id": "sun-service-system",
+      "eligible": true,
+      "confidence": "high",
+      "estimated_annual_value": 3000,
+      "reasoning": "SUN Community Schools serves families with school-age children in Multnomah County. ZIP 97218 is in Multnomah County. The household has two school-age children (ages 5 and 8) who attend or may be near a SUN school in the Cully/97218 area. There is no income threshold for SUN. The program offers after-school programs, enrichment, food assistance, health connections, and energy bill help. High-value program for this family. Estimated annual value of $3,000 based on after-school programming and services for two children.",
+      "next_steps": [
+        "Call 503-988-6295 or visit multco.us/programs/sun-community-schools to find the SUN site at your children's school",
+        "Ask the school office whether their school is a SUN Community School — several 97218 schools participate",
+        "Enroll both children (ages 5 and 8) in after-school programs — registration is typically done at the school site",
+        "Ask the SUN site coordinator about food assistance, health services, and energy bill help also offered through the program"
+      ],
+      "required_documents": [
+        "Children's school enrollment confirmation",
+        "Photo ID"
+      ],
+      "application_deadline": null,
+      "urgency_note": "High priority for this family — SUN Schools in the 97218 area provide after-school care, meals, and wraparound services that directly benefit both school-age children."
+    },
+    {
+      "program_id": "advsd",
+      "eligible": false,
+      "confidence": "high",
+      "estimated_annual_value": 0,
+      "reasoning": "ADRC Helpline serves individuals who are age 60+, adults with disabilities, or veterans. This household has no senior (has_senior_in_household=false), no disability (has_disability=false), and is not a veteran (is_veteran=false). None of the categorical eligibility criteria are met. Ineligible.",
       "next_steps": [],
       "required_documents": [],
       "application_deadline": null,
@@ -351,36 +329,51 @@
       "eligible": false,
       "confidence": "high",
       "estimated_annual_value": 0,
-      "reasoning": "No veteran in household ('is_veteran': false). Program requires service-connected veteran or surviving spouse. Renter (no property). Does not qualify.",
+      "reasoning": "This program requires the applicant to be a veteran (is_veteran=false), to be a homeowner (housing_status=rent), and to have a service-connected disability of 40%+ (has_disability=false). None of the three core requirements are met. Ineligible.",
       "next_steps": [],
       "required_documents": [],
       "application_deadline": null,
       "urgency_note": null
+    },
+    {
+      "program_id": "lifeline",
+      "eligible": false,
+      "confidence": "high",
+      "estimated_annual_value": 0,
+      "reasoning": "Lifeline income limit is 135% FPL for a family of 4 = $43,403/year. Household income of $48,000 exceeds this. The alternative qualification route via SNAP enrollment does not apply because the household is also over SNAP income limits. The children's OHP enrollment could theoretically trigger Lifeline eligibility under Medicaid participation — if children are enrolled in OHP, the subscriber may qualify. However, current data doesn't confirm OHP enrollment. Marking ineligible on available data; note OHP-based pathway.",
+      "next_steps": [
+        "If your children are enrolled in OHP (Oregon Health Plan/Medicaid), you may qualify for Lifeline through program-based eligibility — visit usac.org/lifeline to check",
+        "Call 1-800-234-9473 to ask about qualification pathways"
+      ],
+      "required_documents": [
+        "Proof of OHP/Medicaid enrollment (if applicable)"
+      ],
+      "application_deadline": null,
+      "urgency_note": null
     }
   ],
-  "total_estimated_annual_value": 46568,
-  "federal_only_value": 24360,
-  "pdx_specific_value": 22208,
+  "total_estimated_annual_value": 36560,
+  "federal_only_value": 14860,
+  "pdx_specific_value": 21700,
   "priority_application_order": [
     "pdx-renter-relocation",
-    "multco-eviction-prev",
-    "snap",
-    "ohp",
     "erdc",
+    "ohp",
+    "school-meals",
     "sun-service-system",
+    "pge-iqbd",
+    "nw-natural-bill-discount",
+    "inclusionary-housing",
     "cep-weatherization",
     "pdx-water-fa",
-    "liheap-energy-trust",
-    "school-meals",
-    "inclusionary-housing",
     "transportation-wallet",
     "oregon-eitc"
   ],
   "warnings": [
-    "⚠️ EVENT-TRIGGERED BENEFIT: You received a 12% rent increase. Portland law (PCC 30.01.085) requires your landlord to pay you $2,900-$4,500. You must send a written demand letter within 45 days of the increase notice. Contact Portland Housing Bureau (503-823-1303) immediately if your landlord refuses.",
-    "⚠️ HUGE SAVINGS OPPORTUNITY: Apply for Portland Inclusionary Housing—below-market units can save $6,000-$18,000 annually. Waitlists are competitive but worth joining now.",
-    "⚠️ PRIORITY FOR WORKING FAMILIES: Enroll children in SUN Community Schools program immediately—free after-school and summer programs, meals, childcare support, and mental health services. Ideal for part-time employed household.",
-    "⚠️ SPANISH-SPEAKING HOUSEHOLD: You indicated primary language is Spanish (es). Ensure applications indicate need for Spanish-language support or interpreter assistance. Contact 211 for language-accessible help.",
-    "⚠️ LANGUAGE ACCESS: Contact Multnomah County (211) or Portland City services and request Spanish-language application assistance. Many programs have bilingual staff available."
+    "URGENT — RENT INCREASE TRIGGER: Your 12% rent increase exceeds Portland's 10% threshold under Portland City Code 30.01.085. You are legally entitled to mandatory relocation assistance from your landlord (estimated $4,200 for a 2-bedroom unit). You must send a written demand letter to your landlord. Call Portland Rental Services Helpdesk NOW at 503-823-1303 — Spanish interpretation available.",
+    "LANGUAGE ACCESS: This household's primary language is Spanish. All programs listed have Spanish-language support available. When calling 211, state 'Español' to be connected to a Spanish-speaking navigator who can help apply for multiple programs in a single call.",
+    "CHILDREN'S HEALTHCARE: Both children (ages 5 and 8) likely qualify for free Oregon Health Plan (OHP) coverage up to 305% FPL (~$98,000 for a family of 4). If not already enrolled, apply immediately at ONE.Oregon.gov — this is free comprehensive healthcare.",
+    "CHILDCARE SUBSIDY: ERDC childcare subsidy for two children could be worth $12,000+ annually and your income qualifies. This is the second-highest value program available — apply as soon as possible at oregon.gov/delc.",
+    "SUN SCHOOLS: Both school-age children (5 and 8) in the 97218 (Cully) area may be attending a SUN Community School. Contact your children's school immediately to enroll in free after-school programs, meals, and wraparound services."
   ]
 }

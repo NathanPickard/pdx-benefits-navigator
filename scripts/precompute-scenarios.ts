@@ -1,73 +1,114 @@
-import { writeFileSync } from 'node:fs';
+/**
+ * Re-bakes the pre-computed demo scenario fixtures at data/scenarios/*.json.
+ *
+ * Calls analyzeEligibilityStream from lib/claudeBrowser.ts directly in a Node
+ * context, using ANTHROPIC_API_KEY from .env.local. The runtime app still uses
+ * the same function from the browser with the user's BYOK — this script is the
+ * build-time path for refreshing demo fixtures after the seed or eligibility
+ * prompt changes. The server never sees an API key in production.
+ *
+ * Usage:
+ *   npx tsx scripts/precompute-scenarios.ts                  # all scenarios
+ *   npx tsx scripts/precompute-scenarios.ts maria            # one scenario
+ *
+ * Env (.env.local): ANTHROPIC_API_KEY
+ */
+
+import { readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { scenarios } from '../lib/scenarios';
-import type { AnalysisOutput } from '../types/program';
+import { analyzeEligibilityStream } from '../lib/claudeBrowser';
 
-const BASE = process.env.BASE_URL ?? 'http://localhost:3000';
-const OUT_DIR = join(process.cwd(), 'data', 'scenarios');
+const ROOT = process.cwd();
+const OUT_DIR = join(ROOT, 'data', 'scenarios');
 
-async function runOne(slug: keyof typeof scenarios): Promise<void> {
-  const intake = scenarios[slug];
-  console.log(`\n→ ${slug}: posting intake to ${BASE}/api/analyze`);
+/**
+ * Precompute uses Sonnet rather than the runtime default (Haiku) because
+ * baked fixtures are public and need tighter constraint adherence — Haiku
+ * has been observed marking eligible=true while its own reasoning concludes
+ * the applicant is ineligible, and making basic income-vs-threshold
+ * comparison errors. Sonnet's stronger reasoning is worth the higher
+ * one-time cost. Runtime BYOK still hits Haiku unless production changes
+ * ELIGIBILITY_MODEL globally.
+ */
+const PRECOMPUTE_MODEL = 'claude-sonnet-4-6';
 
-  const res = await fetch(`${BASE}/api/analyze`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(intake),
-  });
-
-  if (!res.ok || !res.body) {
-    throw new Error(`${slug}: HTTP ${res.status}`);
-  }
-
-  const reader = res.body.getReader();
-  const decoder = new TextDecoder();
-  let buffer = '';
-  let output: AnalysisOutput | null = null;
-  let progressCount = 0;
-
-  while (true) {
-    const { value, done } = await reader.read();
-    if (done) break;
-    buffer += decoder.decode(value, { stream: true });
-    let idx: number;
-    while ((idx = buffer.indexOf('\n\n')) !== -1) {
-      const rawEvent = buffer.slice(0, idx);
-      buffer = buffer.slice(idx + 2);
-      const dataLine = rawEvent.split('\n').find((l) => l.startsWith('data: '));
-      if (!dataLine) continue;
-      const payload = JSON.parse(dataLine.slice(6)) as {
-        type: string;
-        programId?: string;
-        output?: AnalysisOutput;
-        message?: string;
-      };
-      if (payload.type === 'progress' && payload.programId) {
-        progressCount++;
-        process.stdout.write('.');
-      } else if (payload.type === 'complete' && payload.output) {
-        output = payload.output;
-      } else if (payload.type === 'error') {
-        throw new Error(`${slug}: ${payload.message}`);
+async function loadDotEnvLocal(): Promise<void> {
+  try {
+    const text = await readFile(join(ROOT, '.env.local'), 'utf8');
+    for (const raw of text.split('\n')) {
+      const line = raw.trim();
+      if (!line || line.startsWith('#')) continue;
+      const eq = line.indexOf('=');
+      if (eq === -1) continue;
+      const key = line.slice(0, eq).trim();
+      let val = line.slice(eq + 1).trim();
+      if (
+        (val.startsWith('"') && val.endsWith('"')) ||
+        (val.startsWith("'") && val.endsWith("'"))
+      ) {
+        val = val.slice(1, -1);
       }
+      if (!process.env[key]) process.env[key] = val;
+    }
+  } catch {
+    // Fall back to shell env.
+  }
+}
+
+async function runOne(slug: keyof typeof scenarios, apiKey: string): Promise<void> {
+  const intake = scenarios[slug];
+  console.log(`\n→ ${slug}`);
+
+  let progressCount = 0;
+  let output = null;
+  let errorMessage: string | null = null;
+
+  for await (const event of analyzeEligibilityStream(apiKey, intake, PRECOMPUTE_MODEL)) {
+    if (event.type === 'progress') {
+      progressCount++;
+      process.stdout.write('.');
+    } else if (event.type === 'complete') {
+      output = event.output;
+    } else if (event.type === 'error') {
+      errorMessage = event.message;
     }
   }
 
+  if (errorMessage) throw new Error(`${slug}: ${errorMessage}`);
   if (!output) throw new Error(`${slug}: no complete event received`);
 
   const eligibleCount = output.matches.filter((m) => m.eligible).length;
   console.log(
-    `\n✓ ${slug}: $${output.total_estimated_annual_value.toLocaleString()} across ${eligibleCount} eligible programs (${progressCount} programs evaluated)`
+    `\n✓ ${slug}: $${output.total_estimated_annual_value.toLocaleString()} across ${eligibleCount} eligible programs (${progressCount} program IDs streamed)`
   );
 
   const path = join(OUT_DIR, `${slug}.json`);
-  writeFileSync(path, JSON.stringify(output, null, 2) + '\n', 'utf8');
+  await writeFile(path, JSON.stringify(output, null, 2) + '\n', 'utf8');
   console.log(`  wrote ${path}`);
 }
 
 async function main() {
-  for (const slug of Object.keys(scenarios) as (keyof typeof scenarios)[]) {
-    await runOne(slug);
+  await loadDotEnvLocal();
+  const apiKey = process.env.ANTHROPIC_API_KEY;
+  if (!apiKey) {
+    console.error('Missing ANTHROPIC_API_KEY in .env.local');
+    process.exit(1);
+  }
+
+  const filter = process.argv[2];
+  const allSlugs = Object.keys(scenarios) as (keyof typeof scenarios)[];
+  const targets = filter
+    ? (allSlugs.filter((s) => s === filter) as (keyof typeof scenarios)[])
+    : allSlugs;
+
+  if (targets.length === 0) {
+    console.error(`No scenario matches "${filter}". Available: ${allSlugs.join(', ')}`);
+    process.exit(1);
+  }
+
+  for (const slug of targets) {
+    await runOne(slug, apiKey);
   }
 }
 

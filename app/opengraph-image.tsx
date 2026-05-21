@@ -2,10 +2,15 @@ import { ImageResponse } from 'next/og';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 
+import mariaFixture from '@/data/scenarios/maria.json';
+
 export const alt =
   'PDX Benefits Navigator — find every Portland benefit your family qualifies for';
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
+
+const MARIA_PDX_DELTA =
+  mariaFixture.total_estimated_annual_value - mariaFixture.federal_only_value;
 
 const PAPER = '#fbf4e7';
 const INK = '#2c3a4a';
@@ -146,7 +151,9 @@ export default async function Image() {
             }}
           >
             <div style={{ display: 'flex' }}>
-              <span style={{ color: MOSS_DEEP }}>$22,208/yr</span>
+              <span style={{ color: MOSS_DEEP }}>
+                ${MARIA_PDX_DELTA.toLocaleString()}/yr
+              </span>
               <span>&nbsp;more</span>
             </div>
             <div style={{ display: 'flex' }}>than federal tools find.</div>

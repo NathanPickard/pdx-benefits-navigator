@@ -3,6 +3,14 @@ import { ArrowRight, Briefcase, Heart, ShieldCheck } from 'lucide-react';
 
 import { buttonVariants } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import mariaFixture from '@/data/scenarios/maria.json';
+import jamesFixture from '@/data/scenarios/james.json';
+import roseFixture from '@/data/scenarios/rose.json';
+
+type Fixture = { total_estimated_annual_value: number };
+
+const expectedFromFixture = (f: Fixture) =>
+  `~$${f.total_estimated_annual_value.toLocaleString()}/year`;
 
 interface ScenarioCard {
   slug: string;
@@ -32,7 +40,7 @@ const SCENARIOS: ScenarioCard[] = [
       'SUN Schools wraparound',
       'PCEF weatherization',
     ],
-    expected: '~$24,000+/year',
+    expected: expectedFromFixture(mariaFixture),
     icon: <Heart className="h-5 w-5" />,
     accentClass: 'border-emerald-200 bg-emerald-50/40 hover:border-emerald-300',
   },
@@ -52,7 +60,7 @@ const SCENARIOS: ScenarioCard[] = [
       'ADVSD case management',
       'Energy Trust weatherization',
     ],
-    expected: '~$18,000+/year',
+    expected: expectedFromFixture(jamesFixture),
     icon: <ShieldCheck className="h-5 w-5" />,
     accentClass: 'border-blue-200 bg-blue-50/40 hover:border-blue-300',
   },
@@ -72,7 +80,7 @@ const SCENARIOS: ScenarioCard[] = [
       'OHP + SNAP',
       'Vietnamese translation',
     ],
-    expected: '~$9,000+/year',
+    expected: expectedFromFixture(roseFixture),
     icon: <Briefcase className="h-5 w-5" />,
     accentClass: 'border-amber-200 bg-amber-50/40 hover:border-amber-300',
   },

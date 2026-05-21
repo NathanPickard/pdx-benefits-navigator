@@ -96,9 +96,9 @@ To run the full intake with your own answers, click the **key icon** in the top 
 
 | Family | Situation | Federal & state programs | PDX Benefits Navigator (full local layer) |
 |---|---|---|---|
-| **María & family** | Single parent, 2 kids, part-time at Fred Meyer, renter in Cully, Spanish-speaking, 12% rent increase | $24,360/yr | **$46,568/yr** across 13 programs |
-| **James** | Single, disabled veteran, unemployed, owns home in St. Johns | $15,360/yr | **$23,260/yr** across 11 programs |
-| **Rose** | Senior widow, Social Security only, owns home in Lents, Vietnamese-speaking | $11,960/yr | **$19,860/yr** across 10 programs |
+| **María & family** | Single parent, 2 kids, part-time at Fred Meyer, renter in Cully, Spanish-speaking, 12% rent increase | $14,860/yr | **$36,560/yr** across 11 programs |
+| **James** | Single, disabled veteran, unemployed, owns home in St. Johns | $9,807/yr | **$17,707/yr** across 11 programs |
+| **Rose** | Senior widow, Social Security only, owns home in Lents, Vietnamese-speaking | $4,600/yr | **$12,500/yr** across 6 programs |
 
 The gap comes from **hidden-gem** programs — 8 of our 20 are flagged this way, and no national tool surfaces them. Numbers are pulled directly from the [`data/scenarios/*.json`](data/scenarios/) fixtures; the source of truth for ranges is [`data/programs.seed.json`](data/programs.seed.json).
 

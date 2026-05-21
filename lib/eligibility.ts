@@ -32,12 +32,17 @@ ${JSON.stringify(programs, null, 2)}
 
 1. For EVERY program, evaluate eligibility against intake data. Do not skip any.
 
-2. Confidence levels:
-   - "high": All hard requirements clearly met. Apply with confidence.
-   - "medium": Likely qualifies but requires verification of 1-2 ambiguous details.
-   - "low": Edge case. Worth applying but uncertain.
+2. The "eligible" boolean is the eligibility DECISION implied by the intake data. It MUST be consistent with your reasoning text:
+   - If your reasoning concludes a hard requirement (income, residency, citizenship, household composition, age, employment, veteran/disability/senior status) is NOT met based on intake, set eligible=false.
+   - Do NOT mark eligible=true based on conditional pathways ("if enrolled in OHP", "if net-income test passes", "worth verifying"). If the intake doesn't confirm the condition, set eligible=false and put the alternative path in next_steps.
+   - Do NOT write "INELIGIBLE" or "Likely ineligible" in reasoning and still set eligible=true. The reasoning and the boolean must agree.
 
-3. Estimate dollar value based on household composition. For programs with per-child or per-household-member benefits, multiply correctly.
+3. Confidence levels (refer to the eligibility DECISION, not the application advice):
+   - "high": Intake data clearly satisfies (eligible=true) or clearly violates (eligible=false) all hard requirements.
+   - "medium": Decision rests on a value close to a threshold (within ~10%) or on a requirement the intake doesn't directly answer.
+   - "low": Decision depends on facts the intake doesn't capture (e.g., specific SNAP shelter/childcare deductions, current SUN enrollment, exact home RMV, citizenship-status edge cases).
+
+4. Estimate dollar value based on household composition. For programs with per-child or per-household-member benefits, multiply correctly.
 
    When a program has a "benefit_schedule" field (present on programs where official sources publish a benefit table), USE IT as authoritative — pick the row whose "condition" best matches the user's intake (their household_size, income tier, etc.) and convert to an annual estimate based on "unit":
      - usd_monthly → row value × 12
@@ -46,19 +51,21 @@ ${JSON.stringify(programs, null, 2)}
      - percent_discount → estimate annual discount using the relevant base bill if you can reason about it; otherwise note the discount tier in reasoning and use a conservative midpoint
    Prefer benefit_schedule over the program's coarser "estimated_annual_value" range whenever both are present. If no schedule, fall back to estimated_annual_value, scaled by household composition.
 
-4. PRIORITIZE hyperlocal Portland and Multnomah County programs (hidden_gem: true). These are our differentiator. Always evaluate them — never skip because the user didn't mention housing/utilities/etc.
+   If eligible=false, set estimated_annual_value to 0.
 
-5. Urgency handling:
+5. PRIORITIZE hyperlocal Portland and Multnomah County programs (hidden_gem: true). These are our differentiator. Always evaluate them — never skip because the user didn't mention housing/utilities/etc.
+
+6. Urgency handling:
    - If user has eviction notice → Multnomah Eviction Prevention is URGENT
    - If user had rent increase >10% → Portland Renter Relocation Assistance is event-triggered
    - If user has school-age children → SUN Schools is high-priority
    - Surface these in "warnings" array
 
-6. For each match, generate 2-4 concrete next_steps starting with strong verbs ("Call 503-...", "Visit oregon.gov/...", "Gather your last 2 paystubs").
+7. For each match, generate 2-4 concrete next_steps starting with strong verbs ("Call 503-...", "Visit oregon.gov/...", "Gather your last 2 paystubs").
 
-7. List 2-5 required_documents per program.
+8. List 2-5 required_documents per program.
 
-8. Output ONLY valid JSON matching the AnalysisOutput schema. No markdown, no preamble.
+9. Output ONLY valid JSON matching the AnalysisOutput schema. No markdown, no preamble.
 
 ==== OUTPUT SCHEMA ====
 {
@@ -81,6 +88,45 @@ ${JSON.stringify(programs, null, 2)}
   "priority_application_order": [string],
   "warnings": [string]
 }`;
+
+/**
+ * Words/phrases that signal the model concluded an applicant is NOT eligible.
+ * If any of these appear in reasoning while eligible=true, the boolean is
+ * contradicting the model's own conclusion — we trust the prose and flip it.
+ */
+const INELIGIBILITY_MARKERS =
+  /\b(ineligible|not eligible|does not qualify|doesn't qualify|do not qualify)\b/i;
+
+/**
+ * Enforce that the eligible boolean matches what the reasoning text says.
+ * Haiku frequently writes "INELIGIBLE on income basis" or "does not qualify"
+ * in reasoning while still setting eligible=true (it treats the boolean as
+ * "should they apply anyway"). This guard reconciles them: prose wins.
+ *
+ * When a match is flipped, estimated_annual_value is also zeroed since an
+ * ineligible match shouldn't contribute to the user's projected totals.
+ */
+export function enforceEligibilityConsistency(output: AnalysisOutput): AnalysisOutput {
+  let flipped = 0;
+  const matches = output.matches.map((m) => {
+    if (m.eligible && INELIGIBILITY_MARKERS.test(m.reasoning)) {
+      flipped++;
+      return {
+        ...m,
+        eligible: false,
+        estimated_annual_value: 0,
+        confidence: 'high' as const,
+      };
+    }
+    return m;
+  });
+  if (flipped > 0 && typeof console !== 'undefined') {
+    console.warn(
+      `[eligibility] Flipped ${flipped} match${flipped === 1 ? '' : 'es'} from eligible=true to false (reasoning text indicated ineligibility).`
+    );
+  }
+  return { ...output, matches };
+}
 
 /** Recompute total / federal / PDX dollar buckets from the matches array. */
 export function recomputeTotals(output: AnalysisOutput): AnalysisOutput {

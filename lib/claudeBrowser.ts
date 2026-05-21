@@ -13,6 +13,7 @@ import Anthropic from '@anthropic-ai/sdk';
 import {
   ELIGIBILITY_MODEL,
   ELIGIBILITY_SYSTEM_PROMPT,
+  enforceEligibilityConsistency,
   parseJsonObject,
   recomputeTotals,
 } from './eligibility';
@@ -32,13 +33,22 @@ export type AnalyzeStreamEvent =
 
 export async function* analyzeEligibilityStream(
   apiKey: string,
-  intake: IntakeData
+  intake: IntakeData,
+  /**
+   * Optional model override. Defaults to ELIGIBILITY_MODEL (Haiku) for the
+   * runtime BYOK path. Precompute uses Sonnet for tighter constraint
+   * adherence and arithmetic.
+   */
+  model: string = ELIGIBILITY_MODEL
 ): AsyncGenerator<AnalyzeStreamEvent> {
   try {
     const anthropic = makeClient(apiKey);
     const stream = anthropic.messages.stream({
-      model: ELIGIBILITY_MODEL,
-      max_tokens: 8000,
+      model,
+      // 16K accommodates Sonnet's longer reasoning for the full 20-program
+      // evaluation; Haiku rarely uses more than ~8K but the extra ceiling
+      // costs nothing on input/cache-miss pricing.
+      max_tokens: 16000,
       system: [
         {
           type: 'text',
@@ -74,7 +84,8 @@ export async function* analyzeEligibilityStream(
     }
 
     const parsed = parseJsonObject<AnalysisOutput>(buffer);
-    yield { type: 'complete', output: recomputeTotals(parsed) };
+    const consistent = enforceEligibilityConsistency(parsed);
+    yield { type: 'complete', output: recomputeTotals(consistent) };
   } catch (e) {
     yield {
       type: 'error',
