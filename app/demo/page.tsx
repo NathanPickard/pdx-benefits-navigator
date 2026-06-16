@@ -17,13 +17,23 @@ const SHORT_BY_ID: Record<string, string> = Object.fromEntries(
   (programs as { id: string; short_name: string }[]).map((p) => [p.id, p.short_name]),
 );
 
-/** Top eligible programs for a persona, by estimated value — guaranteed real. */
-const heroPrograms = (f: Fixture, n = 4): string[] =>
-  f.matches
-    .filter((m) => m.eligible)
-    .sort((a, b) => b.estimated_annual_value - a.estimated_annual_value)
-    .slice(0, n)
-    .map((m) => SHORT_BY_ID[m.program_id] ?? m.program_id);
+const GEM_BY_ID: Record<string, boolean> = Object.fromEntries(
+  (programs as { id: string; hidden_gem: boolean }[]).map((p) => [p.id, p.hidden_gem]),
+);
+
+/**
+ * Hero programs for a persona, derived from the fixture: eligible hidden-gem
+ * programs first (the differentiator), then the highest-value other eligible
+ * programs, capped at n. Always real and always eligible.
+ */
+const heroPrograms = (f: Fixture, n = 4): string[] => {
+  const eligible = f.matches.filter((m) => m.eligible);
+  const byValueDesc = (a: Fixture['matches'][number], b: Fixture['matches'][number]) =>
+    b.estimated_annual_value - a.estimated_annual_value;
+  const gems = eligible.filter((m) => GEM_BY_ID[m.program_id]).sort(byValueDesc);
+  const others = eligible.filter((m) => !GEM_BY_ID[m.program_id]).sort(byValueDesc);
+  return [...gems, ...others].slice(0, n).map((m) => SHORT_BY_ID[m.program_id] ?? m.program_id);
+};
 
 const expectedFromFixture = (f: Fixture) =>
   `~$${f.total_estimated_annual_value.toLocaleString()}/year`;
