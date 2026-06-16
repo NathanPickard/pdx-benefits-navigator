@@ -4,9 +4,8 @@ import {
   createContext,
   useCallback,
   useContext,
-  useEffect,
   useMemo,
-  useState,
+  useSyncExternalStore,
 } from 'react';
 
 const STORAGE_KEY = 'pdx_anthropic_key';
@@ -63,34 +62,45 @@ interface ApiKeyState {
 
 const ApiKeyContext = createContext<ApiKeyState | null>(null);
 
+/**
+ * Subscribe to key changes: cross-tab `storage` events plus the in-tab
+ * `pdx-key-changed` custom event dispatched by set/clear.
+ */
+function subscribeKey(onChange: () => void): () => void {
+  if (typeof window === 'undefined') return () => {};
+  window.addEventListener('storage', onChange);
+  window.addEventListener('pdx-key-changed', onChange);
+  return () => {
+    window.removeEventListener('storage', onChange);
+    window.removeEventListener('pdx-key-changed', onChange);
+  };
+}
+
+/** No-op subscribe for the hydration flag — the value never changes after mount. */
+const noopSubscribe = () => () => {};
+
 export function ApiKeyProvider({ children }: { children: React.ReactNode }) {
-  const [apiKey, setApiKeyState] = useState<string | null>(null);
-  const [hydrated, setHydrated] = useState(false);
+  // Read the key straight from localStorage as an external store. The server
+  // snapshot (and first client render) is null to match SSR, then React
+  // re-renders with the real value — no setState-in-effect needed.
+  const apiKey = useSyncExternalStore(subscribeKey, getStoredKey, () => null);
 
-  // Hydrate from localStorage on mount
-  useEffect(() => {
-    setApiKeyState(getStoredKey());
-    setHydrated(true);
+  // False on the server + first client render, true once hydrated. Lets
+  // consumers avoid flashing "no key" UI before localStorage has been read.
+  const hydrated = useSyncExternalStore(
+    noopSubscribe,
+    () => true,
+    () => false
+  );
 
-    // Sync across tabs + within tab when set/clear is called elsewhere
-    const onChange = () => setApiKeyState(getStoredKey());
-    window.addEventListener('storage', onChange);
-    window.addEventListener('pdx-key-changed', onChange);
-    return () => {
-      window.removeEventListener('storage', onChange);
-      window.removeEventListener('pdx-key-changed', onChange);
-    };
-  }, []);
-
+  // set/clear write to localStorage and dispatch `pdx-key-changed`, which the
+  // subscription above picks up to re-render with the new value.
   const setKey = useCallback((key: string) => {
-    const trimmed = key.trim();
-    setStoredKey(trimmed);
-    setApiKeyState(trimmed);
+    setStoredKey(key.trim());
   }, []);
 
   const clearKey = useCallback(() => {
     clearStoredKey();
-    setApiKeyState(null);
   }, []);
 
   const value = useMemo<ApiKeyState>(

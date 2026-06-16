@@ -51,6 +51,11 @@ export default function ResultsPage() {
   const [pendingLang, setPendingLang] = useState<LanguageCode | null>(null);
   const [translateError, setTranslateError] = useState<string | null>(null);
 
+  // This effect reads browser-only sessionStorage and orchestrates the on-mount
+  // data load (demo replay or live streaming analysis), so the synchronous
+  // setState calls are intentional load-once-on-mount transitions, not the
+  // cascading-render anti-pattern the rule targets.
+  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     if (!hydrated) return; // wait for key hydration before deciding what to do
 
@@ -138,6 +143,7 @@ export default function ResultsPage() {
       cancelled = true;
     };
   }, [router, apiKey, hydrated]);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   const originalData = state.kind === 'ok' ? state.data : null;
 

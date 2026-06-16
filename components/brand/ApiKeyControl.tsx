@@ -189,7 +189,7 @@ function ApiKeyModal({
           }}
         >
           Personalized results call Claude directly from your browser using your
-          own key. It's stored only in this browser&rsquo;s local storage —
+          own key. It&rsquo;s stored only in this browser&rsquo;s local storage —
           never sent to our server.
         </p>
 

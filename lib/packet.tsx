@@ -346,6 +346,8 @@ function ProgramPage({
             <Text style={styles.contactNote}>Processing time: {program.processing_time}</Text>
           )}
         </View>
+        {/* react-pdf <Image>, not an HTML <img> — it has no alt prop. */}
+        {/* eslint-disable-next-line jsx-a11y/alt-text */}
         {qrCode && <Image src={qrCode} style={styles.qrCode} />}
       </View>
 

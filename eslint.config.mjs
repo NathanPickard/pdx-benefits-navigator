@@ -12,6 +12,9 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Standalone design mockups — reference JSX, not part of the app build.
+    // They intentionally reference undefined globals (Icon, AppBar, …).
+    "docs/**",
   ]),
 ]);
 
