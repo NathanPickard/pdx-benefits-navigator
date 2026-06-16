@@ -18,20 +18,13 @@ import { readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { scenarios } from '../lib/scenarios';
 import { analyzeEligibilityStream } from '../lib/claudeBrowser';
+import { ELIGIBILITY_MODEL } from '../lib/eligibility';
 
 const ROOT = process.cwd();
 const OUT_DIR = join(ROOT, 'data', 'scenarios');
 
-/**
- * Precompute uses Sonnet rather than the runtime default (Haiku) because
- * baked fixtures are public and need tighter constraint adherence — Haiku
- * has been observed marking eligible=true while its own reasoning concludes
- * the applicant is ineligible, and making basic income-vs-threshold
- * comparison errors. Sonnet's stronger reasoning is worth the higher
- * one-time cost. Runtime BYOK still hits Haiku unless production changes
- * ELIGIBILITY_MODEL globally.
- */
-const PRECOMPUTE_MODEL = 'claude-sonnet-4-6';
+// Precompute and runtime now share ELIGIBILITY_MODEL (Sonnet 4.6), so the
+// baked demo fixtures match what live BYOK users get.
 
 async function loadDotEnvLocal(): Promise<void> {
   try {
@@ -64,7 +57,7 @@ async function runOne(slug: keyof typeof scenarios, apiKey: string): Promise<voi
   let output = null;
   let errorMessage: string | null = null;
 
-  for await (const event of analyzeEligibilityStream(apiKey, intake, PRECOMPUTE_MODEL)) {
+  for await (const event of analyzeEligibilityStream(apiKey, intake, ELIGIBILITY_MODEL)) {
     if (event.type === 'progress') {
       progressCount++;
       process.stdout.write('.');

@@ -12,7 +12,7 @@
   <img src="https://img.shields.io/badge/Next.js-16-black?logo=next.js" alt="Next.js 16">
   <img src="https://img.shields.io/badge/React-19-61dafb?logo=react" alt="React 19">
   <img src="https://img.shields.io/badge/TypeScript-5-3178c6?logo=typescript" alt="TypeScript">
-  <img src="https://img.shields.io/badge/Claude-Haiku%204.5-d97757?logo=anthropic" alt="Claude Haiku 4.5">
+  <img src="https://img.shields.io/badge/Claude-Sonnet%204.6-d97757?logo=anthropic" alt="Claude Sonnet 4.6">
   <img src="https://img.shields.io/badge/Deployed%20on-Vercel-black?logo=vercel" alt="Vercel">
   <img src="https://img.shields.io/badge/license-MIT-green" alt="MIT License">
 </p>
@@ -183,7 +183,7 @@ The full programs database is stuffed into the system prompt. Claude has the ent
 
 - **[Next.js 16](https://nextjs.org/)** App Router on **[Vercel](https://vercel.com/)**
 - **[React 19](https://react.dev/)** + **TypeScript**
-- **[Anthropic Claude](https://www.anthropic.com/api)** — `claude-haiku-4-5-20251001` for eligibility analysis (configurable in [`lib/eligibility.ts`](lib/eligibility.ts))
+- **[Anthropic Claude](https://www.anthropic.com/api)** — `claude-sonnet-4-6` for eligibility analysis (configurable in [`lib/eligibility.ts`](lib/eligibility.ts))
 - **[Tailwind CSS v4](https://tailwindcss.com/)** + custom **Rose City** design tokens (OKLCH palette, Lora + Plus Jakarta Sans pairing)
 - **[shadcn/ui](https://ui.shadcn.com/)** + **[Base UI](https://base-ui.com/)** primitives
 - **[react-hook-form](https://react-hook-form.com/)** + **[Zod](https://zod.dev/)** for the intake wizard

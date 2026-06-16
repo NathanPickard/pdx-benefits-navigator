@@ -6,7 +6,7 @@ const JURISDICTION_BY_ID: Record<string, Program['jurisdiction']> =
     (programs as Program[]).map((p) => [p.id, p.jurisdiction]),
   );
 
-export const ELIGIBILITY_MODEL = 'claude-haiku-4-5-20251001';
+export const ELIGIBILITY_MODEL = 'claude-sonnet-4-6';
 
 export const ELIGIBILITY_SYSTEM_PROMPT = `You are the eligibility engine for PDX Benefits Navigator, helping Portland, Oregon residents identify every benefit program they qualify for.
 
