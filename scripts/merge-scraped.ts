@@ -59,9 +59,11 @@ function isNullish(v: unknown): boolean {
   }
   if (Array.isArray(v)) {
     if (v.length === 0) return true;
-    // An array-of-objects is nullish if any element contains a null value
-    // (e.g. benefit_schedule.amounts with value:null). Such partial data must
-    // not be promoted — the scraper should not inject incomplete records.
+    // Treat an array of records atomically: if any element has a null field,
+    // the whole array is considered incomplete and is not promoted (we never
+    // promote a partially-scraped record over the seed). This is intentional
+    // and field-agnostic — a partial array is always unsafe to inject wholesale
+    // regardless of which specific field contains the null.
     return v.some((el) => typeof el === 'object' && el !== null && Object.values(el).some((f) => f === null));
   }
   return false;
@@ -97,8 +99,10 @@ function mergeProgram(seed: Program, scraped: ScrapedProgram): Program {
       const seedHadField = seed[key as keyof Program] !== undefined && seed[key as keyof Program] !== null;
       if (skipped === 0 || seedHadField) {
         if (Object.keys(merged).length > 0) out[key] = merged;
+      } else {
+        // Scraped object has partial nulls and seed has no fallback — suppress and warn.
+        console.warn(`  [warn] ${seed.id}: scraped '${key}' suppressed (partial nulls, no seed fallback)`);
       }
-      // Otherwise: scraped object has partial nulls and seed has no fallback — skip.
     } else {
       out[key] = scrapedValue;
     }
