@@ -21,7 +21,7 @@
       ],
       "citizenship_status": "lpr_or_citizen",
       "other_requirements": [
-        "Able-bodied adults without dependent children must meet SNAP work requirements (ABAWD status) to receive benefits for more than three months in a 36-month period",
+        "Able-bodied adults aged 18 through 64 without dependents must meet SNAP work requirements (ABAWD status) to receive benefits for more than three months in a 36-month period — the upper age was raised from 54 to 64 by the July 2025 federal law (OBBBA)",
         "Students ages 18-49 enrolled more than half-time in college or higher education must meet special conditions related to work, work-study, TANF receipt, unemployment compensation, employer-sponsored training, or caring for children",
         "House, car, or money in the bank do not usually count against eligibility"
       ],
@@ -107,11 +107,12 @@
       "must_reside_in": [
         "oregon"
       ],
-      "citizenship_status": "lpr_or_citizen",
+      "citizenship_status": "any",
       "other_requirements": [
         "Adults: 138% FPL",
         "Children: 305% FPL",
-        "Pregnant: 190% FPL"
+        "Pregnant: 190% FPL",
+        "Full OHP is available regardless of immigration status under Oregon's Healthier Oregon program (since July 2023) — includes undocumented residents and DACA recipients."
       ]
     },
     "application_url": "https://www.oregon.gov/oha/hsd/ohp/pages/eligibility.aspx",
@@ -204,7 +205,7 @@
       "median": 12000
     },
     "eligibility": {
-      "income_max_pct_fpl": 250,
+      "income_max_pct_fpl": 200,
       "must_have_children_under": 13,
       "employment_required": true,
       "must_reside_in": [
@@ -215,7 +216,8 @@
       "other_requirements": [
         "Children must meet immunization requirements or qualify for medical or non-medical exemption",
         "Child care provider must be approved to receive ERDC payments",
-        "In two-parent families, both parents must be working or in school, with exceptions for TANF receipt, Child Welfare participation, or medical/mental health conditions"
+        "In two-parent families, both parents must be working or in school, with exceptions for TANF receipt, Child Welfare participation, or medical/mental health conditions",
+        "Income limit to newly qualify is 200% FPL; already-enrolled families may stay eligible up to 250% FPL (exit limit). ERDC may have an active waitlist due to limited funding — confirm current status."
       ]
     },
     "application_url": "https://www.oregon.gov/delc/programs/pages/erdc.aspx",
@@ -489,16 +491,18 @@
       "median": 600
     },
     "eligibility": {
-      "income_max_pct_fpl": 200,
       "other_requirements": [
         "Must be a current PGE residential customer",
-        "Household income calculation based on combined annual gross income of household members 18 years and older"
+        "Household income calculation based on combined annual gross income of household members 18 years and older",
+        "Income ceiling is 60% of Oregon State Median Income (SMI), adjusted for household size — NOT the federal poverty level. Discount tiers (15%-80%) scale by SMI band; auto-enrolled customers default to the lowest discount tier."
       ],
       "age_min": 18,
       "must_reside_in": [
         "oregon"
       ],
-      "employment_required": false
+      "employment_required": false,
+      "income_basis": "smi",
+      "income_max_pct": 60
     },
     "application_url": "https://portlandgeneral.com/income-qualified-bill-discount",
     "application_method": "online",
@@ -549,12 +553,14 @@
         "Must be single-family residential customer",
         "Must live at service address",
         "Proof of income required",
-        "Must reapply every two years"
+        "Must reapply every two years",
+        "Income ceiling is 60% of Oregon state median family income (published as ~$52,128/yr for 1 person to ~$74,460/yr for 4); the Portland HUD AMI 60% column is a close proxy. An enhanced 30%-MFI tier exists for the lowest incomes. NOT the federal poverty level."
       ],
-      "income_max_pct_fpl": 60,
       "household_size_min": 1,
       "must_be_renter": false,
-      "triggered_by_event": "job_loss"
+      "triggered_by_event": "job_loss",
+      "income_basis": "ami",
+      "income_max_pct": 60
     },
     "application_url": "https://www.portland.gov/water/customer-service/apply-financial-assistance",
     "application_method": "online",
@@ -596,13 +602,15 @@
       "median": 400
     },
     "eligibility": {
-      "income_max_pct_fpl": 60,
       "other_requirements": [
-        "Must be NW Natural customer"
+        "Must be NW Natural customer",
+        "Income ceiling is 60% of Oregon State Median Income (SMI), adjusted for household size — NOT the federal poverty level. Discount (15%-85% in Oregon) scales by SMI band; see benefit_schedule."
       ],
       "must_reside_in": [
         "oregon"
-      ]
+      ],
+      "income_basis": "smi",
+      "income_max_pct": 60
     },
     "application_url": "https://www.nwnatural.com/account/bill-discount-program",
     "application_method": "online",
@@ -670,15 +678,17 @@
       "median": 700
     },
     "eligibility": {
-      "income_max_pct_fpl": 60,
       "must_reside_in": [
         "oregon"
       ],
       "must_be_renter": false,
       "must_be_homeowner": false,
       "other_requirements": [
-        "A household must have documented energy costs"
-      ]
+        "A household must have documented energy costs",
+        "Income ceiling is 60% of Oregon State Median Income (SMI), adjusted for household size (FFY2026: ~$38,384/yr for 1 person up to ~$73,816/yr for 4) — NOT the federal poverty level."
+      ],
+      "income_basis": "smi",
+      "income_max_pct": 60
     },
     "application_url": "https://www.oregon.gov/ohcs/energy-weatherization/pages/utility-bill-payment-assistance.aspx",
     "application_method": "phone",
@@ -737,7 +747,7 @@
     "contact_phone": "211 toll-free; TTY relay 711 or 1-800-735-2900",
     "contact_org": "Oregon Health Authority WIC Program",
     "benefit_schedule": {
-      "description": "WIC cash-value benefit (CVB) for fruits and vegetables, maximum monthly allowances by participant category, FY 2024",
+      "description": "USDA WIC cash-value benefit (CVB): maximum monthly fruit & vegetable allowance by participant category (USDA-set, adjusted annually for inflation — verify current FY at fns.usda.gov)",
       "unit": "usd_monthly",
       "amounts": [
         {
@@ -803,12 +813,16 @@
       "median": 2000
     },
     "eligibility": {
-      "income_max_pct_fpl": 200,
       "must_reside_in": [
         "multnomah"
       ],
       "must_be_renter": true,
-      "triggered_by_event": "eviction_notice"
+      "triggered_by_event": "eviction_notice",
+      "income_basis": "ami",
+      "income_max_pct": 80,
+      "other_requirements": [
+        "Income is NOT measured against the federal poverty level. Rent assistance (STRA) uses HUD Area Median Income (50%-80% AMI); the energy-assistance component uses 60% of Oregon State Median Income."
+      ]
     },
     "application_url": "https://multco.us/info/eviction-prevention-and-energy-bill-assistance",
     "application_method": "phone",
@@ -838,9 +852,13 @@
       "median": 5000
     },
     "eligibility": {
-      "income_max_pct_fpl": 200,
       "must_reside_in": [
         "portland"
+      ],
+      "income_basis": "ami",
+      "income_max_pct": 80,
+      "other_requirements": [
+        "Income ceiling is 50%-80% of HUD Area Median Income depending on the service — NOT the federal poverty level. The flagship free home repair/weatherization program additionally requires owning and occupying the home and being 55+ and/or having a disability; renters and other homeowners use separate CEP tracks."
       ]
     },
     "application_url": "https://www.communityenergyproject.org/",
@@ -879,11 +897,13 @@
       "other_requirements": [
         "Real market value (RMV) minimum cap amount for 2026 increased to $301,000",
         "Homeowners that owned and lived in their home less than 17 years may qualify if homestead RMV is less than 150 percent of the county's median value of residential improved property",
-        "If reverse mortgage entered into on or after July 1, 2011 and before January 1, 2017, must have equity in home of at least 40 percent as of date of deferral application"
+        "If reverse mortgage entered into on or after July 1, 2011 and before January 1, 2017, must have equity in home of at least 40 percent as of date of deferral application",
+        "Eligible if you are EITHER age 62+ OR have a qualifying disability (federal/state-recognized) — you do not need both.",
+        "Net worth excluding the home must be under $500,000 (ORS 311.668)."
       ],
       "must_be_renter": false,
-      "must_be_disabled": true,
-      "must_be_senior": true
+      "must_be_disabled": false,
+      "must_be_senior": false
     },
     "application_url": "https://www.oregon.gov/dor/programs/property/Pages/Deferral.aspx",
     "application_method": "online",
@@ -923,7 +943,7 @@
       ]
     },
     "application_url": "https://www.portland.gov/transportation/wallet/access-all",
-    "application_method": "online",
+    "application_method": "in_person",
     "documents_required": [
       "Proof of Portland residency",
       "Proof of income OR enrollment in qualifying program"
@@ -954,13 +974,16 @@
       "must_reside_in": [
         "portland"
       ],
-      "income_max_pct_fpl": 80,
       "other_requirements": [
-        "Residential buildings must propose 20 or more new units"
-      ]
+        "Residential buildings must propose 20 or more new units",
+        "No central application portal: find IH units via the Portland Housing Bureau units list and apply directly to each building's own waitlist with that building's requirements.",
+        "Units are restricted at 60% and 80% of HUD Median Family Income for the Portland MSA (FY2026: 80% MFI is $71,900/yr for 1 person up to $102,650/yr for 4) — NOT the federal poverty level."
+      ],
+      "income_basis": "ami",
+      "income_max_pct": 80
     },
     "application_url": "https://www.portland.gov/phb/inclusionary-housing",
-    "application_method": "online",
+    "application_method": "in_person",
     "documents_required": [
       "Proof of income",
       "Photo ID",
@@ -1025,7 +1048,7 @@
         "oregon"
       ],
       "other_requirements": [
-        "Age 60+, OR adult with disability, OR veteran"
+        "The ADRC information & referral helpline is open to people of all ages, incomes, and abilities (including family caregivers). OAA-funded direct services (case management, in-home care, meal delivery) prioritize adults 60+, adults with disabilities, and veterans."
       ]
     },
     "application_url": "https://multco.us/info/aging-and-disability-resource-connection-helpline",
@@ -1085,7 +1108,7 @@
     ],
     "processing_time": "60-90 days",
     "renewal_cycle": "Annual for physicians' certifications; not required for VA/Armed Forces certifications dated within three years or after age 65 with permanent disability certification",
-    "contact_org": "Oregon Department of Revenue",
+    "contact_org": "Oregon Department of Veterans’ Affairs (ODVA)",
     "benefit_schedule": {
       "description": "Property tax exemption amounts by disability/service status",
       "unit": "usd_annual",

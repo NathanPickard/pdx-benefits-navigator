@@ -41,6 +41,17 @@ export interface Program {
 
   eligibility: {
     income_max_pct_fpl?: number;
+    /**
+     * Income-ceiling basis when the program does NOT use the federal poverty level.
+     *   'smi' = Oregon 60% State Median Income (LIHEAP + OPUC utility bill discounts)
+     *   'ami' = Portland-area HUD Area/Median Family Income (housing, weatherization)
+     * Absent ⇒ FPL: use income_max_pct_fpl. When set, use income_max_pct against the
+     * matching SMI/AMI table in the eligibility system prompt. These scales run 3-5x
+     * higher than FPL, so never store an SMI/AMI percentage in income_max_pct_fpl.
+     */
+    income_basis?: 'fpl' | 'smi' | 'ami';
+    /** Income ceiling as a percent of `income_basis` (used when income_basis is 'smi' or 'ami'). */
+    income_max_pct?: number;
     income_max_annual?: number;
     household_size_min?: number;
     household_size_max?: number;
