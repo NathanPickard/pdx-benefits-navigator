@@ -13,6 +13,11 @@ import { StatReveal } from "@/components/landing/StatReveal";
 import mariaFixture from "@/data/scenarios/maria.json";
 import jamesFixture from "@/data/scenarios/james.json";
 import roseFixture from "@/data/scenarios/rose.json";
+import programs from "@/data/programs.json";
+
+const HIDDEN_GEM_COUNT = (programs as { hidden_gem: boolean }[]).filter(
+  (p) => p.hidden_gem,
+).length;
 
 const eligibleCount = (f: { matches: { eligible: boolean }[] }) =>
   f.matches.filter((m) => m.eligible).length;
@@ -423,7 +428,7 @@ export default function HomePage() {
                 fontSize: "0.94rem",
               }}
             >
-              These nine hyperlocal programs alone add{" "}
+              Portland&rsquo;s {HIDDEN_GEM_COUNT} hidden-gem programs alone add{" "}
               <strong style={{ color: "var(--rose)" }}>
                 $10–25K a year
               </strong>{" "}

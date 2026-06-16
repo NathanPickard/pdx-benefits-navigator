@@ -6,8 +6,24 @@ import { cn } from '@/lib/utils';
 import mariaFixture from '@/data/scenarios/maria.json';
 import jamesFixture from '@/data/scenarios/james.json';
 import roseFixture from '@/data/scenarios/rose.json';
+import programs from '@/data/programs.json';
 
-type Fixture = { total_estimated_annual_value: number };
+type Fixture = {
+  total_estimated_annual_value: number;
+  matches: { program_id: string; eligible: boolean; estimated_annual_value: number }[];
+};
+
+const SHORT_BY_ID: Record<string, string> = Object.fromEntries(
+  (programs as { id: string; short_name: string }[]).map((p) => [p.id, p.short_name]),
+);
+
+/** Top eligible programs for a persona, by estimated value — guaranteed real. */
+const heroPrograms = (f: Fixture, n = 4): string[] =>
+  f.matches
+    .filter((m) => m.eligible)
+    .sort((a, b) => b.estimated_annual_value - a.estimated_annual_value)
+    .slice(0, n)
+    .map((m) => SHORT_BY_ID[m.program_id] ?? m.program_id);
 
 const expectedFromFixture = (f: Fixture) =>
   `~$${f.total_estimated_annual_value.toLocaleString()}/year`;
@@ -34,12 +50,7 @@ const SCENARIOS: ScenarioCard[] = [
       { label: 'Where', value: 'Cully (97218) · renting' },
       { label: 'Language', value: 'Spanish · LPR status' },
     ],
-    hero: [
-      'Portland Renter Relocation triggered',
-      'ERDC childcare subsidy',
-      'SUN Schools wraparound',
-      'PCEF weatherization',
-    ],
+    hero: heroPrograms(mariaFixture),
     expected: expectedFromFixture(mariaFixture),
     icon: <Heart className="h-5 w-5" />,
     accentClass: 'border-emerald-200 bg-emerald-50/40 hover:border-emerald-300',
@@ -54,12 +65,7 @@ const SCENARIOS: ScenarioCard[] = [
       { label: 'Where', value: 'St. Johns (97203) · homeowner' },
       { label: 'Status', value: 'Veteran · service-connected disability' },
     ],
-    hero: [
-      'Veterans property tax exemption',
-      'Oregon Health Plan',
-      'ADVSD case management',
-      'Energy Trust weatherization',
-    ],
+    hero: heroPrograms(jamesFixture),
     expected: expectedFromFixture(jamesFixture),
     icon: <ShieldCheck className="h-5 w-5" />,
     accentClass: 'border-blue-200 bg-blue-50/40 hover:border-blue-300',
@@ -74,12 +80,7 @@ const SCENARIOS: ScenarioCard[] = [
       { label: 'Where', value: 'Lents (97266) · homeowner' },
       { label: 'Language', value: 'Vietnamese' },
     ],
-    hero: [
-      'Senior Property Tax Deferral',
-      'ADVSD support services',
-      'OHP + SNAP',
-      'Vietnamese translation',
-    ],
+    hero: heroPrograms(roseFixture),
     expected: expectedFromFixture(roseFixture),
     icon: <Briefcase className="h-5 w-5" />,
     accentClass: 'border-amber-200 bg-amber-50/40 hover:border-amber-300',
@@ -102,7 +103,7 @@ export default function DemoHubPage() {
         </h1>
         <p className="max-w-2xl text-muted-foreground">
           Each scenario runs against all 20 federal, Oregon, Multnomah County, and Portland
-          programs in under five seconds. Pick one — we&rsquo;ll show exactly what they qualify
+          programs in a single pass. Pick one — we&rsquo;ll show exactly what they qualify
           for and how to apply.
         </p>
       </header>
