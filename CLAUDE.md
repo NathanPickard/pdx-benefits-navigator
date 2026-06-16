@@ -44,7 +44,7 @@ Built for the 2026 AI Portland Build Challenge. The hackathon submission is froz
 
 **Changing the runtime model.** Edit `ELIGIBILITY_MODEL` in `lib/eligibility.ts`. The README badge advertises the current value — update both together.
 
-**Re-baking demo fixtures.** After changing the system prompt or programs database, the pre-baked fixtures in `data/scenarios/*.json` go stale. `scripts/precompute-scenarios.ts` was written against an earlier server route; either restore `app/api/analyze/route.ts` from git history first, or update the script to call `analyzeEligibility()` directly from `lib/claudeBrowser.ts` in a Node context with `ANTHROPIC_API_KEY` from env.
+**Re-baking demo fixtures.** After changing the system prompt, the model, or the programs database, the pre-baked fixtures in `data/scenarios/*.json` go stale. Run `npm run bake` (alias for `scripts/precompute-scenarios.ts`), which calls `analyzeEligibilityStream()` from `lib/claudeBrowser.ts` directly in Node using `ANTHROPIC_API_KEY` from `.env.local`. It uses the same `ELIGIBILITY_MODEL` as the runtime, so demos match live results. Do NOT add a server-side AI route — that would violate hard rule #3.
 
 **Refreshing program data from official sites.** `scripts/scrape-programs.ts` uses Firecrawl. The seed file is the source of truth; scrape output is opportunistic enrichment.
 
