@@ -2,18 +2,21 @@
   "matches": [
     {
       "program_id": "snap",
-      "eligible": false,
-      "confidence": "high",
-      "estimated_annual_value": 0,
-      "reasoning": "SNAP income limit for a 1-person household is 130% FPL = $20,345/year. The applicant's annual income of $21,600 exceeds this threshold. Therefore ineligible.",
+      "eligible": true,
+      "confidence": "medium",
+      "estimated_annual_value": 3576,
+      "reasoning": "Household size 1, annual income $21,600. SNAP income limit is 130% FPL for 1-person household = $15,960 × 1.30 = $20,748/year. However, SNAP uses net income for the benefit calculation and gross income for the 130% test. At $21,600 gross, this is slightly above the 130% FPL gross limit of $20,748. However, retired individuals may have deductions (e.g., shelter costs as a homeowner) that bring net income below the threshold, and seniors 60+ are subject to a 200% FPL gross income test ($31,920) with only a net income test. Since the household has a senior, the 200% FPL gross limit applies ($31,920), which $21,600 clearly falls under. The senior net income test (100% FPL = $15,960/year = $1,330/month) may apply — with standard deductions for housing costs, net income could fall below this. Confidence is medium given the net income calculation depends on deductible expenses not captured in intake.",
       "next_steps": [
-        "If income drops or changes, recheck eligibility at oregon.gov/odhs/food/Pages/snap.aspx",
-        "Call 211 to ask about other food assistance programs that may have higher income limits"
+        "Visit oregon.gov/odhs/food/Pages/snap.aspx to apply online or call 211 for assistance in Vietnamese",
+        "Gather last 30 days of income documentation (Social Security award letter, pension statements)",
+        "Note your monthly housing costs (mortgage, property taxes, insurance) as these are deductible for seniors and may significantly reduce countable income",
+        "Ask about expedited SNAP if your liquid resources are very low"
       ],
       "required_documents": [
         "Photo ID",
-        "Proof of income",
-        "Proof of housing costs"
+        "Proof of income (Social Security/pension award letter)",
+        "Proof of housing costs (mortgage statement, property tax bill)",
+        "Social Security number"
       ],
       "application_deadline": null,
       "urgency_note": null
@@ -23,28 +26,28 @@
       "eligible": true,
       "confidence": "high",
       "estimated_annual_value": 4000,
-      "reasoning": "OHP for adults covers up to 138% FPL = $21,597/year for a 1-person household. The applicant's income of $21,600 is just above the 138% FPL adult threshold. However, OHP also covers adults up to 200% FPL under certain pathways (Medicare Savings Programs, etc.), and the program record lists income_max_pct_fpl: 200. At $21,600 for a household of 1, income is 138% FPL — right at the standard adult Medicaid threshold. Given the senior in the household and retired status, Medicare Savings Programs through OHP may apply up to higher thresholds. Flagging as eligible with medium confidence given the income is essentially at the adult Medicaid line and senior-specific OHP pathways (QMB, SLMB) extend to higher income levels. Applicant is a citizen and Oregon resident (97266 = Portland/Lents).",
+      "reasoning": "Household size 1, annual income $21,600. OHP adult income limit is 138% FPL = $15,960 × 1.38 = $22,025/year. At $21,600, this is below $22,025, so the applicant qualifies for full OHP. Applicant is a U.S. citizen residing in Oregon. As a retired senior, they may currently have Medicare, but OHP can serve as a Medicaid wraparound for cost-sharing, dental, vision, and services Medicare doesn't cover. Even if already on Medicare, OHP/Medicaid dual enrollment provides substantial additional value.",
       "next_steps": [
-        "Call 1-800-273-0557 to discuss OHP eligibility including Medicare Savings Program options for seniors",
-        "Apply online at oregon.gov/oha/hsd/ohp/pages/eligibility.aspx",
-        "Gather proof of income (Social Security award letter or pension statement) before applying",
-        "Ask specifically about the Qualified Medicare Beneficiary (QMB) and SLMB programs that help pay Medicare premiums"
+        "Visit oregon.gov/oha/hsd/ohp/pages/eligibility.aspx to apply or check current enrollment status",
+        "Call 1-800-273-0557 to request Vietnamese-language assistance",
+        "If already on Medicare, applying for OHP as a Medicare Savings Program can help cover Medicare premiums, deductibles, and copays",
+        "Gather proof of income and Oregon residency before applying"
       ],
       "required_documents": [
         "Photo ID",
-        "Proof of income (Social Security or retirement benefit letter)",
+        "Proof of income (Social Security award letter)",
         "Proof of Oregon residency",
         "Social Security number"
       ],
       "application_deadline": null,
-      "urgency_note": "Senior in household — Medicare Savings Programs through OHP can save hundreds per month on Medicare costs."
+      "urgency_note": null
     },
     {
       "program_id": "pdx-renter-relocation",
       "eligible": false,
       "confidence": "high",
       "estimated_annual_value": 0,
-      "reasoning": "Applicant is a homeowner (housing_status: own), not a renter. This program requires the applicant to be a renter. Ineligible.",
+      "reasoning": "Applicant is a homeowner (housing_status: 'own'), not a renter. This program requires must_be_renter: true. Ineligible.",
       "next_steps": [],
       "required_documents": [],
       "application_deadline": null,
@@ -55,7 +58,7 @@
       "eligible": false,
       "confidence": "high",
       "estimated_annual_value": 0,
-      "reasoning": "ERDC requires children under age 13. This applicant has no children. Ineligible.",
+      "reasoning": "No children in household (num_children: 0, children_ages: []). ERDC requires children under age 13. Ineligible.",
       "next_steps": [],
       "required_documents": [],
       "application_deadline": null,
@@ -66,7 +69,7 @@
       "eligible": false,
       "confidence": "high",
       "estimated_annual_value": 0,
-      "reasoning": "Oregon EITC requires earned income from employment and qualification for the federal EITC. The applicant is retired with no employment income indicated. Additionally, the Oregon Kids Credit requires children ages 0–5. This applicant has no children. Ineligible.",
+      "reasoning": "Applicant is retired (employment_status: 'retired') with no earned income. Oregon EITC requires earned income and employment. Additionally, there are no children under age 5 for the Oregon Kids Credit. Retirement income does not qualify as earned income for EITC purposes. Ineligible.",
       "next_steps": [],
       "required_documents": [],
       "application_deadline": null,
@@ -77,17 +80,16 @@
       "eligible": true,
       "confidence": "medium",
       "estimated_annual_value": 600,
-      "reasoning": "PGE IQBD requires income at or below 200% FPL. For a 1-person household, 200% FPL = $31,300/year. The applicant's income of $21,600 is approximately 138% FPL, well within the 200% threshold. The applicant must be a PGE residential customer — the program serves the Portland area including 97266 (Lents neighborhood). Assuming they are a PGE customer, this is a strong match. Discount tier based on income of ~138% FPL would likely fall in the 15–80% range; using the median estimated annual value of $600.",
+      "reasoning": "Household size 1, annual income $21,600. PGE IQBD income ceiling is 60% Oregon SMI for 1 person = $38,384/year. At $21,600, the applicant is well below this limit (~56% of the 60% SMI threshold). This places them likely in a mid-to-high discount tier (50%–80% discount). Confidence is medium because we don't know if the applicant is a PGE customer — ZIP 97266 (Lents neighborhood, Portland) is generally in PGE service territory. Estimated annual value uses program median of $600.",
       "next_steps": [
+        "Confirm you are a PGE customer and locate your PGE account number on your electric bill",
         "Visit portlandgeneral.com/income-qualified-bill-discount to apply online",
-        "Gather your PGE account number and a recent benefit verification letter or proof of income",
-        "Call PGE at 503-228-6322 and ask for Vietnamese-language assistance if needed",
-        "If enrolled in OHP, use that enrollment as automatic proof of eligibility"
+        "You may auto-qualify by showing enrollment in OHP/SNAP — submit proof of program participation instead of income documents if enrolled",
+        "Call 503-228-6322 to request Vietnamese-language assistance"
       ],
       "required_documents": [
         "PGE account number",
-        "Proof of income (Social Security award letter or retirement benefit statement)",
-        "Photo ID"
+        "Proof of income (Social Security award letter) OR proof of enrollment in SNAP/OHP"
       ],
       "application_deadline": null,
       "urgency_note": null
@@ -95,38 +97,38 @@
     {
       "program_id": "pdx-water-fa",
       "eligible": true,
-      "confidence": "medium",
+      "confidence": "high",
       "estimated_annual_value": 400,
-      "reasoning": "Portland Water Bureau Financial Assistance is available to Portland residents (97266 is in Portland — Lents neighborhood). The income ceiling listed is $53,000/year and the program targets households at or below 60% FPL, though the listed income_max_annual of $53,000 is the upper bound. At $21,600 for a 1-person household, the applicant is at approximately 138% FPL. The program's income_max_pct_fpl field says 60%, which would be $9,390 for a 1-person household — this conflicts with the $53,000 listed income_max_annual. Given this ambiguity, marking medium confidence; however, the applicant should apply and let the Water Bureau determine the tier. The program also serves homeowners (must_be_renter: false). Using median estimated annual value of $400.",
+      "reasoning": "Applicant lives at ZIP 97266 (Lents, Portland — confirmed Portland city limits per system rules). Annual income $21,600. Water Bureau Financial Assistance income ceiling is 60% AMI for 1-person household = $53,940/year. At $21,600, the applicant is well below this limit (~40% of the threshold). As a homeowner who lives at the service address, they meet the single-family residential requirement. Estimated annual value uses program median of $400.",
       "next_steps": [
         "Visit portland.gov/water/customer-service/apply-financial-assistance to apply online",
-        "Call 503-823-7770 and request a Vietnamese interpreter",
-        "Gather proof of all household income sources and names/ages of all household members",
-        "Collect your most recent water/sewer bill to have your account number ready"
+        "Gather proof of income (Social Security award letter) and names/birthdates of all household members — note you are 60+ which may qualify you for enhanced tier",
+        "Call 503-823-7770 to request Vietnamese-language assistance",
+        "Have your service address and water account number ready"
       ],
       "required_documents": [
-        "Service address and account information",
-        "Proof of gross monthly income (Social Security or pension letter)",
-        "Names and birthdates of all household members (especially anyone 60+)",
-        "Photo ID"
+        "Proof of income (Social Security award letter or pension statement)",
+        "Service address confirmation",
+        "Names and birthdates of all household members (your age 60+ is relevant for enhanced tier)"
       ],
       "application_deadline": null,
       "urgency_note": null
     },
     {
       "program_id": "nw-natural-bill-discount",
-      "eligible": false,
+      "eligible": true,
       "confidence": "medium",
-      "estimated_annual_value": 0,
-      "reasoning": "NW Natural Bill Discount requires income at or below 60% FPL (for maximum discount tiers, though the schedule shows discounts up to $73,817 in Oregon). For a 1-person household, 60% FPL = $9,390. The applicant earns $21,600, which falls in the $18,455–$36,908 tier = 50% discount. However, the program requires being an NW Natural customer. It is not confirmed the applicant uses NW Natural for gas. Additionally, at $21,600 (above the 60% FPL threshold), the eligibility field income_max_pct_fpl: 60 would technically disqualify, but the benefit_schedule shows discounts for higher incomes. Marking ineligible with medium confidence due to the income_max_pct_fpl: 60 hard threshold in the program record, but noting the applicant should check directly since the published schedule extends to $73,817.",
+      "estimated_annual_value": 400,
+      "reasoning": "Household size 1, annual income $21,600. NW Natural Bill Discount income ceiling is 60% Oregon SMI for 1 person = $38,384/year. At $21,600, the applicant is well below this limit. Per the benefit schedule, Oregon households with income $18,455–$36,908 qualify for a 50% discount. At $21,600, this 50% tier applies. Confidence is medium because we don't know if the applicant is an NW Natural customer. Estimated annual value uses program median of $400.",
       "next_steps": [
-        "Check your gas bill to see if your provider is NW Natural",
-        "If NW Natural customer, call 800-422-4012 to confirm your eligibility tier — the discount schedule extends to incomes well above $21,600",
-        "Visit nwnatural.com/account/bill-discount-program for more information"
+        "Check your gas bill to confirm you are an NW Natural customer",
+        "Visit nwnatural.com/account/bill-discount-program to apply online",
+        "Call 800-422-4012 to request Vietnamese-language assistance",
+        "Gather your NW Natural account number and proof of income"
       ],
       "required_documents": [
         "NW Natural account number",
-        "Proof of income",
+        "Proof of income (Social Security award letter)",
         "Photo ID"
       ],
       "application_deadline": null,
@@ -134,24 +136,31 @@
     },
     {
       "program_id": "liheap-energy-trust",
-      "eligible": false,
-      "confidence": "medium",
-      "estimated_annual_value": 0,
-      "reasoning": "LIHEAP requires household income at or below 60% FPL. For a 1-person household, 60% FPL = $9,390/year. The applicant's income of $21,600 exceeds this threshold. Ineligible.",
+      "eligible": true,
+      "confidence": "high",
+      "estimated_annual_value": 700,
+      "reasoning": "Household size 1, annual income $21,600. LIHEAP income ceiling is 60% Oregon SMI for 1 person = $38,384/year. At $21,600, the applicant is comfortably below this limit (~56% of ceiling). Applicant is a homeowner (renters and owners both eligible). Household has a senior, which often gives priority access. Estimated annual value uses program median of $700.",
       "next_steps": [
-        "If income changes, recheck eligibility by calling 1-800-453-5511",
-        "Ask 211 about other energy assistance programs with higher income thresholds"
+        "Call 1-800-453-5511, option 1 to reach Oregon LIHEAP — request a Vietnamese interpreter when you call",
+        "Contact 211 (dial 2-1-1) to find your local community action agency that processes LIHEAP in Multnomah County",
+        "Gather last 30 days of income documentation and a recent utility bill before calling",
+        "Apply early in the season — LIHEAP funds can run out, so apply as soon as the program opens (typically fall/winter)"
       ],
-      "required_documents": [],
+      "required_documents": [
+        "Proof of income (last 30 days — Social Security award letter)",
+        "Recent utility bill",
+        "Social Security number",
+        "Photo ID"
+      ],
       "application_deadline": null,
-      "urgency_note": null
+      "urgency_note": "LIHEAP funds are limited and distributed on a first-come, first-served basis. Apply early in the heating season (October–November) to avoid waitlists."
     },
     {
       "program_id": "wic",
       "eligible": false,
       "confidence": "high",
       "estimated_annual_value": 0,
-      "reasoning": "WIC is for pregnant, postpartum, or breastfeeding women and children under age 5. The applicant is not pregnant and has no children. Ineligible.",
+      "reasoning": "No children under 5, not pregnant, not postpartum/breastfeeding. WIC requires being a pregnant/postpartum/breastfeeding woman, infant, or child under 5. Ineligible.",
       "next_steps": [],
       "required_documents": [],
       "application_deadline": null,
@@ -162,7 +171,7 @@
       "eligible": false,
       "confidence": "high",
       "estimated_annual_value": 0,
-      "reasoning": "School Meals require children under age 18 in the household. This applicant has no children. Ineligible.",
+      "reasoning": "No children in household (num_children: 0). School Meals program requires school-age children. Ineligible.",
       "next_steps": [],
       "required_documents": [],
       "application_deadline": null,
@@ -173,7 +182,7 @@
       "eligible": false,
       "confidence": "high",
       "estimated_annual_value": 0,
-      "reasoning": "Multnomah County Eviction Prevention requires the applicant to be a renter. This applicant is a homeowner. Ineligible.",
+      "reasoning": "Applicant is a homeowner (housing_status: 'own'). The rent assistance (STRA) component requires must_be_renter: true. The energy assistance component requires residency in Multnomah County (ZIP 97266 qualifies) and income below 60% SMI ($38,384 for 1 person — applicant at $21,600 qualifies income-wise), but the program is primarily triggered by eviction notice and is designed for renters. As a homeowner with no eviction notice, the applicant does not meet the primary eligibility trigger. Marking ineligible; LIHEAP is a better pathway for energy assistance.",
       "next_steps": [],
       "required_documents": [],
       "application_deadline": null,
@@ -184,56 +193,58 @@
       "eligible": true,
       "confidence": "medium",
       "estimated_annual_value": 5000,
-      "reasoning": "Community Energy Project Home Weatherization is available to Portland residents at or below 200% FPL. 97266 (Lents) is within Portland city limits. The applicant's income of $21,600 is approximately 138% FPL for a 1-person household, well within 200% FPL. As a homeowner, the applicant is an excellent candidate for weatherization services (insulation, weatherstripping, heating efficiency improvements). Using the median estimated value of $5,000. This is a hidden gem program.",
+      "reasoning": "Applicant lives at ZIP 97266 (Portland city limits confirmed). CEP Weatherization income ceiling is 80% AMI for 1-person household = $71,900/year. At $21,600, the applicant is well below this limit. The flagship free home repair/weatherization program requires owning and occupying the home AND being 55+ or having a disability. The intake confirms the applicant is a homeowner with a senior in the household (has_senior_in_household: true) — meeting the 55+ and homeowner-occupant requirements. This is an excellent match. Confidence is medium because exact age and specific program track must be confirmed by CEP directly. Estimated annual value uses program median of $5,000.",
       "next_steps": [
-        "Call Community Energy Project at 503-284-6827 and request Vietnamese-language assistance",
-        "Visit communityenergyproject.org to learn about the services offered and submit an inquiry",
-        "Gather proof of Portland residency (utility bill or property records) and proof of income",
-        "Ask specifically about free insulation, weatherstripping, and heating system tune-ups for senior homeowners"
+        "Call Community Energy Project at 503-284-6827 — request a Vietnamese interpreter or ask if Vietnamese-speaking staff are available",
+        "Visit communityenergyproject.org to review program tracks and submit an interest form",
+        "Gather proof of income, proof of Portland residency (utility bill or ID), and a recent utility bill",
+        "Note that weatherization improvements (insulation, heating system upgrades, air sealing) can save hundreds per year on utility bills in addition to the one-time installation value"
       ],
       "required_documents": [
-        "Proof of Portland residency (utility bill or property tax statement)",
-        "Proof of income (Social Security or pension letter)",
-        "Utility bill"
+        "Proof of income (Social Security award letter)",
+        "Proof of Portland residency",
+        "Proof of home ownership (property tax statement or deed)",
+        "Recent utility bill"
       ],
       "application_deadline": null,
-      "urgency_note": "As a senior homeowner, weatherization can meaningfully reduce heating costs and improve home comfort and safety."
+      "urgency_note": "CEP has a waitlist — apply as early as possible. Processing and project completion can take 2–6 months."
     },
     {
       "program_id": "senior-prop-tax-deferral",
-      "eligible": false,
+      "eligible": true,
       "confidence": "medium",
-      "estimated_annual_value": 0,
-      "reasoning": "Oregon Senior Property Tax Deferral requires age 62+ (senior in household confirmed) and income at or below $70,000/year (applicant at $21,600 qualifies). The applicant must be a homeowner (confirmed). However, the program also requires must_be_disabled: true in the program record. The applicant does not have a disability. Additionally, the program description states it is for 'senior and disabled' homeowners — in practice, Oregon's deferral program is available to seniors age 62+ OR disabled homeowners, not requiring both. Given the program record marks must_be_disabled: true AND must_be_senior: true, and the applicant is not disabled, marking ineligible per the strict program record. However, this should be verified as Oregon law (ORS 311.666) covers seniors independently of disability status.",
+      "estimated_annual_value": 3500,
+      "reasoning": "Applicant has a senior in the household (has_senior_in_household: true) and is a homeowner in Oregon. Oregon Senior Property Tax Deferral requires age 62+ OR qualifying disability. With has_senior_in_household: true, the applicant likely meets the age 62+ requirement. Annual income of $21,600 is well below the $70,000 income cap. Net worth excluding the home must be under $500,000 — not captured in intake but likely met at this income level. Home RMV must be at or above $301,000 — not confirmed in intake. Confidence is medium because exact age and home value are not in intake. If eligible, estimated annual value uses program median of $3,500 (deferred property taxes — note this is a loan, not a grant, repaid upon sale/transfer of home).",
       "next_steps": [
-        "Call Oregon Department of Revenue at 503-945-8348 to confirm whether the deferral program applies to seniors age 62+ without a disability",
-        "Visit oregon.gov/dor/programs/property/Pages/Deferral.aspx for current eligibility details",
-        "If eligible, gather your property tax statement and proof of income to apply by April 15"
+        "Visit oregon.gov/dor/programs/property/Pages/Deferral.aspx to apply online — deadline is typically April 15 each year",
+        "Call 503-945-8348 or 800-356-4222 to request Vietnamese-language assistance and confirm eligibility",
+        "Confirm your home's Real Market Value is at or above $301,000 (check your county property tax statement)",
+        "Note: this is a state loan against your property, not a grant — taxes are deferred (not forgiven) and repaid with 6% interest when the home is sold or transferred"
       ],
       "required_documents": [
-        "Online application",
-        "Proof of age (passport or birth certificate)",
-        "Property tax statement",
-        "Proof of income"
+        "Online application (Oregon DOR portal)",
+        "Proof of age (passport, birth certificate, or driver's license)",
+        "Proof of home ownership and residency (property tax statement)",
+        "Income documentation (Social Security award letter)"
       ],
       "application_deadline": "April 15 annually",
-      "urgency_note": "If the applicant is age 62+, they may qualify for property tax deferral regardless of disability status — confirm directly with Oregon DOR."
+      "urgency_note": "Annual application deadline is April 15. If you miss this year's deadline, apply by April 15 of next year."
     },
     {
       "program_id": "transportation-wallet",
       "eligible": true,
       "confidence": "medium",
       "estimated_annual_value": 100,
-      "reasoning": "Portland Transportation Wallet (Access for All) is available to Portland residents at or below 200% FPL. 97266 (Lents) is in Portland. The applicant's income of $21,600 is approximately 138% FPL, within the 200% limit. The applicant is a senior (age 18+ confirmed by retirement status). The main caveat is the referral requirement — the applicant must be referred by a participating community-based organization. Using the minimum estimated annual value of $100. This is a hidden gem program that can help with transit fares and ride-share costs.",
+      "reasoning": "Applicant lives at ZIP 97266 (Portland city limits confirmed). Annual income $21,600 is below 200% FPL for 1-person household ($15,960 × 2.00 = $31,920). Applicant is a citizen and adult (age 18+ confirmed by senior status). Must be referred by a participating community-based organization — not confirmed in intake but meetable. Confidence is medium due to the referral requirement. Estimated annual value uses program minimum of $100 (available once per calendar year).",
       "next_steps": [
-        "Visit portland.gov/transportation/wallet/access-all to find participating community organizations that can provide a referral",
-        "Call 311 and ask about the Access for All Transportation Wallet program",
-        "Ask your local senior center, neighborhood association, or social services provider in the Lents neighborhood if they are a referring partner",
-        "Gather proof of Portland residency and proof of income or OHP enrollment card"
+        "Visit portland.gov/transportation/wallet/access-all to find participating community-based organizations that serve Vietnamese-speaking seniors in East Portland",
+        "Call 311 and request Vietnamese-language assistance to learn which CBOs in the 97266 area participate",
+        "Ask your local community center, senior center, or Vietnamese community organization if they are a participating referral partner",
+        "Gather proof of Portland residency and proof of income or program enrollment"
       ],
       "required_documents": [
         "Proof of Portland residency",
-        "Proof of income or enrollment in qualifying benefit program",
+        "Proof of income OR enrollment in qualifying program (SNAP, OHP)",
         "Referral from participating community-based organization"
       ],
       "application_deadline": null,
@@ -244,7 +255,7 @@
       "eligible": false,
       "confidence": "high",
       "estimated_annual_value": 0,
-      "reasoning": "The Inclusionary Housing Program requires the applicant to be a renter seeking housing. This applicant is a homeowner. Ineligible.",
+      "reasoning": "Applicant is a homeowner (housing_status: 'own'). The Inclusionary Housing Program requires must_be_renter: true — it is an affordable rental unit program. Ineligible.",
       "next_steps": [],
       "required_documents": [],
       "application_deadline": null,
@@ -255,7 +266,7 @@
       "eligible": false,
       "confidence": "high",
       "estimated_annual_value": 0,
-      "reasoning": "SUN Community Schools requires children under age 18 in the household. This applicant has no children. Ineligible.",
+      "reasoning": "No children in household (num_children: 0, children_ages: []). SUN Community Schools requires children under 18. Ineligible.",
       "next_steps": [],
       "required_documents": [],
       "application_deadline": null,
@@ -266,27 +277,27 @@
       "eligible": true,
       "confidence": "high",
       "estimated_annual_value": 2400,
-      "reasoning": "The ADRC Helpline serves people age 60+ (senior in household confirmed), adults with disabilities, or veterans in Oregon. The applicant has a senior in the household and resides in Oregon (97266 = Portland). There are no income or citizenship requirements. This is a hidden gem navigation service that can connect the applicant to many additional programs. The ADRC can help identify senior-specific services, in-home supports, and benefits the applicant may not know about. Vietnamese-language assistance may be available. Using the median estimated annual value of $2,400.",
+      "reasoning": "Applicant has a senior in the household (has_senior_in_household: true) and resides in Oregon (ZIP 97266, Portland/Multnomah County). The ADRC helpline is open to people of all ages, incomes, and abilities — no income or citizenship test. OAA-funded direct services prioritize adults 60+, which this applicant likely qualifies for. As a retired Vietnamese-speaking senior homeowner, the ADRC can connect them to in-home services, meal delivery, caregiver support, and other programs in their language. Estimated annual value uses program median of $2,400.",
       "next_steps": [
-        "Call the ADRC Helpline at 503-988-3646 and request a Vietnamese-speaking specialist",
-        "Ask specifically about in-home support services, prescription assistance programs, and any senior benefits you may be missing",
-        "Prepare a list of your current income sources, medications, and insurance coverage before calling",
-        "Ask about Meals on Wheels, home-delivered meals, and other senior services available in the Lents (97266) area"
+        "Call the ADRC Helpline at 503-988-3646 — ask for a Vietnamese interpreter at the start of your call",
+        "Request a comprehensive needs assessment to identify all services you may qualify for, including in-home care, meal delivery, and transportation assistance",
+        "Ask specifically about Vietnamese-language services and culturally specific senior programs in East Portland/Lents area",
+        "Contact Multnomah County via multco.us/info/aging-and-disability-resource-connection-helpline for additional information"
       ],
       "required_documents": [
         "Photo ID",
-        "Insurance cards (Medicare/Medicaid if applicable)",
-        "Medication list"
+        "Insurance cards (Medicare/OHP if applicable)",
+        "Medication list (for health-related referrals)"
       ],
       "application_deadline": null,
-      "urgency_note": "As a senior living alone, the ADRC is a critical first call — they can identify additional benefits across all categories and provide Vietnamese-language navigation support."
+      "urgency_note": null
     },
     {
       "program_id": "veterans-prop-tax-exempt",
       "eligible": false,
       "confidence": "high",
       "estimated_annual_value": 0,
-      "reasoning": "Oregon Veterans Property Tax Exemption requires the applicant to be a veteran. This applicant is not a veteran. Ineligible.",
+      "reasoning": "Applicant is not a veteran (is_veteran: false). Oregon Veterans Property Tax Exemption requires must_be_veteran: true. Ineligible.",
       "next_steps": [],
       "required_documents": [],
       "application_deadline": null,
@@ -294,40 +305,47 @@
     },
     {
       "program_id": "lifeline",
-      "eligible": false,
-      "confidence": "medium",
-      "estimated_annual_value": 0,
-      "reasoning": "Lifeline requires income at or below 135% FPL. For a 1-person household, 135% FPL = $21,128/year. The applicant's income of $21,600 exceeds this threshold by approximately $472. The applicant could also qualify via enrollment in SNAP or Medicaid — but the applicant does not currently qualify for SNAP, and OHP eligibility is uncertain. Marking ineligible based on income threshold not being met. If the applicant is enrolled in OHP or another qualifying program, they would qualify automatically.",
+      "eligible": true,
+      "confidence": "high",
+      "estimated_annual_value": 111,
+      "reasoning": "Household size 1, annual income $21,600. Lifeline income limit is 135% FPL for 1-person household = $15,960 × 1.35 = $21,546/year. At $21,600, the applicant is very slightly above the income-based threshold ($21,600 vs. $21,546 — a difference of only $54/year). However, Lifeline also allows qualification through program participation (SNAP, Medicaid/OHP) — if the applicant qualifies for SNAP or OHP (both likely given income level), they automatically qualify for Lifeline regardless of the income calculation. Confidence is high based on program-based qualification pathway via OHP (which applicant qualifies for at $21,600 < $22,025 138% FPL). Estimated annual value = $9.25/month × 12 = $111/year on non-Tribal lands.",
       "next_steps": [
-        "If enrolled in OHP or Medicaid, apply for Lifeline immediately at usac.org/lifeline — program enrollment is an automatic qualifier",
-        "Call 1-800-234-9473 to ask about qualifying via program participation",
-        "If income decreases, recheck income-based eligibility at 135% FPL"
+        "Visit usac.org/lifeline to apply online — you can qualify automatically if enrolled in OHP or SNAP",
+        "Apply for OHP first (see OHP steps above), then use OHP enrollment as your Lifeline qualifier",
+        "Call 1-800-234-9473 and request Vietnamese-language assistance",
+        "Ask your phone or internet provider if they participate in Lifeline to apply the discount to your existing account"
       ],
       "required_documents": [
         "Photo ID",
-        "Proof of income or proof of enrollment in qualifying program"
+        "Proof of OHP/SNAP enrollment OR proof of income",
+        "Current phone or internet account information"
       ],
       "application_deadline": null,
       "urgency_note": null
     }
   ],
-  "total_estimated_annual_value": 12500,
-  "federal_only_value": 4600,
+  "total_estimated_annual_value": 20787,
+  "federal_only_value": 12887,
   "pdx_specific_value": 7900,
   "priority_application_order": [
-    "advsd",
     "ohp",
+    "advsd",
+    "snap",
+    "liheap-energy-trust",
+    "senior-prop-tax-deferral",
     "pge-iqbd",
-    "cep-weatherization",
+    "nw-natural-bill-discount",
     "pdx-water-fa",
-    "transportation-wallet",
-    "senior-prop-tax-deferral"
+    "cep-weatherization",
+    "lifeline",
+    "transportation-wallet"
   ],
   "warnings": [
-    "SENIOR LIVING ALONE: This resident is a senior (age 62+) living alone in Lents (97266). Call the ADRC Helpline at 503-988-3646 first — they provide Vietnamese-language navigation and can unlock benefits not captured here.",
-    "VIETNAMESE LANGUAGE: Primary language is Vietnamese (Tiếng Việt). When contacting agencies, always request a Vietnamese interpreter. Oregon DHS, Multnomah County, and many Portland bureaus are required to provide free interpretation.",
-    "OHP INCOME THRESHOLD: Income of $21,600 is essentially at the 138% FPL adult Medicaid line ($21,597 for 1 person). OHP should be applied for immediately — Medicare Savings Programs through OHP extend to higher income levels and could pay Medicare Part B premiums (~$185/month), representing over $2,000/year in savings.",
-    "PROPERTY TAX DEFERRAL: As a senior homeowner, Oregon's Property Tax Deferral program (ORS 311.666) may be available at age 62+ without requiring a disability — contact Oregon DOR at 503-945-8348 to confirm eligibility. Deadline is April 15 annually.",
-    "NW NATURAL DISCOUNT: If this resident uses NW Natural for gas service, the published discount schedule extends to incomes up to $73,817 — call 800-422-4012 to check eligibility even though the program record shows a 60% FPL threshold."
+    "VIETNAMESE LANGUAGE ACCESS: This applicant's primary language is Vietnamese (vi). When contacting any agency, immediately request a Vietnamese interpreter — federal law (Title VI) requires agencies to provide this at no cost. Key Vietnamese community resources in Portland include Immigrant and Refugee Community Organization (IRCO) at 503-872-8100 and the Asian Health & Service Center at 503-653-6323, both of which can assist with benefits navigation.",
+    "SENIOR IN HOUSEHOLD: Multiple high-value programs prioritize seniors 60+ (LIHEAP, ADRC, CEP Weatherization, Property Tax Deferral). Apply to ADRC first — they can coordinate referrals to many other programs simultaneously and provide Vietnamese-language case management.",
+    "PROPERTY TAX DEFERRAL DEADLINE: The Oregon Senior Property Tax Deferral has an annual deadline of April 15. If this deadline is approaching, prioritize this application immediately.",
+    "LIHEAP FUNDING ALERT: LIHEAP energy assistance funds are distributed on a first-come, first-served basis and often run out mid-season. Apply as early as possible in the fall heating season (October–November).",
+    "CEP WEATHERIZATION WAITLIST: Community Energy Project has significant waitlists. As a senior homeowner in Portland, this applicant is a strong candidate for free home weatherization (potentially $2,000–$15,000 in improvements). Apply immediately to get on the waitlist.",
+    "INCOME NEAR THRESHOLDS: Applicant's income of $21,600/year is very close to several program thresholds (OHP at $22,025; Lifeline income test at $21,546). Confirm current income carefully — any reduction in income (medical expenses, deductions) could expand eligibility. SNAP shelter deductions for seniors are particularly important to document."
   ]
 }

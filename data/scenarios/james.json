@@ -5,49 +5,48 @@
       "eligible": true,
       "confidence": "high",
       "estimated_annual_value": 3576,
-      "reasoning": "Household of 1 with $0 income is well within the 130% FPL limit ($20,345/year). Citizen, Oregon resident in 97203 (Portland/St. Johns). No children to trigger ABAWD exemption, but disability status typically exempts from ABAWD work requirements. Maximum monthly benefit for household of 1 is $298/month per benefit schedule.",
+      "reasoning": "Household of 1, $0 annual income (well within 130% FPL limit of $20,748/yr for 1 person). Oregon resident in ZIP 97203 (Portland/St. Johns). U.S. citizen. No children, but as a disabled individual, ABAWD work requirements are waived. Maximum monthly benefit for household of 1 is $298/month per benefit_schedule.",
       "next_steps": [
-        "Visit oregon.gov/odhs/food/pages/snap.aspx to apply online today",
-        "Call 211 to get application help from a benefits navigator",
-        "Gather Photo ID, proof of Oregon residency, and documentation of disability status",
-        "Request expedited SNAP (7-day processing) given $0 income — you likely qualify"
+        "Apply online at oregon.gov/odhs/food/pages/snap.aspx or call 211",
+        "Gather proof of identity (photo ID) and Oregon residency documents",
+        "Request expedited processing — $0 income qualifies for 7-day expedited issuance",
+        "Ask about categorical eligibility if you are enrolled in OHP or other programs"
       ],
       "required_documents": [
         "Photo ID",
         "Proof of Oregon residency (utility bill, lease, or mortgage statement)",
         "Social Security number",
-        "Documentation of disability (for ABAWD exemption)"
+        "Documentation of disability status (for ABAWD waiver)"
       ],
       "application_deadline": null,
-      "urgency_note": "With $0 income, you likely qualify for expedited SNAP benefits within 7 days — request this when applying."
+      "urgency_note": "With $0 income, you likely qualify for expedited SNAP within 7 days — request this at application."
     },
     {
       "program_id": "ohp",
       "eligible": true,
       "confidence": "high",
       "estimated_annual_value": 4000,
-      "reasoning": "Household of 1 with $0 income is far below the 138% FPL adult threshold (~$21,597/year). Citizen, Oregon resident. OHP is free health coverage. Disability status makes this especially critical.",
+      "reasoning": "Household of 1, $0 income — well within 138% FPL ($22,025/yr) for adult Medicaid. Oregon resident, U.S. citizen. OHP is available regardless of immigration status, but as a citizen this is a non-issue. $0 income clearly qualifies. Estimated value uses program median of $4,000/yr.",
       "next_steps": [
-        "Apply online at oregon.gov/oha/hsd/ohp/pages/eligibility.aspx",
-        "Call 1-800-273-0557 if you need help applying by phone",
-        "Gather Photo ID, proof of Oregon residency, and Social Security number",
-        "Ask about coordinated disability services through OHP once enrolled"
+        "Apply online at oregon.gov/oha/hsd/ohp or call 1-800-273-0557",
+        "Enroll immediately — coverage can begin the first of the month following enrollment",
+        "Once enrolled, OHP enrollment can automatically qualify you for PGE IQBD and NW Natural discounts",
+        "Ask about OHP Plus dental and vision coverage available to adults"
       ],
       "required_documents": [
         "Photo ID",
         "Proof of Oregon residency",
-        "Social Security number",
-        "Proof of income (or statement of $0 income)"
+        "Social Security number"
       ],
       "application_deadline": null,
-      "urgency_note": "As a person with a disability and no income, OHP coverage is critical — apply immediately to ensure access to medical and disability-related care."
+      "urgency_note": null
     },
     {
       "program_id": "pdx-renter-relocation",
       "eligible": false,
       "confidence": "high",
       "estimated_annual_value": 0,
-      "reasoning": "Intake indicates homeowner (housing_status: 'own'). This program requires the resident to be a renter. Ineligible.",
+      "reasoning": "Applicant is a homeowner (housing_status: 'own'), not a renter. Portland Mandatory Renter Relocation Assistance requires must_be_renter = true. Ineligible.",
       "next_steps": [],
       "required_documents": [],
       "application_deadline": null,
@@ -58,7 +57,7 @@
       "eligible": false,
       "confidence": "high",
       "estimated_annual_value": 0,
-      "reasoning": "No children under 13 reported. ERDC requires dependent children under age 13. Ineligible.",
+      "reasoning": "No children in household (num_children: 0, children_ages: []). ERDC requires children under age 13. Ineligible.",
       "next_steps": [],
       "required_documents": [],
       "application_deadline": null,
@@ -69,7 +68,7 @@
       "eligible": false,
       "confidence": "high",
       "estimated_annual_value": 0,
-      "reasoning": "Oregon EITC and Kids Credit both require earned income (employment_required: true) and the Kids Credit requires children ages 0–5. This applicant is unemployed with $0 income and no children. Ineligible for both credits.",
+      "reasoning": "Oregon EITC and Kids Credit both require earned income (employment_required: true) and filing an Oregon income tax return. Applicant is unemployed with $0 income. No earned income means no federal EITC to base Oregon EIC on, and no qualifying children under 5 for the Kids Credit. Ineligible.",
       "next_steps": [],
       "required_documents": [],
       "application_deadline": null,
@@ -80,16 +79,16 @@
       "eligible": true,
       "confidence": "medium",
       "estimated_annual_value": 720,
-      "reasoning": "Household of 1 with $0 income is well within 200% FPL ($31,300/year). 97203 is in Portland and within PGE service territory. Eligibility also confirmed via likely SNAP enrollment. Discount ranges 15–80% off energy bill. At $0 income, the highest discount tier (80%) likely applies. Estimated $60/month savings on a ~$75/month electric bill = ~$720/year. Confidence medium because we must confirm PGE (not Pacific Power) is the utility provider at this address.",
+      "reasoning": "Household of 1, $0 income. The 60% SMI ceiling for 1-person household is $38,384/yr — $0 income is far below this. Program requires being a current PGE residential customer; 97203 (St. Johns, Portland) is within PGE service territory. With $0 income, applicant would qualify for the highest discount tier (up to 80% off energy use). Confidence is medium because we cannot confirm PGE account status from intake data. Estimated value assumes ~80% discount on a modest annual electric bill of ~$900, saving ~$720/yr.",
       "next_steps": [
-        "Visit portlandgeneral.com/income-qualified-bill-discount to apply online",
-        "Call PGE at 503-228-6322 to verify service and apply by phone",
-        "Use proof of SNAP enrollment (once received) as automatic qualifier — no separate income verification needed",
-        "Gather your PGE account number from a recent bill"
+        "Call PGE at 503-228-6322 or visit portlandgeneral.com/income-qualified-bill-discount to apply",
+        "If enrolled in SNAP or OHP, use that enrollment letter as proof of income — no pay stubs needed",
+        "Have your PGE account number ready when applying",
+        "Enrollment in OHP (once approved) may auto-enroll you in IQBD at the lowest-income tier"
       ],
       "required_documents": [
         "PGE account number",
-        "Proof of SNAP or OHP enrollment (as automatic qualifier), OR proof of income"
+        "Proof of income OR enrollment letter from SNAP or OHP"
       ],
       "application_deadline": null,
       "urgency_note": null
@@ -99,18 +98,17 @@
       "eligible": true,
       "confidence": "medium",
       "estimated_annual_value": 400,
-      "reasoning": "Resident lives in 97203 (Portland/St. Johns), which is fully within Portland city limits and Portland Water Bureau service territory. $0 income is well below any income threshold. Program is for single-family residential customers — homeowners qualify. Note: program lists income_max_pct_fpl of 60% but also an income_max_annual of $53,000; at $0 income both are easily met. Confidence medium because we must confirm the applicant is a direct Portland Water Bureau account holder (not a renter where landlord pays water).",
+      "reasoning": "ZIP 97203 is within City of Portland. Applicant is a homeowner (single-family residential customer). $0 income is well below the 60% AMI ceiling for 1-person household ($53,940/yr). With $0 income, applicant likely qualifies for the enhanced 30% AMI discount tier. Confidence medium because we cannot confirm Water Bureau account status or single-family designation from intake. Estimated value uses program median of $400/yr.",
       "next_steps": [
         "Apply online at portland.gov/water/customer-service/apply-financial-assistance",
-        "Call the Portland Water Bureau at 503-823-7770 to apply by phone or get help",
-        "Gather your Portland Water Bureau account number and proof of address",
-        "Prepare documentation of $0 income (written statement or benefits award letter)"
+        "Call Portland Water Bureau at 503-823-7770 if you need application assistance",
+        "Gather mortgage statement or deed as proof of homeownership at the service address",
+        "Reapply every two years to maintain the discount"
       ],
       "required_documents": [
-        "Service address",
-        "Names of all household members",
-        "Documentation of $0 income (written statement, unemployment notice, or SSA letter)",
-        "Portland Water Bureau account number"
+        "Service address verification",
+        "Proof of income (or statement of $0 income)",
+        "Proof of homeownership (mortgage statement or deed)"
       ],
       "application_deadline": null,
       "urgency_note": null
@@ -119,17 +117,17 @@
       "program_id": "nw-natural-bill-discount",
       "eligible": true,
       "confidence": "medium",
-      "estimated_annual_value": 400,
-      "reasoning": "Household of 1 with $0 income qualifies under the 60% FPL threshold. 97203 is within NW Natural's Portland service area. At $0 income, the highest Oregon discount tier applies (85% off, for income ≤$18,454). Estimated ~$400/year savings on a typical gas bill. Confidence medium because we must confirm NW Natural is the gas utility provider at this address.",
+      "estimated_annual_value": 510,
+      "reasoning": "Household of 1, $0 income — well below 60% SMI ceiling of $38,384/yr for 1-person household. ZIP 97203 is within NW Natural service territory (Portland). With $0 income, applicant falls in the highest Oregon discount tier ($18,454 or less = 85% discount). Confidence medium because we cannot confirm NW Natural account status from intake. Estimated value assumes 85% discount on a modest annual gas bill of ~$600, saving ~$510/yr.",
       "next_steps": [
-        "Visit nwnatural.com/account/bill-discount-program to apply online",
-        "Call NW Natural at 800-422-4012 to apply by phone",
-        "Use SNAP enrollment (once received) as automatic income qualifier",
-        "Gather your NW Natural account number from a recent gas bill"
+        "Apply online at nwnatural.com/account/bill-discount-program or call 800-422-4012",
+        "Use SNAP or OHP enrollment letter as alternative proof of income",
+        "Have your NW Natural account number ready",
+        "Apply for both PGE IQBD and NW Natural discounts in the same session if you use both utilities"
       ],
       "required_documents": [
         "NW Natural account number",
-        "Proof of income OR proof of enrollment in SNAP/OHP",
+        "Proof of income OR enrollment in qualifying program (SNAP, OHP)",
         "Photo ID"
       ],
       "application_deadline": null,
@@ -140,28 +138,28 @@
       "eligible": true,
       "confidence": "high",
       "estimated_annual_value": 700,
-      "reasoning": "Household of 1 with $0 income is well within the 60% FPL threshold ($9,390/year). Oregon resident and homeowner with documented energy costs. LIHEAP pays the utility company directly — highly valuable at $0 income. Median estimated value used from program data.",
+      "reasoning": "Household of 1, $0 income — well within 60% SMI ceiling of $38,384/yr for 1-person household. Oregon resident (97203, Portland). Both renters and homeowners are eligible (must_be_renter: false, must_be_homeowner: false). Applicant must have documented energy costs — as a homeowner, utility bills fulfill this. Estimated value uses program median of $700/yr.",
       "next_steps": [
-        "Call 1-800-453-5511, option 1 to apply through Oregon Housing and Community Services",
-        "Call 211 to find your nearest local LIHEAP provider in Multnomah County",
-        "Gather your utility bills (electricity and/or gas) and Photo ID",
-        "Apply as early as possible — LIHEAP funds are limited and distributed seasonally"
+        "Call 1-800-453-5511, option 1 to reach Oregon Housing and Community Services (OHCS)",
+        "Contact 211 to find your local LIHEAP community agency serving 97203",
+        "Gather recent utility bills showing energy costs",
+        "Apply before funds run out — LIHEAP funding is limited and distributed seasonally"
       ],
       "required_documents": [
-        "Photo ID",
-        "Proof of income (or written statement of $0 income)",
-        "Current utility bill (electricity and/or gas)",
-        "Social Security number"
+        "Proof of income (or documentation of $0 income)",
+        "Recent utility bill",
+        "Social Security number",
+        "Photo ID"
       ],
       "application_deadline": null,
-      "urgency_note": "LIHEAP funds are limited and often exhausted — apply as soon as the program opens each season (typically fall/winter)."
+      "urgency_note": "LIHEAP funding is limited and often exhausted mid-season. Apply as early as possible in the program year (typically opens in fall/winter)."
     },
     {
       "program_id": "wic",
       "eligible": false,
       "confidence": "high",
       "estimated_annual_value": 0,
-      "reasoning": "No children under 5 and applicant is not pregnant. WIC requires participant to be a pregnant/postpartum/breastfeeding woman, infant, or child under 5. Ineligible.",
+      "reasoning": "WIC requires being a pregnant woman, postpartum/breastfeeding woman, infant, or child under age 5. Applicant has no children, is not pregnant, and is not an infant/child under 5. Ineligible.",
       "next_steps": [],
       "required_documents": [],
       "application_deadline": null,
@@ -172,7 +170,7 @@
       "eligible": false,
       "confidence": "high",
       "estimated_annual_value": 0,
-      "reasoning": "No children reported. School Meals program requires school-age children. Ineligible.",
+      "reasoning": "School meals program requires children under 18 enrolled in school. Applicant has no children (num_children: 0). Ineligible.",
       "next_steps": [],
       "required_documents": [],
       "application_deadline": null,
@@ -183,7 +181,7 @@
       "eligible": false,
       "confidence": "high",
       "estimated_annual_value": 0,
-      "reasoning": "Applicant is a homeowner, not a renter. This program requires renter status and is triggered by eviction notice. Neither condition is met. Ineligible.",
+      "reasoning": "This program requires must_be_renter = true. Applicant is a homeowner. The rent assistance (STRA) component is renter-only. The energy assistance component overlaps with LIHEAP, which is already captured separately. Ineligible for this program.",
       "next_steps": [],
       "required_documents": [],
       "application_deadline": null,
@@ -192,55 +190,63 @@
     {
       "program_id": "cep-weatherization",
       "eligible": true,
-      "confidence": "high",
+      "confidence": "medium",
       "estimated_annual_value": 5000,
-      "reasoning": "Household of 1 with $0 income is well within 200% FPL threshold. 97203 is Portland city limits. Homeowners are eligible for weatherization improvements. As a disabled veteran with no income, this applicant may also qualify for priority processing. Median estimated value of $5,000 used — actual value depends on home needs assessment.",
+      "reasoning": "ZIP 97203 is within City of Portland. $0 income is well below 80% AMI ceiling for 1-person household ($71,900/yr). The flagship free home repair/weatherization program additionally requires owning and occupying the home AND being 55+ and/or having a disability. Applicant is a homeowner with a documented disability — this satisfies the disability requirement for the flagship owner-occupant track, even without age 55+ status. Confidence medium because we cannot confirm the specific CEP track the applicant qualifies for without a more detailed assessment. Estimated value uses program median of $5,000.",
       "next_steps": [
-        "Call Community Energy Project at 503-284-6827 to schedule a free home energy assessment",
-        "Visit communityenergyproject.org to learn about available weatherization services",
-        "Mention disability and veteran status when calling — priority placement may be available",
-        "Prepare proof of income ($0) and a recent utility bill"
+        "Call Community Energy Project at 503-284-6827 to schedule an intake assessment",
+        "Visit communityenergyproject.org to review available services for disabled homeowners",
+        "Gather proof of disability documentation and homeownership (deed or mortgage statement)",
+        "Ask specifically about the free weatherization program for homeowners with disabilities"
       ],
       "required_documents": [
-        "Proof of Portland residency (mortgage statement or deed)",
-        "Proof of income (written statement of $0 or benefits letter)",
+        "Proof of income",
+        "Proof of Portland residency (97203 qualifies)",
+        "Proof of homeownership",
+        "Documentation of disability status",
         "Recent utility bill"
       ],
       "application_deadline": null,
-      "urgency_note": "This is a hidden gem — free home weatherization (insulation, heating, etc.) worth thousands of dollars. Call soon as waitlists can be long."
+      "urgency_note": "Wait times for CEP weatherization can be 2–6 months. Apply early to get on the waitlist."
     },
     {
       "program_id": "senior-prop-tax-deferral",
-      "eligible": false,
+      "eligible": true,
       "confidence": "medium",
-      "estimated_annual_value": 0,
-      "reasoning": "Program requires age 62+ (senior) OR disability status with age 62+. Intake indicates has_disability=true but has_senior_in_household=false, and applicant age is not provided. Since the program requires age 62+ and the intake does not confirm senior status, marking ineligible. If applicant is age 62 or older, they should investigate this program further.",
+      "estimated_annual_value": 3500,
+      "reasoning": "The program requires EITHER age 62+ OR a qualifying disability — both are not required. Applicant has a documented disability, satisfying the disability pathway. Applicant is a homeowner in Oregon (97203, Portland). $0 income and no children means net worth (excluding home) is very likely under $500,000. Income is $0, well under the $70,000 annual income cap. Confidence is medium because home ownership duration (<17 years triggers RMV cap check vs. county median) and exact disability certification type (VA/federal vs. physician) are not confirmed from intake — these affect the exemption tier and some procedural requirements.",
       "next_steps": [
-        "If you are age 62 or older, visit oregon.gov/dor/programs/property/Pages/Deferral.aspx to check eligibility",
-        "Call Oregon DOR at 503-945-8348 to confirm age and disability-based eligibility"
+        "Apply online at oregon.gov/dor/programs/property/Pages/Deferral.aspx",
+        "Call Oregon DOR at 503-945-8348 to confirm disability documentation requirements",
+        "Gather proof of disability certification (VA letter, federal/state agency letter, or physician certificate)",
+        "Check your property deed or closing documents for ownership start date"
       ],
-      "required_documents": [],
-      "application_deadline": null,
-      "urgency_note": null
+      "required_documents": [
+        "Online application",
+        "Proof of disability (VA certificate, federal/state disability letter, or licensed physician certification)",
+        "Proof of homeownership and Oregon residency",
+        "Documentation of home ownership duration"
+      ],
+      "application_deadline": "Applications typically due April 1 of the tax year — verify current deadline with Oregon DOR.",
+      "urgency_note": "Property tax deferral deadline is typically April 1. If the current year's deadline has passed, apply now to lock in eligibility for next year."
     },
     {
       "program_id": "transportation-wallet",
       "eligible": true,
       "confidence": "medium",
-      "estimated_annual_value": 100,
-      "reasoning": "Household of 1 with $0 income is well within 200% FPL. 97203 is Portland city limits. Applicant is presumably 18+ (adult with disability and veteran status). Program provides free transportation credits (transit, e-bike, rideshare, etc.) once per calendar year. Confidence medium because enrollment requires referral through a participating community-based organization.",
+      "estimated_annual_value": 308,
+      "reasoning": "ZIP 97203 is within City of Portland. $0 income is well below 200% FPL ($31,920/yr for 1 person). Applicant is at least 18 (must_be_renter not required; homeowners eligible). Program requires referral from a participating community-based organization — this is a process requirement, not an eligibility disqualifier, so eligible=true with next_steps noting the referral pathway. Confidence medium due to referral requirement and 'once per calendar year' availability. Maximum benefit is $308/yr per the estimated_annual_value max.",
       "next_steps": [
-        "Visit portland.gov/transportation/wallet/access-all to find participating referral organizations near 97203",
-        "Call 311 to ask about the Access for All Transportation Wallet program and get a referral",
-        "Ask your VA caseworker or disability services provider if they can provide a referral",
-        "Apply once per calendar year — do not delay if you need transportation assistance now"
+        "Visit portland.gov/transportation/wallet/access-all to find participating community organizations near 97203 (St. Johns area)",
+        "Contact 311 for referral to a community-based organization that can connect you to the Transportation Wallet",
+        "Ask your SNAP caseworker, OHP navigator, or disability services provider if they can provide a referral",
+        "Gather proof of Portland residency and income documentation for the referral appointment"
       ],
       "required_documents": [
         "Proof of Portland residency",
-        "Proof of income or enrollment in qualifying program (SNAP/OHP)",
-        "Referral from a participating community-based organization"
+        "Proof of income or enrollment in qualifying program (SNAP, OHP)"
       ],
-      "application_deadline": null,
+      "application_deadline": "Available once per calendar year — apply before December 31.",
       "urgency_note": null
     },
     {
@@ -248,7 +254,7 @@
       "eligible": false,
       "confidence": "high",
       "estimated_annual_value": 0,
-      "reasoning": "Applicant is a homeowner, not a renter. The Inclusionary Housing program is for renters seeking below-market-rate units. Ineligible.",
+      "reasoning": "Applicant is a homeowner (housing_status: 'own'). Inclusionary Housing requires must_be_renter = true. Ineligible.",
       "next_steps": [],
       "required_documents": [],
       "application_deadline": null,
@@ -259,7 +265,7 @@
       "eligible": false,
       "confidence": "high",
       "estimated_annual_value": 0,
-      "reasoning": "No children reported. SUN Community Schools requires children in the household. Ineligible.",
+      "reasoning": "SUN Community Schools requires children under 18 in the household. Applicant has no children (num_children: 0). Ineligible.",
       "next_steps": [],
       "required_documents": [],
       "application_deadline": null,
@@ -270,82 +276,85 @@
       "eligible": true,
       "confidence": "high",
       "estimated_annual_value": 2400,
-      "reasoning": "ADRC Helpline eligibility explicitly includes 'adult with disability OR veteran' — this applicant is both. Oregon resident in Multnomah County. The helpline connects people to long-term support options, benefits navigation, and community services. With $0 income and a disability, this resource can unlock significant additional assistance. Median value used.",
+      "reasoning": "The ADRC Helpline is open to people of all ages, incomes, and abilities — including adults with disabilities and veterans. Applicant has a disability and is a veteran, both of which are priority populations for OAA-funded direct services (case management, in-home care, etc.). Oregon resident (97203). No income or household-size restriction for the helpline itself. Estimated value uses program median of $2,400/yr for direct services that may be unlocked through referral.",
       "next_steps": [
-        "Call the ADRC Helpline at 503-988-3646 to schedule a free needs assessment",
-        "Ask specifically about programs for veterans with disabilities and zero income",
-        "Request help identifying any VA benefits (disability compensation, pension) you may not yet be receiving",
-        "Ask about in-home support services available through Multnomah County"
+        "Call the ADRC Helpline at 503-988-3646 to request an assessment and benefits navigation session",
+        "Ask specifically about veterans' benefits, disability-related in-home services, and meal delivery programs",
+        "Request a connection to Oregon Department of Veterans' Affairs (ODVA) for additional veterans-specific benefits",
+        "Ask the ADRC about Medicaid-funded in-home support services available through OHP"
       ],
       "required_documents": [
         "Photo ID",
-        "Insurance cards (if any)",
-        "List of any current medications or medical conditions"
+        "Insurance cards (Medicare, Medicaid/OHP if enrolled)",
+        "Medication list",
+        "DD-214 or other military service documentation (for veterans' services)"
       ],
       "application_deadline": null,
-      "urgency_note": "As a disabled veteran with $0 income, the ADRC can connect you to VA disability compensation, in-home care, and other critical services you may not know about — call soon."
+      "urgency_note": null
     },
     {
       "program_id": "veterans-prop-tax-exempt",
       "eligible": true,
       "confidence": "medium",
       "estimated_annual_value": 300,
-      "reasoning": "Applicant is a veteran, homeowner, and citizen in Oregon — all primary requirements met. Disability status is confirmed (has_disability=true). The program requires a VA or physician certification of 40%+ service-connected disability. Since the intake confirms disability but does not specify the VA disability rating percentage, confidence is medium. At $0 income, the 185% FPL income requirement is easily met. Estimated annual value uses the program's median of $300 (actual savings depend on home assessed value and disability rating tier). If VA-certified at 40%+ service-connected, the exemption could be $27,092–$32,512 of assessed value reduction, worth roughly $200–$600/year in tax savings.",
+      "reasoning": "Applicant is a veteran, U.S. citizen, and homeowner in Oregon (97203). Has a documented disability (has_disability: true). The program requires 40%+ disability certified by VA, Armed Forces, or licensed physician, and honorable discharge with qualifying service duration. $0 income is well within 185% FPL ($29,526/yr for 1 person) for the physician-certified disability pathway. For the VA/Armed Forces-certified pathway, there is no income limit. Confidence is medium because the intake confirms disability and veteran status but does not confirm the specific VA disability rating percentage (must be 40%+), discharge type (must be honorable), or service duration — these are the key undetermined factors. Estimated annual value uses program median of $300/yr (exemption on assessed value; actual savings depend on local tax rate and assessed value).",
       "next_steps": [
-        "Visit oregon.gov/odva/benefits/pages/taxes.aspx to review eligibility details and download the application form",
-        "Call Oregon DVA at 800-692-9666 to confirm your VA disability rating qualifies (must be 40%+)",
-        "Visit your county assessor's office in person with your DD-214 and VA disability certificate",
-        "Contact the ADRC at 503-988-3646 or a VSO (Veterans Service Officer) for free help navigating VA benefits"
+        "Call Oregon Department of Veterans' Affairs (ODVA) at 800-692-9666 to verify your VA disability rating percentage and confirm eligibility",
+        "Apply at oregon.gov/odva/benefits/pages/taxes.aspx or visit your county assessor's office in person",
+        "Gather DD-214 and VA disability certificate (showing 40%+ rating) before applying",
+        "File application with Multnomah County Assessor's office — deadline is typically April 1"
       ],
       "required_documents": [
-        "DD-214 (discharge papers showing honorable discharge and service period)",
-        "VA or Armed Forces certificate showing 40%+ disability rating",
+        "DD-214 (Certificate of Release or Discharge from Active Duty)",
+        "VA disability certificate showing 40% or more disability rating",
         "Proof of homeownership and Oregon residency"
       ],
-      "application_deadline": "April 1 of the tax year — apply before April 1 to receive exemption for that year",
-      "urgency_note": "Apply before April 1 to receive the property tax exemption for the current tax year. If you do not yet have a VA disability rating, contact a Veterans Service Officer immediately to file a claim."
+      "application_deadline": "Applications typically due April 1 of the tax year — verify with Multnomah County Assessor.",
+      "urgency_note": "If your VA disability rating is 40% or higher, this exemption could reduce your property tax bill. Apply before April 1 deadline."
     },
     {
       "program_id": "lifeline",
       "eligible": true,
       "confidence": "high",
       "estimated_annual_value": 111,
-      "reasoning": "Household of 1 with $0 income is well within 135% FPL threshold ($21,128/year). Citizen. Once enrolled in SNAP or Medicaid/OHP, automatic Lifeline qualification applies. Monthly benefit is $9.25/month on non-Tribal lands = $111/year. 97203 is not on Tribal lands.",
+      "reasoning": "Household of 1, $0 income — well within 135% FPL ($21,546/yr for 1 person). Oregon resident. U.S. citizen. Additionally, once enrolled in SNAP or Medicaid/OHP (both likely given $0 income), applicant qualifies categorically regardless of income. Non-Tribal lands benefit is $9.25/month = $111/yr per benefit_schedule.",
       "next_steps": [
-        "Visit usac.org/lifeline to apply online and find participating phone/internet providers",
-        "Call 1-800-234-9473 for help applying by phone",
-        "Use SNAP or OHP enrollment (once received) as automatic proof of eligibility",
-        "Check with your current phone or internet provider if they participate in Lifeline"
+        "Apply online at usac.org/lifeline or call 1-800-234-9473",
+        "Use SNAP or OHP enrollment letter as categorical eligibility proof — faster than income documentation",
+        "Check if your current phone/internet provider participates in Lifeline, or find a provider at lifelinesupport.org",
+        "Ask about Oregon's Telephone Assistance Program (TAP) for additional state-level phone discounts"
       ],
       "required_documents": [
         "Photo ID",
-        "Proof of SNAP or OHP enrollment (automatic qualifier), OR proof of income"
+        "Proof of income OR proof of enrollment in SNAP, Medicaid/OHP, or other qualifying federal program"
       ],
       "application_deadline": null,
       "urgency_note": null
     }
   ],
-  "total_estimated_annual_value": 17707,
-  "federal_only_value": 9807,
-  "pdx_specific_value": 7900,
+  "total_estimated_annual_value": 21525,
+  "federal_only_value": 13417,
+  "pdx_specific_value": 8108,
   "priority_application_order": [
-    "ohp",
     "snap",
-    "advsd",
-    "veterans-prop-tax-exempt",
+    "ohp",
     "liheap-energy-trust",
+    "veterans-prop-tax-exempt",
+    "senior-prop-tax-deferral",
     "pge-iqbd",
     "nw-natural-bill-discount",
-    "cep-weatherization",
     "pdx-water-fa",
+    "cep-weatherization",
     "lifeline",
+    "advsd",
     "transportation-wallet"
   ],
   "warnings": [
-    "URGENT — VA BENEFITS: As a disabled veteran with $0 income, you may be entitled to VA Disability Compensation or VA Pension, which are not in this local benefits database but could provide significant monthly income. Contact a Veterans Service Officer immediately at 800-692-9666 (Oregon DVA) or call the ADRC at 503-988-3646.",
-    "PROPERTY TAX DEADLINE: Veterans Property Tax Exemption applications must be filed by April 1 to apply to the current tax year. Do not miss this deadline.",
-    "ZERO INCOME RISK: With $0 annual income, you may be eligible for additional federal benefits not listed here (SSI, SSDI). The ADRC helpline can conduct a comprehensive benefits screening — call 503-988-3646.",
-    "LIHEAP SEASONAL FUNDING: LIHEAP energy assistance funds are limited and distributed on a first-come, first-served basis each season. Apply as soon as the program opens in your area (typically fall). Call 211 to find your local provider.",
-    "SNAP EXPEDITED: With $0 income, request expedited SNAP processing — you should receive benefits within 7 days rather than the standard 30 days."
+    "PROPERTY TAX DEADLINES: Both the Oregon Veterans Property Tax Exemption and Senior/Disabled Property Tax Deferral have April 1 filing deadlines. If you have a VA disability rating of 40%+, apply to both immediately.",
+    "UTILITY DISCOUNTS STACK: You may be eligible for PGE IQBD, NW Natural Bill Discount, LIHEAP, AND Water Bureau FA simultaneously — all can be active at the same time for significant combined savings.",
+    "SNAP EXPEDITED: With $0 income, you qualify for 7-day expedited SNAP processing. Request this explicitly when you apply.",
+    "OHP AS KEY UNLOCKS: Enrolling in OHP may automatically qualify you for PGE IQBD and NW Natural discounts through categorical eligibility — enroll in OHP first.",
+    "ADRC PRIORITY SERVICES: As a disabled veteran, you are a priority population for ADRC-connected services including in-home care, meal delivery, and case management. Call 503-988-3646.",
+    "CEP WEATHERIZATION WAITLIST: Community Energy Project weatherization projects have 2–6 month wait times. Apply early to get on the waitlist — free home energy improvements could yield $2,000–$15,000 in value."
   ]
 }
