@@ -62,8 +62,10 @@ Most national benefit-screening tools only check **federal** programs (SNAP, Med
 
 For a typical Portland family, that gap is **$10,000–$25,000 per year**.
 
-> A federal-and-state screener gets María's family to **$24,360/yr**.
-> PDX Benefits Navigator adds the local layer — Multnomah County + City of Portland — and brings the total to **$46,568/yr**. That's **$22,208 more** her family is owed but most tools never surface.
+<!-- README:HOOK:START -->
+> A federal-and-state screener gets María's family to **$33,611/yr**.
+> PDX Benefits Navigator adds the local layer — Multnomah County + City of Portland — and brings the total to **$53,311/yr**. That's **$19,700 more** her family is owed but most tools never surface.
+<!-- README:HOOK:END -->
 
 ---
 
@@ -96,9 +98,11 @@ To run the full intake with your own answers, click the **key icon** in the top 
 
 | Family | Situation | Federal & state programs | PDX Benefits Navigator (full local layer) |
 |---|---|---|---|
-| **María & family** | Single parent, 2 kids, part-time at Fred Meyer, renter in Cully, Spanish-speaking, 12% rent increase | $14,860/yr | **$36,560/yr** across 11 programs |
-| **James** | Single, disabled veteran, unemployed, owns home in St. Johns | $9,807/yr | **$17,707/yr** across 11 programs |
-| **Rose** | Senior widow, Social Security only, owns home in Lents, Vietnamese-speaking | $4,600/yr | **$12,500/yr** across 6 programs |
+<!-- README:TABLE:START -->
+| **María & family** | Single parent, 2 kids, part-time at Fred Meyer, renter in Cully, Spanish-speaking, 12% rent increase | $33,611/yr | **$53,311/yr** across 12 programs |
+| **James** | Single, disabled veteran, unemployed, owns home in St. Johns | $13,487/yr | **$21,387/yr** across 12 programs |
+| **Rose** | Senior widow, Social Security only, owns home in Lents, Vietnamese-speaking | $12,887/yr | **$20,787/yr** across 11 programs |
+<!-- README:TABLE:END -->
 
 The gap comes from **hidden-gem** programs — 8 of our 20 are flagged this way, and no national tool surfaces them. Numbers are pulled directly from the [`data/scenarios/*.json`](data/scenarios/) fixtures; the source of truth for ranges is [`data/programs.seed.json`](data/programs.seed.json).
 

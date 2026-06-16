@@ -10,7 +10,8 @@
     "validate:data": "tsx scripts/validate-data.ts",
     "merge": "tsx scripts/merge-scraped.ts",
     "typecheck": "tsc --noEmit",
-    "bake": "tsx scripts/precompute-scenarios.ts"
+    "bake": "tsx scripts/precompute-scenarios.ts",
+    "sync:readme": "tsx scripts/sync-readme-numbers.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.96.0",
