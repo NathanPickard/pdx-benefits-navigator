@@ -42,20 +42,11 @@ const LOCKED_FIELDS = new Set([
   'urgency',
   'application_url',
   'application_method',
-]);
-
-/**
- * Eligibility sub-fields that encode human-curated POLICY — the scrape must never
- * override these even with a non-null value. The scraper has historically gotten
- * them wrong (e.g. labeling a 60%-of-State-Median-Income ceiling as "60% FPL", or
- * narrowing citizenship on a program that is immigration-status-neutral). Seed wins.
- * See data-accuracy audit, June 2026.
- */
-const SEED_AUTHORITATIVE_ELIGIBILITY = new Set([
-  'income_max_pct_fpl',
-  'income_max_pct',
-  'income_basis',
-  'citizenship_status',
+  // Eligibility is human-curated POLICY. The scrape has repeatedly injected
+  // wrong gates (a 60%-SMI ceiling labeled "FPL", a citizenship gate on an
+  // immigration-neutral program, residence widened past a program's own
+  // jurisdiction). Seed wins wholesale. Enforced by scripts/validate-data.ts.
+  'eligibility',
 ]);
 
 type ScrapedProgram = Program & { _provenance?: Record<string, unknown> };
@@ -66,7 +57,13 @@ function isNullish(v: unknown): boolean {
     // Nested object like estimated_annual_value or eligibility — recurse on values.
     return Object.values(v).every(isNullish);
   }
-  if (Array.isArray(v) && v.length === 0) return true;
+  if (Array.isArray(v)) {
+    if (v.length === 0) return true;
+    // An array-of-objects is nullish if any element contains a null value
+    // (e.g. benefit_schedule.amounts with value:null). Such partial data must
+    // not be promoted — the scraper should not inject incomplete records.
+    return v.some((el) => typeof el === 'object' && el !== null && Object.values(el).some((f) => f === null));
+  }
   return false;
 }
 
@@ -77,22 +74,31 @@ function mergeProgram(seed: Program, scraped: ScrapedProgram): Program {
     if (LOCKED_FIELDS.has(key)) continue;
     if (isNullish(scrapedValue)) continue;
 
-    // For nested objects (estimated_annual_value, eligibility), merge field-by-field
-    // so a scraped null doesn't erase a non-null seed value.
+    // For nested objects (estimated_annual_value, benefit_schedule, etc.), merge
+    // field-by-field so a scraped null doesn't erase a non-null seed value.
+    // Also applies when the seed field is absent — scraped sub-fields are only
+    // promoted if they are non-nullish, preventing partial data (e.g. amounts
+    // with null values) from being injected wholesale.
     if (
       scrapedValue &&
       typeof scrapedValue === 'object' &&
-      !Array.isArray(scrapedValue) &&
-      seed[key as keyof Program] &&
-      typeof seed[key as keyof Program] === 'object'
+      !Array.isArray(scrapedValue)
     ) {
-      const seedObj = seed[key as keyof Program] as Record<string, unknown>;
+      const seedObj = (seed[key as keyof Program] ?? {}) as Record<string, unknown>;
       const merged: Record<string, unknown> = { ...seedObj };
+      let skipped = 0;
       for (const [subKey, subVal] of Object.entries(scrapedValue as Record<string, unknown>)) {
-        if (key === 'eligibility' && SEED_AUTHORITATIVE_ELIGIBILITY.has(subKey)) continue;
         if (!isNullish(subVal)) merged[subKey] = subVal;
+        else skipped++;
       }
-      out[key] = merged;
+      // If any scraped sub-field was nullish (and there's no seed fallback for it),
+      // the merged object may be structurally incomplete. Only promote when the
+      // scraped data was fully non-nullish or the seed already covers the gap.
+      const seedHadField = seed[key as keyof Program] !== undefined && seed[key as keyof Program] !== null;
+      if (skipped === 0 || seedHadField) {
+        if (Object.keys(merged).length > 0) out[key] = merged;
+      }
+      // Otherwise: scraped object has partial nulls and seed has no fallback — skip.
     } else {
       out[key] = scrapedValue;
     }
