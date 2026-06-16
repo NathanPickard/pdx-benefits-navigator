@@ -41,6 +41,21 @@ const LOCKED_FIELDS = new Set([
   'hidden_gem',
   'urgency',
   'application_url',
+  'application_method',
+]);
+
+/**
+ * Eligibility sub-fields that encode human-curated POLICY — the scrape must never
+ * override these even with a non-null value. The scraper has historically gotten
+ * them wrong (e.g. labeling a 60%-of-State-Median-Income ceiling as "60% FPL", or
+ * narrowing citizenship on a program that is immigration-status-neutral). Seed wins.
+ * See data-accuracy audit, June 2026.
+ */
+const SEED_AUTHORITATIVE_ELIGIBILITY = new Set([
+  'income_max_pct_fpl',
+  'income_max_pct',
+  'income_basis',
+  'citizenship_status',
 ]);
 
 type ScrapedProgram = Program & { _provenance?: Record<string, unknown> };
@@ -74,6 +89,7 @@ function mergeProgram(seed: Program, scraped: ScrapedProgram): Program {
       const seedObj = seed[key as keyof Program] as Record<string, unknown>;
       const merged: Record<string, unknown> = { ...seedObj };
       for (const [subKey, subVal] of Object.entries(scrapedValue as Record<string, unknown>)) {
+        if (key === 'eligibility' && SEED_AUTHORITATIVE_ELIGIBILITY.has(subKey)) continue;
         if (!isNullish(subVal)) merged[subKey] = subVal;
       }
       out[key] = merged;
