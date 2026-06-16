@@ -1,9 +1,10 @@
 import programs from '@/data/programs.json';
 import type { AnalysisOutput, Program } from '@/types/program';
 
-const JURISDICTION_BY_ID: Record<string, Program['jurisdiction']> = Object.fromEntries(
-  (programs as Program[]).map((p) => [p.id, p.jurisdiction])
-);
+const JURISDICTION_BY_ID: Record<string, Program['jurisdiction']> =
+  Object.fromEntries(
+    (programs as Program[]).map((p) => [p.id, p.jurisdiction]),
+  );
 
 export const ELIGIBILITY_MODEL = 'claude-haiku-4-5-20251001';
 
@@ -12,13 +13,47 @@ export const ELIGIBILITY_SYSTEM_PROMPT = `You are the eligibility engine for PDX
 You have complete knowledge of 20 programs covering federal, Oregon state, Multnomah County, and City of Portland benefits. Your job is to analyze a person's intake data and return rigorous, well-reasoned eligibility matches.
 
 ==== 2026 FEDERAL POVERTY LEVEL (FPL) ====
-1-person household: $15,650/year
-2-person: $21,150
-3-person: $26,650
-4-person: $32,150
-5-person: $37,650
-6-person: $43,150
-Add $5,500 per additional person.
+Official 2026 HHS Poverty Guidelines, 48 contiguous states & DC
+(Federal Register notice 2026-00755, effective Jan 13, 2026):
+1-person household: $15,960/year
+2-person: $21,640
+3-person: $27,320
+4-person: $33,000
+5-person: $38,680
+6-person: $44,360
+7-person: $50,040
+8-person: $55,720
+Add $5,680 per additional person beyond 8.
+
+==== OREGON STATE MEDIAN INCOME (SMI) — 60% SMI, FFY2026 ====
+For programs whose eligibility.income_basis is "smi" (LIHEAP energy assistance, PGE and NW Natural bill discounts). Maximum annual gross household income at 60% of Oregon SMI:
+1-person: $38,384
+2-person: $50,194
+3-person: $62,005
+4-person: $73,816
+5-person: $85,626
+6-person: $97,437
+7-person: $109,248
+8-person: $121,059
+
+==== PORTLAND-AREA HUD INCOME LIMITS (AMI / MEDIAN FAMILY INCOME) — FY2026 ====
+Portland-Vancouver-Hillsboro OR-WA MSA, effective May 1, 2026 (4-person median family income $128,300). For programs whose eligibility.income_basis is "ami" (Inclusionary Housing, CEP Weatherization, Multnomah eviction/rent assistance, Water Bureau financial assistance). Maximum annual household income by household size and AMI tier:
+Household | 30% AMI | 50% AMI | 60% AMI | 80% AMI
+1 | $26,950 | $44,950 | $53,940 | $71,900
+2 | $30,800 | $51,350 | $61,620 | $82,150
+3 | $34,650 | $57,750 | $69,300 | $92,400
+4 | $38,500 | $64,150 | $76,980 | $102,650
+5 | $41,600 | $69,300 | $83,160 | $110,900
+6 | $44,700 | $74,450 | $89,340 | $119,100
+7 | $50,040 | $79,550 | $95,460 | $127,300
+8 | $55,720 | $84,700 | $101,640 | $135,500
+
+==== HOW TO APPLY INCOME LIMITS ====
+Each program's income ceiling uses ONE of three scales. Read eligibility.income_basis to choose:
+- absent or "fpl": ceiling = income_max_pct_fpl% of the FPL table above.
+- "smi": ceiling = income_max_pct% of the Oregon 60% SMI table above (income_max_pct is the percent of SMI; 60 means use the table as shown).
+- "ami": ceiling = the Portland HUD AMI column matching income_max_pct (e.g. 80 → the 80% AMI column; 60 → the 60% column).
+Always compare the applicant's annual household income to the limit for THEIR household size. SMI and AMI ceilings run roughly 3-5x higher than FPL — NEVER screen an "smi" or "ami" program against the FPL table, or you will wrongly exclude eligible low- and moderate-income households. Some programs also carry income_max_annual as a coarse single-number fallback; prefer the basis table whenever income_basis is set.
 
 ==== PORTLAND CITY LIMITS — ZIP CODES ====
 Treat any of these ZIPs as inside the City of Portland — fully eligible for Portland-jurisdiction programs (Water Bureau FA, PCEF, Renter Relocation, Transportation Wallet, Inclusionary Housing, etc.):
@@ -106,7 +141,9 @@ const INELIGIBILITY_MARKERS =
  * When a match is flipped, estimated_annual_value is also zeroed since an
  * ineligible match shouldn't contribute to the user's projected totals.
  */
-export function enforceEligibilityConsistency(output: AnalysisOutput): AnalysisOutput {
+export function enforceEligibilityConsistency(
+  output: AnalysisOutput,
+): AnalysisOutput {
   let flipped = 0;
   const matches = output.matches.map((m) => {
     if (m.eligible && INELIGIBILITY_MARKERS.test(m.reasoning)) {
@@ -122,7 +159,7 @@ export function enforceEligibilityConsistency(output: AnalysisOutput): AnalysisO
   });
   if (flipped > 0 && typeof console !== 'undefined') {
     console.warn(
-      `[eligibility] Flipped ${flipped} match${flipped === 1 ? '' : 'es'} from eligible=true to false (reasoning text indicated ineligibility).`
+      `[eligibility] Flipped ${flipped} match${flipped === 1 ? '' : 'es'} from eligible=true to false (reasoning text indicated ineligibility).`,
     );
   }
   return { ...output, matches };
