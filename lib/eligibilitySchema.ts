@@ -13,12 +13,14 @@ export const MatchSchema = z.object({
   confidence: z.enum(['high', 'medium', 'low']),
   estimated_annual_value: z.number(),
   reasoning: z.string(),
-  // Optional so pre-rebake fixtures (which lack this field) still parse cleanly.
-  requirements: z.array(RequirementSchema).optional(),
+  // Required as the live structured-output contract — forces the model to emit
+  // per-requirement breakdowns on every match. The TS type keeps requirements
+  // optional for fixture compatibility; parseAnalysis casts with `as AnalysisOutput`.
+  requirements: z.array(RequirementSchema),
   next_steps: z.array(z.string()),
   required_documents: z.array(z.string()),
-  application_deadline: z.string().nullable().optional(),
-  urgency_note: z.string().nullable().optional(),
+  application_deadline: z.string().nullable().optional().transform((v) => v ?? undefined),
+  urgency_note: z.string().nullable().optional().transform((v) => v ?? undefined),
 });
 
 export const AnalysisOutputSchema = z.object({
