@@ -113,7 +113,6 @@ export async function* analyzeEligibilityStream(
   const pendingProgress: string[] = [];
 
   try {
-    let parsed: AnalysisOutput;
     let firstAttemptError: unknown = null;
 
     // ── Attempt 1 ──────────────────────────────────────────────────────────
@@ -134,11 +133,9 @@ export async function* analyzeEligibilityStream(
       if (result.stopReason === 'max_tokens') {
         // Truncated — treat as retryable.
         firstAttemptError = new Error('max_tokens');
-        parsed = result.parsed; // may be partial; retry will overwrite
       } else {
-        parsed = result.parsed;
         // Apply derive → assert → recompute and yield complete.
-        const derived = deriveEligibility(parsed);
+        const derived = deriveEligibility(result.parsed);
         assertConsistency(derived);
         yield { type: 'complete', output: recomputeTotals(derived) };
         return;
@@ -152,29 +149,43 @@ export async function* analyzeEligibilityStream(
     }
 
     // ── Attempt 2 (retry once on truncation or validation failure) ──────────
+    // Collect attempt-2 progress ids so we can yield them after the call
+    // resolves (can't yield from inside a plain callback).
+    const retryProgress: string[] = [];
+
+    let attempt2Result: { parsed: AnalysisOutput; stopReason: string | null };
     try {
-      const result = await runStreamAttempt(
+      attempt2Result = await runStreamAttempt(
         anthropic,
         intake,
         model,
         seenIds, // shared — won't re-emit already-seen program ids
-        (_id) => {
-          // Progress on retry: yield immediately (no buffering needed, already
-          // past the first-attempt flush point).
-        }
+        (id) => retryProgress.push(id)
       );
-
-      if (result.stopReason === 'max_tokens') {
-        yield {
-          type: 'error',
-          message: 'The analysis response was cut off — please try again.',
-        };
-        return;
+    } catch (err) {
+      // Re-throw typed API errors so the outer handler produces the correct
+      // user-facing message (auth failure, rate limit, etc.). Only absorb
+      // truncation/parse failures here.
+      if (
+        err instanceof Anthropic.AuthenticationError ||
+        err instanceof Anthropic.RateLimitError ||
+        err instanceof Anthropic.APIError
+      ) {
+        throw err;
       }
+      yield {
+        type: 'error',
+        message: 'The analysis response was cut off — please try again.',
+      };
+      return;
+    }
 
-      parsed = result.parsed;
-    } catch {
-      // Second attempt also failed.
+    // Flush attempt-2 progress events (mirroring attempt-1 flush above).
+    for (const id of retryProgress) {
+      yield { type: 'progress', programId: id };
+    }
+
+    if (attempt2Result.stopReason === 'max_tokens') {
       yield {
         type: 'error',
         message: 'The analysis response was cut off — please try again.',
@@ -184,6 +195,7 @@ export async function* analyzeEligibilityStream(
 
     // Both attempts succeeded enough to reach here; apply pipeline.
     void firstAttemptError; // acknowledged, not rethrown
+    const parsed = attempt2Result.parsed;
     const derived = deriveEligibility(parsed);
     assertConsistency(derived);
     yield { type: 'complete', output: recomputeTotals(derived) };
