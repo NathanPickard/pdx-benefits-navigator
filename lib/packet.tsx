@@ -341,6 +341,7 @@ function ProgramPage({
           <Text style={styles.sectionTitle}>How to apply</Text>
           {program.contact_org && <Text style={styles.contactOrg}>{program.contact_org}</Text>}
           {program.contact_phone && <Text>{program.contact_phone}</Text>}
+          {program.source_url && <Text style={styles.contactNote}>Verified per: {program.source_url}</Text>}
           <Text style={styles.contactUrl}>{program.application_url}</Text>
           {program.processing_time && (
             <Text style={styles.contactNote}>Processing time: {program.processing_time}</Text>

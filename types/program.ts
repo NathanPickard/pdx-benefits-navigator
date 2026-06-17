@@ -76,6 +76,8 @@ export interface Program {
     other_requirements?: string[];
   };
 
+  source_url?: string;
+  last_verified?: string;
   application_url: string;
   /**
    * Additional source URLs the scraper should consult alongside application_url.

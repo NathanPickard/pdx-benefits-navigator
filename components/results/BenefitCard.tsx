@@ -246,6 +246,11 @@ export function BenefitCard({
                   <MetaRow label="Legal basis" value={program.legal_basis} />
                 )}
               </div>
+              {program.source_url && (
+                <a href={program.source_url} target="_blank" rel="noopener noreferrer" className="text-xs underline text-[var(--ink-3)]">
+                  Verified per official source
+                </a>
+              )}
               <a
                 href={program.application_url}
                 target="_blank"

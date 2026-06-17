@@ -40,6 +40,7 @@
     "renewal_cycle": "Renewal packets sent 45 days before renewal due date; periodic reports required halfway through benefit period",
     "contact_phone": "211",
     "contact_org": "Oregon Department of Human Services (ODHS)",
+    "source_url": "https://www.usda.gov/sites/default/files/guidance-documents/fns.snap-cola-fy26memo.pdf",
     "benefit_schedule": {
       "description": "Maximum monthly SNAP allotments for 48 States and D.C., FY 2026 (October 1, 2025 - September 30, 2026)",
       "unit": "usd_monthly",
@@ -118,7 +119,8 @@
     "processing_time": "45 days",
     "renewal_cycle": "every two years",
     "contact_phone": "1-800-273-0557",
-    "contact_org": "Oregon Health Authority"
+    "contact_org": "Oregon Health Authority",
+    "source_url": "https://www.oregon.gov/oha/hsd/ohp/pages/eligibility.aspx"
   },
   {
     "id": "pdx-renter-relocation",
@@ -157,6 +159,7 @@
     "processing_time": "Payment due within 45 days of demand",
     "contact_phone": "503-823-1303",
     "contact_org": "City of Portland Rental Services Helpdesk",
+    "source_url": "https://www.portland.gov/phb/rental-services/mandatory-renter-relocation-assistance",
     "benefit_schedule": {
       "description": "Relocation assistance amounts by rental unit size (one-time payment)",
       "unit": "usd_one_time",
@@ -219,6 +222,7 @@
     "renewal_cycle": "Annual",
     "contact_phone": "800-699-9075",
     "contact_org": "Department of Early Learning and Care (DELC)",
+    "source_url": "https://www.oregon.gov/delc/programs/pages/copays-billing.aspx",
     "benefit_schedule": {
       "description": "Monthly copay amounts by family size and countable monthly income",
       "unit": "usd_monthly",
@@ -430,6 +434,7 @@
     "processing_time": "Refund within 2-6 weeks",
     "renewal_cycle": "Annually (tax year basis)",
     "contact_org": "Oregon Department of Revenue",
+    "source_url": "https://www.oregon.gov/dor/programs/individuals/pages/credits.aspx",
     "contact_phone": "503-378-4988 or 800-356-4222"
   },
   {
@@ -466,6 +471,7 @@
     "renewal_cycle": "Two years",
     "contact_phone": "503-228-6322",
     "contact_org": "Portland General Electric (PGE)",
+    "source_url": "https://portlandgeneral.com/income-qualified-bill-discount",
     "benefit_schedule": {
       "description": "Monthly discount percentage by household size and annual gross income",
       "unit": "percent_discount",
@@ -530,7 +536,8 @@
     "processing_time": "30 days",
     "renewal_cycle": "Every two years",
     "contact_phone": "503-823-7770",
-    "contact_org": "Portland Water Bureau"
+    "contact_org": "Portland Water Bureau",
+    "source_url": "https://www.portland.gov/water/customer-service/apply-financial-assistance"
   },
   {
     "id": "nw-natural-bill-discount",
@@ -566,6 +573,7 @@
     "renewal_cycle": "2 years",
     "contact_phone": "800-422-4012",
     "contact_org": "NW Natural",
+    "source_url": "https://www.nwnatural.com/account/bill-discount-program",
     "benefit_schedule": {
       "description": "Monthly bill discount percentage by household income level for Oregon and Washington",
       "unit": "percent_discount",
@@ -641,7 +649,8 @@
     "processing_time": "4-8 weeks",
     "renewal_cycle": "Annual",
     "contact_phone": "1-800-453-5511, option 1",
-    "contact_org": "Oregon Housing and Community Services (OHCS)"
+    "contact_org": "Oregon Housing and Community Services (OHCS)",
+    "source_url": "https://www.oregon.gov/ohcs/energy-weatherization/pages/utility-bill-payment-assistance.aspx"
   },
   {
     "id": "wic",
@@ -682,6 +691,7 @@
     "renewal_cycle": "Every 6-12 months",
     "contact_phone": "211 toll-free; TTY relay 711 or 1-800-735-2900",
     "contact_org": "Oregon Health Authority WIC Program",
+    "source_url": "https://www.fns.usda.gov/wic/wic-food-packages",
     "benefit_schedule": {
       "description": "WIC cash-value benefit (CVB) for fruits and vegetables, maximum monthly allowances by participant category, FY 2024",
       "unit": "usd_monthly",
@@ -731,7 +741,8 @@
     ],
     "processing_time": "1-2 weeks",
     "renewal_cycle": "Annual, effective July 1 through June 30",
-    "contact_org": "Food and Nutrition Service (FNS), USDA"
+    "contact_org": "Food and Nutrition Service (FNS), USDA",
+    "source_url": "https://www.fns.usda.gov/school-meals/income-eligibility-guidelines"
   },
   {
     "id": "multco-eviction-prev",
@@ -770,7 +781,8 @@
     ],
     "processing_time": "3-14 days",
     "contact_phone": "211",
-    "contact_org": "211info"
+    "contact_org": "211info",
+    "source_url": "https://multco.us/info/eviction-prevention-and-energy-bill-assistance"
   },
   {
     "id": "cep-weatherization",
@@ -806,7 +818,8 @@
     ],
     "processing_time": "2-6 months for project completion",
     "contact_phone": "503-284-6827",
-    "contact_org": "Community Energy Project"
+    "contact_org": "Community Energy Project",
+    "source_url": "https://www.communityenergyproject.org/"
   },
   {
     "id": "senior-prop-tax-deferral",
@@ -845,7 +858,8 @@
     "processing_time": "60-90 days",
     "renewal_cycle": "Every two years after initial approval",
     "contact_phone": "503-945-8348 or 800-356-4222",
-    "contact_org": "Oregon Department of Revenue"
+    "contact_org": "Oregon Department of Revenue",
+    "source_url": "https://www.oregon.gov/dor/programs/property/Pages/Deferral.aspx"
   },
   {
     "id": "transportation-wallet",
@@ -881,6 +895,7 @@
     "processing_time": "2-3 weeks",
     "renewal_cycle": "Calendar year (once per calendar year)",
     "contact_org": "Portland Bureau of Transportation (PBOT)",
+    "source_url": "https://www.portland.gov/transportation/wallet/access-all",
     "contact_phone": "311"
   },
   {
@@ -921,7 +936,8 @@
     ],
     "processing_time": "Varies by building waitlist",
     "contact_phone": "503-823-9042",
-    "contact_org": "Portland Housing Bureau"
+    "contact_org": "Portland Housing Bureau",
+    "source_url": "https://www.portland.gov/phb/inclusionary-housing"
   },
   {
     "id": "sun-service-system",
@@ -955,7 +971,8 @@
     ],
     "processing_time": "Same day for most programs",
     "contact_phone": "503-988-6295",
-    "contact_org": "Department of County Human Services"
+    "contact_org": "Department of County Human Services",
+    "source_url": "https://multco.us/programs/sun-community-schools"
   },
   {
     "id": "advsd",
@@ -989,7 +1006,8 @@
     ],
     "processing_time": "1-2 weeks for initial assessment",
     "contact_phone": "503-988-3646",
-    "contact_org": "Multnomah County Aging and Disability Resource Connection"
+    "contact_org": "Multnomah County Aging and Disability Resource Connection",
+    "source_url": "https://multco.us/info/aging-and-disability-resource-connection-helpline"
   },
   {
     "id": "veterans-prop-tax-exempt",
@@ -1031,6 +1049,7 @@
     "renewal_cycle": "Annual for physicians' certifications; not required for VA/Armed Forces certifications dated within three years or after age 65 with permanent disability certification",
     "contact_phone": "800-692-9666",
     "contact_org": "Oregon Department of Revenue",
+    "source_url": "https://www.oregon.gov/dor/forms/FormsPubs/veteran-spouse-exemption_310-676.pdf",
     "benefit_schedule": {
       "description": "Property tax exemption amounts by disability/service status",
       "unit": "usd_annual",
@@ -1077,6 +1096,7 @@
     "renewal_cycle": "Annual",
     "contact_phone": "1-800-234-9473",
     "contact_org": "USAC (Universal Service Administrative Company)",
+    "source_url": "https://www.usac.org/lifeline/",
     "benefit_schedule": {
       "description": "Monthly benefit amount by residential status",
       "unit": "usd_monthly",

@@ -49,7 +49,8 @@ const LOCKED_FIELDS = new Set([
   'eligibility',
 ]);
 
-type ScrapedProgram = Program & { _provenance?: Record<string, unknown> };
+type ProvenanceEntry = { source_url?: string; quote?: string };
+type ScrapedProgram = Program & { _provenance?: Record<string, ProvenanceEntry> };
 
 function isNullish(v: unknown): boolean {
   if (v === null || v === undefined) return true;
@@ -69,8 +70,31 @@ function isNullish(v: unknown): boolean {
   return false;
 }
 
+/** Derive a best source_url from _provenance (prefer benefit_schedule or eligibility fields). */
+function deriveSourceUrl(provenance: Record<string, ProvenanceEntry>): string | undefined {
+  const preferred = ['benefit_schedule', 'eligibility'];
+  for (const pref of preferred) {
+    for (const [key, entry] of Object.entries(provenance)) {
+      if (key === pref || key.startsWith(`${pref}.`)) {
+        if (entry?.source_url) return entry.source_url;
+      }
+    }
+  }
+  for (const entry of Object.values(provenance)) {
+    if (entry?.source_url) return entry.source_url;
+  }
+  return undefined;
+}
+
 function mergeProgram(seed: Program, scraped: ScrapedProgram): Program {
   const out: Record<string, unknown> = { ...seed };
+
+  // Before stripping _provenance, derive source_url if the seed doesn't already have one.
+  if (!seed.source_url && scraped._provenance) {
+    const derived = deriveSourceUrl(scraped._provenance);
+    if (derived) out.source_url = derived;
+  }
+
   for (const [key, scrapedValue] of Object.entries(scraped)) {
     if (key === '_provenance') continue;
     if (LOCKED_FIELDS.has(key)) continue;
@@ -146,10 +170,13 @@ async function main() {
     return result;
   });
 
+  const sourceUrlCount = merged.filter((p) => (p as unknown as Record<string, unknown>).source_url).length;
+
   await fs.writeFile(OUT_PATH, JSON.stringify(merged, null, 2) + '\n');
 
   console.log();
   console.log(`Refreshed: ${refreshed}  ·  Opted-out: ${kept}  ·  Scrape failures: ${missing}`);
+  console.log(`Programs that gained a source_url: ${sourceUrlCount}`);
   console.log('Wrote data/programs.json');
   console.log('Rollback: cp data/programs.seed.json data/programs.json');
 }

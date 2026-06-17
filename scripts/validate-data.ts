@@ -64,6 +64,8 @@ const ProgramSchema = z.object({
     })
     .optional(),
   eligibility: Eligibility,
+  source_url: z.string().url().optional(),
+  last_verified: z.string().optional(),
   application_url: z.string().url(),
   info_urls: z.array(z.string().url()).optional(),
   application_method: z.enum(['online', 'phone', 'in_person', 'mail']),
