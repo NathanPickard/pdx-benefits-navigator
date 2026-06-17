@@ -35,9 +35,9 @@ export async function* analyzeEligibilityStream(
   apiKey: string,
   intake: IntakeData,
   /**
-   * Optional model override. Defaults to ELIGIBILITY_MODEL (Haiku) for the
-   * runtime BYOK path. Precompute uses Sonnet for tighter constraint
-   * adherence and arithmetic.
+   * Optional model override. Defaults to ELIGIBILITY_MODEL (Sonnet 4.6),
+   * which both the runtime BYOK path and the demo precompute now share so
+   * baked fixtures match live results.
    */
   model: string = ELIGIBILITY_MODEL
 ): AsyncGenerator<AnalyzeStreamEvent> {
@@ -45,9 +45,9 @@ export async function* analyzeEligibilityStream(
     const anthropic = makeClient(apiKey);
     const stream = anthropic.messages.stream({
       model,
-      // 16K accommodates Sonnet's longer reasoning for the full 20-program
-      // evaluation; Haiku rarely uses more than ~8K but the extra ceiling
-      // costs nothing on input/cache-miss pricing.
+      // 16K headroom for the analysis model's reasoning across the full
+      // 20-program evaluation; the extra ceiling costs nothing on
+      // input/cache-miss pricing.
       max_tokens: 16000,
       system: [
         {
