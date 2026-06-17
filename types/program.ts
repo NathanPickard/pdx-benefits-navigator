@@ -115,12 +115,29 @@ export interface IntakeData {
   citizenship: 'citizen' | 'lpr' | 'other' | 'prefer_not_say';
 }
 
+export type RequirementKey =
+  | 'income'
+  | 'residency'
+  | 'citizenship'
+  | 'household'
+  | 'age'
+  | 'status'      // disability / veteran / senior / pregnancy
+  | 'event'       // eviction / rent-increase / job-loss / new-baby
+  | 'enrollment'; // categorical eligibility via another program
+
+export interface EligibilityRequirement {
+  key: RequirementKey;
+  met: 'yes' | 'no' | 'unknown';
+  detail: string; // plain-language, e.g. "Income $48,000 is under the $66,000 limit for a household of 4"
+}
+
 export interface MatchResult {
   program_id: string;
   eligible: boolean;
   confidence: 'high' | 'medium' | 'low';
   estimated_annual_value: number;
   reasoning: string;
+  requirements?: EligibilityRequirement[];
   next_steps: string[];
   required_documents: string[];
   application_deadline?: string;
