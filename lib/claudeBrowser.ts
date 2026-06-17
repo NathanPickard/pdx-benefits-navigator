@@ -9,6 +9,7 @@
  */
 
 import Anthropic from '@anthropic-ai/sdk';
+import { zodOutputFormat } from '@anthropic-ai/sdk/helpers/zod';
 
 import {
   ELIGIBILITY_MODEL,
@@ -18,6 +19,7 @@ import {
   parseJsonObject,
   recomputeTotals,
 } from './eligibility';
+import { AnalysisOutputSchema, parseAnalysis } from './eligibilitySchema';
 import type { AnalysisOutput, IntakeData } from '@/types/program';
 
 function makeClient(apiKey: string): Anthropic {
@@ -32,6 +34,68 @@ export type AnalyzeStreamEvent =
   | { type: 'complete'; output: AnalysisOutput }
   | { type: 'error'; message: string };
 
+/**
+ * Run one stream attempt. Returns { parsed, stopReason }. Yields progress
+ * events into the provided callback so the generator can forward them.
+ * On the retry attempt, `onProgress` is still called (uses the same seenIds
+ * set so no duplicate program_id events are emitted across attempts).
+ */
+async function runStreamAttempt(
+  anthropic: Anthropic,
+  intake: IntakeData,
+  model: string,
+  seenIds: Set<string>,
+  onProgress: (programId: string) => void
+): Promise<{ parsed: AnalysisOutput; stopReason: string | null }> {
+  const stream = anthropic.messages.stream({
+    model,
+    max_tokens: 32000,
+    thinking: { type: 'adaptive' },
+    system: [
+      {
+        type: 'text',
+        text: ELIGIBILITY_SYSTEM_PROMPT,
+        cache_control: { type: 'ephemeral' },
+      },
+    ],
+    messages: [
+      {
+        role: 'user',
+        content: `Analyze eligibility for this Portland resident:\n\n${JSON.stringify(intake, null, 2)}`,
+      },
+    ],
+    output_config: { format: zodOutputFormat(AnalysisOutputSchema) },
+  });
+
+  const programIdRegex = /"program_id"\s*:\s*"([^"]+)"/g;
+  let buffer = '';
+
+  for await (const event of stream) {
+    if (event.type === 'content_block_delta' && event.delta.type === 'text_delta') {
+      buffer += event.delta.text;
+      programIdRegex.lastIndex = 0;
+      let match: RegExpExecArray | null;
+      while ((match = programIdRegex.exec(buffer)) !== null) {
+        const id = match[1];
+        if (!seenIds.has(id)) {
+          seenIds.add(id);
+          onProgress(id);
+        }
+      }
+    }
+  }
+
+  const finalMessage = await stream.finalMessage();
+  const stopReason = finalMessage.stop_reason;
+
+  // parsed_output comes from the structured-output schema; fall back to
+  // parsing the buffered JSON text if the SDK didn't populate it (rare).
+  const parsed: AnalysisOutput =
+    finalMessage.parsed_output ?? parseAnalysis(JSON.parse(buffer));
+
+  return { parsed, stopReason };
+}
+
 export async function* analyzeEligibilityStream(
   apiKey: string,
   intake: IntakeData,
@@ -42,57 +106,109 @@ export async function* analyzeEligibilityStream(
    */
   model: string = ELIGIBILITY_MODEL
 ): AsyncGenerator<AnalyzeStreamEvent> {
+  const anthropic = makeClient(apiKey);
+  const seenIds = new Set<string>();
+
+  // Collected progress events from the first attempt to yield them in order.
+  const pendingProgress: string[] = [];
+
   try {
-    const anthropic = makeClient(apiKey);
-    const stream = anthropic.messages.stream({
-      model,
-      // 16K headroom for the analysis model's reasoning across the full
-      // 20-program evaluation; the extra ceiling costs nothing on
-      // input/cache-miss pricing.
-      max_tokens: 16000,
-      system: [
-        {
-          type: 'text',
-          text: ELIGIBILITY_SYSTEM_PROMPT,
-          cache_control: { type: 'ephemeral' },
-        },
-      ],
-      messages: [
-        {
-          role: 'user',
-          content: `Analyze eligibility for this Portland resident:\n\n${JSON.stringify(intake, null, 2)}`,
-        },
-      ],
-    });
+    let parsed: AnalysisOutput;
+    let firstAttemptError: unknown = null;
 
-    let buffer = '';
-    const seenIds = new Set<string>();
-    const programIdRegex = /"program_id"\s*:\s*"([^"]+)"/g;
+    // ── Attempt 1 ──────────────────────────────────────────────────────────
+    try {
+      const result = await runStreamAttempt(
+        anthropic,
+        intake,
+        model,
+        seenIds,
+        (id) => pendingProgress.push(id)
+      );
 
-    for await (const event of stream) {
-      if (event.type === 'content_block_delta' && event.delta.type === 'text_delta') {
-        buffer += event.delta.text;
-        programIdRegex.lastIndex = 0;
-        let match: RegExpExecArray | null;
-        while ((match = programIdRegex.exec(buffer)) !== null) {
-          const id = match[1];
-          if (!seenIds.has(id)) {
-            seenIds.add(id);
-            yield { type: 'progress', programId: id };
-          }
-        }
+      // Flush progress events from the first attempt.
+      for (const id of pendingProgress) {
+        yield { type: 'progress', programId: id };
       }
+
+      if (result.stopReason === 'max_tokens') {
+        // Truncated — treat as retryable.
+        firstAttemptError = new Error('max_tokens');
+        parsed = result.parsed; // may be partial; retry will overwrite
+      } else {
+        parsed = result.parsed;
+        // Apply derive → assert → recompute and yield complete.
+        const derived = deriveEligibility(parsed);
+        assertConsistency(derived);
+        yield { type: 'complete', output: recomputeTotals(derived) };
+        return;
+      }
+    } catch (err) {
+      // Flush whatever progress we collected before the error.
+      for (const id of pendingProgress) {
+        yield { type: 'progress', programId: id };
+      }
+      firstAttemptError = err;
     }
 
-    const parsed = parseJsonObject<AnalysisOutput>(buffer);
+    // ── Attempt 2 (retry once on truncation or validation failure) ──────────
+    try {
+      const result = await runStreamAttempt(
+        anthropic,
+        intake,
+        model,
+        seenIds, // shared — won't re-emit already-seen program ids
+        (_id) => {
+          // Progress on retry: yield immediately (no buffering needed, already
+          // past the first-attempt flush point).
+        }
+      );
+
+      if (result.stopReason === 'max_tokens') {
+        yield {
+          type: 'error',
+          message: 'The analysis response was cut off — please try again.',
+        };
+        return;
+      }
+
+      parsed = result.parsed;
+    } catch {
+      // Second attempt also failed.
+      yield {
+        type: 'error',
+        message: 'The analysis response was cut off — please try again.',
+      };
+      return;
+    }
+
+    // Both attempts succeeded enough to reach here; apply pipeline.
+    void firstAttemptError; // acknowledged, not rethrown
     const derived = deriveEligibility(parsed);
     assertConsistency(derived);
     yield { type: 'complete', output: recomputeTotals(derived) };
   } catch (e) {
-    yield {
-      type: 'error',
-      message: e instanceof Error ? e.message : 'Unknown error calling Claude',
-    };
+    if (e instanceof Anthropic.AuthenticationError) {
+      yield {
+        type: 'error',
+        message: 'Your API key was rejected. Check it in the key settings and try again.',
+      };
+    } else if (e instanceof Anthropic.RateLimitError) {
+      yield {
+        type: 'error',
+        message: 'Anthropic is rate-limiting this key. Wait a moment and try again.',
+      };
+    } else if (e instanceof Anthropic.APIError) {
+      yield {
+        type: 'error',
+        message: `Anthropic API error (${e.status ?? '?'}). Please try again.`,
+      };
+    } else {
+      yield {
+        type: 'error',
+        message: e instanceof Error ? e.message : 'Unknown error calling Claude',
+      };
+    }
   }
 }
 
@@ -117,5 +233,7 @@ export async function translatePayload<T>(
     .filter((b) => b.type === 'text')
     .map((b) => (b as { type: 'text'; text: string }).text)
     .join('');
+  // parseJsonObject is translation-only: used here to tolerantly extract the
+  // returned JSON blob. The eligibility hot path uses structured output instead.
   return parseJsonObject<T>(text);
 }
