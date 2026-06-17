@@ -67,17 +67,20 @@ ${JSON.stringify(programs, null, 2)}
 
 1. For EVERY program, evaluate eligibility against intake data. Do not skip any.
 
-2. The "eligible" boolean is the eligibility DECISION implied by the intake data. It MUST be consistent with your reasoning text:
-   - If your reasoning concludes a hard requirement (income, residency, citizenship, household composition, age, employment, veteran/disability/senior status) is NOT met based on intake, set eligible=false.
-   - Do NOT mark eligible=true based on conditional pathways ("if enrolled in OHP", "if net-income test passes", "worth verifying"). If the intake doesn't confirm the condition, set eligible=false and put the alternative path in next_steps.
-   - Do NOT write "INELIGIBLE" or "Likely ineligible" in reasoning and still set eligible=true. The reasoning and the boolean must agree.
+2. For EVERY program, populate a "requirements" array — one entry per hard requirement that program imposes, drawn from its eligibility object (income, residency, citizenship, household composition, age, disability/veteran/senior/pregnancy status, triggering event, or categorical enrollment). For each:
+   - "key": one of income | residency | citizenship | household | age | status | event | enrollment
+   - "met": "yes" if the intake data satisfies it, "no" if the intake data violates it, "unknown" if the intake doesn't capture the fact needed to decide
+   - "detail": one plain-language sentence with the specific numbers/facts (e.g. "Income $48,000 is under the $66,000 limit (200% FPL) for a household of 4")
+   Only include requirements the program actually imposes. A program with no income test has no "income" requirement entry.
 
-3. Confidence levels (refer to the eligibility DECISION, not the application advice):
+3. Set "eligible" = true unless ANY requirement has met="no". (A requirement with met="unknown" does NOT make the program ineligible — it lowers confidence and should be called out in next_steps as something to verify.) Your "eligible" boolean MUST equal this rule applied to your own requirements array; the app re-derives it and will log any disagreement.
+
+4. Confidence levels (refer to the eligibility DECISION, not the application advice):
    - "high": Intake data clearly satisfies (eligible=true) or clearly violates (eligible=false) all hard requirements.
    - "medium": Decision rests on a value close to a threshold (within ~10%) or on a requirement the intake doesn't directly answer.
    - "low": Decision depends on facts the intake doesn't capture (e.g., specific SNAP shelter/childcare deductions, current SUN enrollment, exact home RMV, citizenship-status edge cases).
 
-4. Estimate dollar value based on household composition. For programs with per-child or per-household-member benefits, multiply correctly.
+5. Estimate dollar value based on household composition. For programs with per-child or per-household-member benefits, multiply correctly.
 
    When a program has a "benefit_schedule" field (present on programs where official sources publish a benefit table), USE IT as authoritative — pick the row whose "condition" best matches the user's intake (their household_size, income tier, etc.) and convert to an annual estimate based on "unit":
      - usd_monthly → row value × 12
@@ -88,19 +91,19 @@ ${JSON.stringify(programs, null, 2)}
 
    If eligible=false, set estimated_annual_value to 0.
 
-5. PRIORITIZE hyperlocal Portland and Multnomah County programs (hidden_gem: true). These are our differentiator. Always evaluate them — never skip because the user didn't mention housing/utilities/etc.
+6. PRIORITIZE hyperlocal Portland and Multnomah County programs (hidden_gem: true). These are our differentiator. Always evaluate them — never skip because the user didn't mention housing/utilities/etc.
 
-6. Urgency handling:
+7. Urgency handling:
    - If user has eviction notice → Multnomah Eviction Prevention is URGENT
    - If user had rent increase >10% → Portland Renter Relocation Assistance is event-triggered
    - If user has school-age children → SUN Schools is high-priority
    - Surface these in "warnings" array
 
-7. For each match, generate 2-4 concrete next_steps starting with strong verbs ("Call 503-...", "Visit oregon.gov/...", "Gather your last 2 paystubs").
+8. For each match, generate 2-4 concrete next_steps starting with strong verbs ("Call 503-...", "Visit oregon.gov/...", "Gather your last 2 paystubs").
 
-8. List 2-5 required_documents per program.
+9. List 2-5 required_documents per program.
 
-9. Output ONLY valid JSON matching the AnalysisOutput schema. No markdown, no preamble.
+10. Output ONLY valid JSON matching the AnalysisOutput schema. No markdown, no preamble.
 
 ==== OUTPUT SCHEMA ====
 {
@@ -109,6 +112,9 @@ ${JSON.stringify(programs, null, 2)}
       "program_id": string,
       "eligible": boolean,
       "confidence": "high" | "medium" | "low",
+      "requirements": [
+        { "key": "income"|"residency"|"citizenship"|"household"|"age"|"status"|"event"|"enrollment", "met": "yes"|"no"|"unknown", "detail": string }
+      ],
       "estimated_annual_value": number,
       "reasoning": string,
       "next_steps": [string],
