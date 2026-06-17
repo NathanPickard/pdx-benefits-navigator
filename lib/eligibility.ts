@@ -132,43 +132,47 @@ ${JSON.stringify(programs, null, 2)}
 
 /**
  * Words/phrases that signal the model concluded an applicant is NOT eligible.
- * If any of these appear in reasoning while eligible=true, the boolean is
- * contradicting the model's own conclusion — we trust the prose and flip it.
+ * Used only by assertConsistency for telemetry — no longer used to flip decisions.
  */
 const INELIGIBILITY_MARKERS =
   /\b(ineligible|not eligible|does not qualify|doesn't qualify|do not qualify)\b/i;
 
 /**
- * Enforce that the eligible boolean matches what the reasoning text says.
- * Haiku frequently writes "INELIGIBLE on income basis" or "does not qualify"
- * in reasoning while still setting eligible=true (it treats the boolean as
- * "should they apply anyway"). This guard reconciles them: prose wins.
- *
- * When a match is flipped, estimated_annual_value is also zeroed since an
- * ineligible match shouldn't contribute to the user's projected totals.
+ * Derive each match's `eligible` from its requirements (the auditable source
+ * of truth). A program is eligible unless a requirement is definitively unmet
+ * (met === 'no'); 'unknown' requirements do not exclude — they lower confidence.
+ * Matches without a requirements array (e.g. pre-rebake fixtures) are left as-is,
+ * trusting the model's own `eligible`.
  */
-export function enforceEligibilityConsistency(
-  output: AnalysisOutput,
-): AnalysisOutput {
-  let flipped = 0;
+export function deriveEligibility(output: AnalysisOutput): AnalysisOutput {
   const matches = output.matches.map((m) => {
-    if (m.eligible && INELIGIBILITY_MARKERS.test(m.reasoning)) {
-      flipped++;
-      return {
-        ...m,
-        eligible: false,
-        estimated_annual_value: 0,
-        confidence: 'high' as const,
-      };
-    }
-    return m;
+    if (!m.requirements || m.requirements.length === 0) return m;
+    const eligible = m.requirements.every((r) => r.met !== 'no');
+    return {
+      ...m,
+      eligible,
+      estimated_annual_value: eligible ? m.estimated_annual_value : 0,
+    };
   });
-  if (flipped > 0 && typeof console !== 'undefined') {
-    console.warn(
-      `[eligibility] Flipped ${flipped} match${flipped === 1 ? '' : 'es'} from eligible=true to false (reasoning text indicated ineligibility).`,
-    );
-  }
   return { ...output, matches };
+}
+
+/**
+ * Telemetry only (no mutation). After deriveEligibility has set the decision,
+ * warn if the model's prose still reads as ineligible while eligible=true, or
+ * vice versa — a signal the prompt or requirements need tightening. The user's
+ * result is NOT altered here; deriveEligibility already decided.
+ */
+export function assertConsistency(output: AnalysisOutput): void {
+  if (typeof console === 'undefined') return;
+  let mismatches = 0;
+  for (const m of output.matches) {
+    const prose = INELIGIBILITY_MARKERS.test(m.reasoning);
+    if (m.eligible && prose) mismatches++;
+  }
+  if (mismatches > 0) {
+    console.warn(`[eligibility] ${mismatches} match(es): eligible=true but reasoning reads ineligible. Review prompt/requirements.`);
+  }
 }
 
 /** Recompute total / federal / PDX dollar buckets from the matches array. */

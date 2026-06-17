@@ -13,7 +13,8 @@ import Anthropic from '@anthropic-ai/sdk';
 import {
   ELIGIBILITY_MODEL,
   ELIGIBILITY_SYSTEM_PROMPT,
-  enforceEligibilityConsistency,
+  deriveEligibility,
+  assertConsistency,
   parseJsonObject,
   recomputeTotals,
 } from './eligibility';
@@ -84,8 +85,9 @@ export async function* analyzeEligibilityStream(
     }
 
     const parsed = parseJsonObject<AnalysisOutput>(buffer);
-    const consistent = enforceEligibilityConsistency(parsed);
-    yield { type: 'complete', output: recomputeTotals(consistent) };
+    const derived = deriveEligibility(parsed);
+    assertConsistency(derived);
+    yield { type: 'complete', output: recomputeTotals(derived) };
   } catch (e) {
     yield {
       type: 'error',
