@@ -532,6 +532,26 @@ function Dashboard({
     });
   }, [data, sortMode]);
 
+  // Confidence band: sum the program-level min/max ranges over eligible rows.
+  // Falls back to the match's point-value for both low and high when the
+  // program's structured range is somehow absent (defensive; the type requires
+  // it, but translated bundles may vary).
+  const { bandLow, bandHigh } = useMemo(() => {
+    let low = 0;
+    let high = 0;
+    for (const { match, program } of eligible) {
+      const range = program?.estimated_annual_value;
+      if (range && typeof range.min === 'number' && typeof range.max === 'number') {
+        low += range.min;
+        high += range.max;
+      } else {
+        low += match.estimated_annual_value;
+        high += match.estimated_annual_value;
+      }
+    }
+    return { bandLow: low, bandHigh: high };
+  }, [eligible]);
+
   // Near-misses: ineligible matches. Computed separately so they can be
   // surfaced below the eligible card grid — or front-and-center in the
   // zero-eligible empty state. Pre-rebake fixtures have no requirements[]
@@ -635,7 +655,11 @@ function Dashboard({
             <div className="eyebrow mb-3" style={{ color: 'var(--moss-2)' }}>
               {chrome.resultsKicker}
             </div>
-            <MoneyCounter value={data.total_estimated_annual_value} />
+            <MoneyCounter
+              value={data.total_estimated_annual_value}
+              low={bandLow}
+              high={bandHigh}
+            />
             <p
               style={{
                 marginTop: 16,
