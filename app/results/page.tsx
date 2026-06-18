@@ -11,6 +11,7 @@ import { MoneyCounter } from '@/components/results/MoneyCounter';
 import { BenefitCard } from '@/components/results/BenefitCard';
 import { ComparisonChart } from '@/components/results/ComparisonChart';
 import { LanguageToggle } from '@/components/results/LanguageToggle';
+import { NearMissSection } from '@/components/results/NearMissSection';
 import { UrgencyBanner } from '@/components/results/UrgencyBanner';
 import { RenewalCalendar } from '@/components/results/RenewalCalendar';
 import {
@@ -531,6 +532,15 @@ function Dashboard({
     });
   }, [data, sortMode]);
 
+  // Near-misses: ineligible matches. Computed separately so they can be
+  // surfaced below the eligible card grid — or front-and-center in the
+  // zero-eligible empty state. Pre-rebake fixtures have no requirements[]
+  // arrays; NearMissSection falls back to match.reasoning for the reason.
+  const nearMisses = useMemo(
+    () => data.matches.filter((m) => !m.eligible),
+    [data]
+  );
+
   const handleExportCalendar = useCallback(() => {
     const ics = buildIcsCalendar(eligible);
     downloadIcsFile(ics);
@@ -761,45 +771,124 @@ function Dashboard({
         </section>
       )}
 
-      <section className="mb-10">
-        <header className="flex items-end justify-between gap-6 flex-wrap mb-8">
-          <div>
-            <div className="eyebrow mb-2">
-              {eligible.length} programs ·{' '}
-              {sortMode === 'gems' ? 'hidden gems first' : 'largest amount first'}
+      {eligible.length === 0 ? (
+        /* ── Zero-eligible empty state ── */
+        // TODO(phase-2 i18n): strings below are English-only; Phase 2 will
+        // wire them into the Chrome bundle and translation pipeline.
+        <section className="mb-10">
+          <div
+            className="rc-card"
+            style={{
+              padding: 'clamp(24px, 5vw, 40px)',
+              textAlign: 'center',
+              marginBottom: 24,
+              background: 'var(--paper-2)',
+              borderColor: 'var(--rule-2)',
+            }}
+          >
+            <div style={{ fontSize: '2rem', marginBottom: 12 }} aria-hidden="true">
+              🌧️
             </div>
             <h2
               className="font-display"
               style={{
-                fontSize: '2.2rem',
-                lineHeight: 1.1,
-                margin: 0,
+                fontSize: '1.6rem',
                 fontWeight: 500,
-                letterSpacing: '-0.02em',
+                letterSpacing: '-0.018em',
+                margin: '0 0 10px',
               }}
             >
-              {programsHeading}
+              No programs matched this time
             </h2>
+            <p
+              style={{
+                margin: '0 auto 16px',
+                maxWidth: 500,
+                color: 'var(--ink-2)',
+                fontSize: '0.96rem',
+                lineHeight: 1.6,
+              }}
+            >
+              That can change — income, household size, and life events all affect eligibility. A local caseworker often finds options the tool misses, especially for locally-funded programs.
+            </p>
+            <div
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 8,
+                background: 'var(--moss-soft)',
+                borderRadius: 10,
+                padding: '10px 18px',
+                fontSize: '0.9rem',
+                color: 'var(--moss-2)',
+                fontWeight: 500,
+              }}
+            >
+              <span>📞</span>
+              <span>Call <strong>211</strong> or visit <strong>211info.org</strong> — free, confidential, available in your language</span>
+            </div>
           </div>
-          <SortToggle value={sortMode} onChange={setSortMode} />
-        </header>
 
-        <div
-          className="grid"
-          style={{ gridTemplateColumns: '1fr', gap: 16 }}
-        >
-          {eligible.map(({ match, program }) => (
-            <BenefitCard
-              key={lang + '-' + match.program_id}
-              match={match}
-              program={program}
+          {nearMisses.length > 0 && (
+            <NearMissSection
+              matches={nearMisses}
+              programById={PROGRAM_BY_ID}
               chrome={chrome}
             />
-          ))}
-        </div>
-      </section>
+          )}
+        </section>
+      ) : (
+        /* ── Normal layout: eligible cards + near-misses below ── */
+        <>
+          <section className="mb-10">
+            <header className="flex items-end justify-between gap-6 flex-wrap mb-8">
+              <div>
+                <div className="eyebrow mb-2">
+                  {eligible.length} programs ·{' '}
+                  {sortMode === 'gems' ? 'hidden gems first' : 'largest amount first'}
+                </div>
+                <h2
+                  className="font-display"
+                  style={{
+                    fontSize: '2.2rem',
+                    lineHeight: 1.1,
+                    margin: 0,
+                    fontWeight: 500,
+                    letterSpacing: '-0.02em',
+                  }}
+                >
+                  {programsHeading}
+                </h2>
+              </div>
+              <SortToggle value={sortMode} onChange={setSortMode} />
+            </header>
 
-      <RenewalCalendar entries={eligible} chrome={chrome} lang={lang} />
+            <div
+              className="grid"
+              style={{ gridTemplateColumns: '1fr', gap: 16 }}
+            >
+              {eligible.map(({ match, program }) => (
+                <BenefitCard
+                  key={lang + '-' + match.program_id}
+                  match={match}
+                  program={program}
+                  chrome={chrome}
+                />
+              ))}
+            </div>
+          </section>
+
+          <RenewalCalendar entries={eligible} chrome={chrome} lang={lang} />
+
+          {nearMisses.length > 0 && (
+            <NearMissSection
+              matches={nearMisses}
+              programById={PROGRAM_BY_ID}
+              chrome={chrome}
+            />
+          )}
+        </>
+      )}
 
       <footer
         className="mt-12 pt-6"
