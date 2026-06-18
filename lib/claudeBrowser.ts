@@ -49,8 +49,12 @@ async function runStreamAttempt(
 ): Promise<{ parsed: AnalysisOutput; stopReason: string | null }> {
   const stream = anthropic.messages.stream({
     model,
-    max_tokens: 32000,
-    thinking: { type: 'adaptive' },
+    // The full 20-program per-requirement analysis runs ~8-12K output tokens;
+    // 64K is safe streaming headroom (timeouts aren't a concern when streaming).
+    // NOTE: adaptive thinking was tried and removed — on this 20-program task it
+    // pushed a streamed analysis past several minutes with no accuracy gain over
+    // Sonnet 4.6's default reasoning (which Phase 0 already validated).
+    max_tokens: 64000,
     system: [
       {
         type: 'text',

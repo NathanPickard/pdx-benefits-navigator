@@ -142,8 +142,8 @@ export interface MatchResult {
   requirements?: EligibilityRequirement[];
   next_steps: string[];
   required_documents: string[];
-  application_deadline?: string;
-  urgency_note?: string;
+  application_deadline?: string | null;
+  urgency_note?: string | null;
 }
 
 export interface AnalysisOutput {

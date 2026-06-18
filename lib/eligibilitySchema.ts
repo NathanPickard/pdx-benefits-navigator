@@ -19,8 +19,11 @@ export const MatchSchema = z.object({
   requirements: z.array(RequirementSchema),
   next_steps: z.array(z.string()),
   required_documents: z.array(z.string()),
-  application_deadline: z.string().nullable().optional().transform((v) => v ?? undefined),
-  urgency_note: z.string().nullable().optional().transform((v) => v ?? undefined),
+  // nullable (model emits null when absent) + optional. NO .transform() here:
+  // zodOutputFormat() throws "Transforms cannot be represented in JSON Schema",
+  // which would break the structured-output stream. The TS type allows `| null`.
+  application_deadline: z.string().nullable().optional(),
+  urgency_note: z.string().nullable().optional(),
 });
 
 export const AnalysisOutputSchema = z.object({
