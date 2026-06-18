@@ -627,92 +627,101 @@ function Dashboard({
         </div>
       )}
 
-      {/* Hero */}
-      <section className="rc-results-hero mb-10">
-        <div>
-          <div className="eyebrow mb-3" style={{ color: 'var(--moss-2)' }}>
-            {chrome.resultsKicker}
-          </div>
-          <MoneyCounter value={data.total_estimated_annual_value} />
-          <p
-            style={{
-              marginTop: 16,
-              fontSize: '1.05rem',
-              color: 'var(--ink-2)',
-              lineHeight: 1.55,
-            }}
-          >
-            across{' '}
-            <strong style={{ color: 'var(--ink)' }}>{eligible.length} programs</strong>
-            {gemCount > 0 && (
-              <>
-                , including{' '}
-                <strong style={{ color: 'var(--rose)' }}>
-                  {gemCount} hyperlocal Portland gem{gemCount > 1 ? 's' : ''}
-                </strong>{' '}
-                that national tools would miss
-              </>
-            )}
-            .
-          </p>
-        </div>
-
-        {intake && (
-          <aside className="rc-card" style={{ padding: 24 }}>
-            <div className="flex items-start justify-between mb-3">
-              <div>
-                <div
-                  className="font-display"
-                  style={{
-                    fontSize: '1.55rem',
-                    lineHeight: 1.1,
-                    fontWeight: 500,
-                    letterSpacing: '-0.015em',
-                  }}
-                >
-                  Your household
-                </div>
-                <div className="tag mt-1">{intake.zip_code || '—'}</div>
-              </div>
-              <RoseStamp size={48} />
+      {/* Hero — only shown when there are eligible programs; the $0/0-program
+          state is degenerate and replaced by the empty state below. */}
+      {eligible.length > 0 && (
+        <section className="rc-results-hero mb-10">
+          <div>
+            <div className="eyebrow mb-3" style={{ color: 'var(--moss-2)' }}>
+              {chrome.resultsKicker}
             </div>
-            <div className="divider mb-3" />
-            <div
-              className="grid"
+            <MoneyCounter value={data.total_estimated_annual_value} />
+            <p
               style={{
-                gridTemplateColumns: '1fr 1fr',
-                gap: 12,
-                fontSize: '0.86rem',
+                marginTop: 16,
+                fontSize: '1.05rem',
+                color: 'var(--ink-2)',
+                lineHeight: 1.55,
               }}
             >
-              <KV k="Household" v={`${intake.household_size} people`} />
-              <KV k="Children" v={String(intake.num_children)} />
-              <KV
-                k="Income"
-                v={`$${(intake.annual_income || 0).toLocaleString()}`}
-              />
-              <KV k="Housing" v={HOUSING_LABEL[intake.housing_status]} />
-              <KV k="Language" v={LANG_LABEL[intake.primary_language]} />
-              <KV
-                k="Employment"
-                v={EMPLOYMENT_LABEL[intake.employment_status]}
-              />
-            </div>
-          </aside>
-        )}
-      </section>
+              across{' '}
+              <strong style={{ color: 'var(--ink)' }}>{eligible.length} programs</strong>
+              {gemCount > 0 && (
+                <>
+                  , including{' '}
+                  <strong style={{ color: 'var(--rose)' }}>
+                    {gemCount} hyperlocal Portland gem{gemCount > 1 ? 's' : ''}
+                  </strong>{' '}
+                  that national tools would miss
+                </>
+              )}
+              .
+            </p>
+          </div>
 
+          {intake && (
+            <aside className="rc-card" style={{ padding: 24 }}>
+              <div className="flex items-start justify-between mb-3">
+                <div>
+                  <div
+                    className="font-display"
+                    style={{
+                      fontSize: '1.55rem',
+                      lineHeight: 1.1,
+                      fontWeight: 500,
+                      letterSpacing: '-0.015em',
+                    }}
+                  >
+                    Your household
+                  </div>
+                  <div className="tag mt-1">{intake.zip_code || '—'}</div>
+                </div>
+                <RoseStamp size={48} />
+              </div>
+              <div className="divider mb-3" />
+              <div
+                className="grid"
+                style={{
+                  gridTemplateColumns: '1fr 1fr',
+                  gap: 12,
+                  fontSize: '0.86rem',
+                }}
+              >
+                <KV k="Household" v={`${intake.household_size} people`} />
+                <KV k="Children" v={String(intake.num_children)} />
+                <KV
+                  k="Income"
+                  v={`$${(intake.annual_income || 0).toLocaleString()}`}
+                />
+                <KV k="Housing" v={HOUSING_LABEL[intake.housing_status]} />
+                <KV k="Language" v={LANG_LABEL[intake.primary_language]} />
+                <KV
+                  k="Employment"
+                  v={EMPLOYMENT_LABEL[intake.employment_status]}
+                />
+              </div>
+            </aside>
+          )}
+        </section>
+      )}
+
+      {/* UrgencyBanner and warnings are shown on both paths — a household with
+          an eviction notice but zero eligible programs still needs the warning. */}
       {intake && <UrgencyBanner intake={intake} chrome={chrome} />}
 
-      <ComparisonChart
-        federal={data.federal_only_value}
-        total={data.total_estimated_annual_value}
-        title={chrome.howWeCompare}
-        subtitle={chrome.mostToolsOnly}
-        federalLabel={chrome.federalStateBarLabel}
-        pdxLabel={chrome.pdxNavigatorBarLabel}
-        missLabel={chrome.youdMiss}
-      />
+      {/* ComparisonChart is only meaningful when there are eligible programs;
+          a 0-vs-0 chart is misleading on the zero-eligible path. */}
+      {eligible.length > 0 && (
+        <ComparisonChart
+          federal={data.federal_only_value}
+          total={data.total_estimated_annual_value}
+          title={chrome.howWeCompare}
+          subtitle={chrome.mostToolsOnly}
+          federalLabel={chrome.federalStateBarLabel}
+          pdxLabel={chrome.pdxNavigatorBarLabel}
+          missLabel={chrome.youdMiss}
+        />
+      )}
 
       {data.warnings?.length > 0 && (
         <section

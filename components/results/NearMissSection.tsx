@@ -43,9 +43,8 @@ interface NearMissSectionProps {
 export function NearMissSection({ matches, programById }: NearMissSectionProps) {
   const [open, setOpen] = useState(false);
 
-  // Only render near-miss entries where we can look up the program
+  // Caller (results/page.tsx) pre-filters to ineligible matches; map to programs here.
   const rows = matches
-    .filter((m) => !m.eligible)
     .map((m) => ({ match: m, program: programById.get(m.program_id) }))
     .filter((r): r is { match: MatchResult; program: Program } => !!r.program);
 
