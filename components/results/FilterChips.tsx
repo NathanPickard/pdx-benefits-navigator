@@ -1,3 +1,4 @@
+import type { Chrome } from '@/lib/i18n';
 import type { Program } from '@/types/program';
 
 const CATEGORY_LABEL: Record<Program['category'], string> = {
@@ -26,12 +27,14 @@ export function FilterChips({
   activeJurisdiction,
   onCategory,
   onJurisdiction,
+  chrome,
 }: {
   rows: { program: Program }[];
   activeCategory: Program['category'] | null;
   activeJurisdiction: Program['jurisdiction'] | null;
   onCategory: (v: Program['category'] | null) => void;
   onJurisdiction: (v: Program['jurisdiction'] | null) => void;
+  chrome: Chrome;
 }) {
   // Derive distinct values present in the eligible set (preserve insertion order,
   // deduplicated via Set iteration).
@@ -60,7 +63,8 @@ export function FilterChips({
     >
       {categories.length > 1 && (
         <ChipRow
-          label="Category"
+          label={chrome.filterCategory}
+          allLabel={chrome.filterAll}
           options={categories.map((c) => ({ value: c, label: CATEGORY_LABEL[c] }))}
           active={activeCategory}
           onSelect={(v) => onCategory(v as Program['category'] | null)}
@@ -68,7 +72,8 @@ export function FilterChips({
       )}
       {jurisdictions.length > 1 && (
         <ChipRow
-          label="Jurisdiction"
+          label={chrome.filterJurisdiction}
+          allLabel={chrome.filterAll}
           options={jurisdictions.map((j) => ({ value: j, label: JURISDICTION_LABEL[j] }))}
           active={activeJurisdiction}
           onSelect={(v) => onJurisdiction(v as Program['jurisdiction'] | null)}
@@ -80,11 +85,13 @@ export function FilterChips({
 
 function ChipRow({
   label,
+  allLabel,
   options,
   active,
   onSelect,
 }: {
   label: string;
+  allLabel: string;
   options: { value: string; label: string }[];
   active: string | null;
   onSelect: (v: string | null) => void;
@@ -97,7 +104,7 @@ function ChipRow({
       >
         {label}:
       </span>
-      <Chip label="All" active={active === null} onClick={() => onSelect(null)} />
+      <Chip label={allLabel} active={active === null} onClick={() => onSelect(null)} />
       {options.map((opt) => (
         <Chip
           key={opt.value}

@@ -45,6 +45,30 @@ export interface Chrome {
   urgencyEvictionBody: string;
   urgencyRentIncreaseTitle: string;
   urgencyRentIncreaseBodyTemplate: string; // contains "{pct}"
+  // Status control (BenefitCard)
+  statusNotStarted: string;
+  statusInProgress: string;
+  statusApplied: string;
+  myStatus: string;
+  // Progress bar
+  applicationProgress: string;
+  appliedOfTotalTemplate: string; // contains "{applied}" and "{total}"
+  // Share / action buttons
+  copySummary: string;
+  print: string;
+  // Application-status metadata row
+  savedOnDevice: string;
+  clearProgress: string;
+  // Filter chips
+  filterCategory: string;
+  filterJurisdiction: string;
+  filterAll: string;
+  showingNofMTemplate: string; // contains "{shown}" and "{total}"
+  noFilterMatch: string;
+  clearFilters: string;
+  // Copy-summary toast messages
+  copySummarySuccess: string;
+  copySummaryFallback: string;
 }
 
 export const CHROME_EN: Chrome = {
@@ -90,4 +114,28 @@ export const CHROME_EN: Chrome = {
   urgencyRentIncreaseTitle: 'Apply within 45 days',
   urgencyRentIncreaseBodyTemplate:
     'Your rent went up {pct}% in the past year. Under Portland City Code 30.01.085, your landlord owes you $2,900–$4,500 in Renter Relocation Assistance — but you have only 45 days from the rent-increase notice to send a written demand.',
+  // Status control (BenefitCard)
+  statusNotStarted: 'Not started',
+  statusInProgress: 'In progress',
+  statusApplied: 'Applied',
+  myStatus: 'My status',
+  // Progress bar
+  applicationProgress: 'Application progress',
+  appliedOfTotalTemplate: '{applied} of {total} applied', // interpolate {applied} and {total}
+  // Share / action buttons
+  copySummary: 'Copy summary',
+  print: 'Print',
+  // Application-status metadata row
+  savedOnDevice: 'Saved only on this device',
+  clearProgress: 'Clear my saved progress',
+  // Filter chips
+  filterCategory: 'Category',
+  filterJurisdiction: 'Jurisdiction',
+  filterAll: 'All',
+  showingNofMTemplate: 'Showing {shown} of {total}', // interpolate {shown} and {total}
+  noFilterMatch: 'No programs match this filter.',
+  clearFilters: 'Clear filters',
+  // Copy-summary toast messages
+  copySummarySuccess: 'Summary copied to clipboard',
+  copySummaryFallback: 'Copy not supported — use the PDF instead',
 };

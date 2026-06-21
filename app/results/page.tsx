@@ -639,11 +639,11 @@ function Dashboard({
     try {
       if (!navigator.clipboard) throw new Error('unavailable');
       await navigator.clipboard.writeText(text);
-      toast.success('Summary copied to clipboard');
+      toast.success(chrome.copySummarySuccess);
     } catch {
-      toast.error('Copy not supported — use the PDF instead');
+      toast.error(chrome.copySummaryFallback);
     }
-  }, [data, allEligible]);
+  }, [data, allEligible, chrome]);
 
   // Use allEligible for hero/progress so counts are stable under filtering
   const gemCount = allEligible.filter((e) => e.program.hidden_gem).length;
@@ -695,7 +695,7 @@ function Dashboard({
             aria-label="Copy plain-text summary to clipboard"
           >
             <Clipboard size={13} />
-            Copy summary
+            {chrome.copySummary}
           </button>
           <button
             type="button"
@@ -704,7 +704,7 @@ function Dashboard({
             aria-label="Print this page"
           >
             <Printer size={13} />
-            Print
+            {chrome.print}
           </button>
         </div>
       </div>
@@ -992,13 +992,13 @@ function Dashboard({
 
             {/* ProgressBar denominator = all eligible (stable under filtering) */}
             <div data-print="hide">
-              <ProgressBar applied={appliedCount} total={allEligible.length} />
+              <ProgressBar applied={appliedCount} total={allEligible.length} chrome={chrome} />
               <div
                 className="flex items-center justify-between flex-wrap"
                 style={{ gap: 8, marginBottom: 16, fontSize: '0.82rem' }}
               >
                 <span style={{ color: 'var(--ink-3)' }}>
-                  Saved only on this device
+                  {chrome.savedOnDevice}
                 </span>
                 {hasAny && (
                   <button
@@ -1014,7 +1014,7 @@ function Dashboard({
                       textDecoration: 'underline',
                     }}
                   >
-                    Clear my saved progress
+                    {chrome.clearProgress}
                   </button>
                 )}
               </div>
@@ -1028,6 +1028,7 @@ function Dashboard({
                 activeJurisdiction={filterJurisdiction}
                 onCategory={setFilterCategory}
                 onJurisdiction={setFilterJurisdiction}
+                chrome={chrome}
               />
             </div>
 
@@ -1040,7 +1041,9 @@ function Dashboard({
                   marginBottom: 12,
                 }}
               >
-                Showing {eligible.length} of {allEligible.length}
+                {chrome.showingNofMTemplate
+                  .replace('{shown}', String(eligible.length))
+                  .replace('{total}', String(allEligible.length))}
               </div>
             )}
 
@@ -1057,7 +1060,7 @@ function Dashboard({
                   color: 'var(--ink-2)',
                 }}
               >
-                No programs match this filter.{' '}
+                {chrome.noFilterMatch}{' '}
                 <button
                   type="button"
                   onClick={() => {
@@ -1075,7 +1078,7 @@ function Dashboard({
                     textDecoration: 'underline',
                   }}
                 >
-                  Clear filters
+                  {chrome.clearFilters}
                 </button>
               </div>
             ) : (

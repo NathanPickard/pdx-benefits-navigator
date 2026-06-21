@@ -16,11 +16,13 @@ import type { AppStatus } from '@/lib/applicationStatus';
 import type { Chrome } from '@/lib/i18n';
 import type { MatchResult, Program } from '@/types/program';
 
-const STATUS_OPTIONS: { value: AppStatus; label: string }[] = [
-  { value: 'not_started', label: 'Not started' },
-  { value: 'in_progress', label: 'In progress' },
-  { value: 'applied', label: 'Applied' },
-];
+function statusOptions(c: Chrome): { value: AppStatus; label: string }[] {
+  return [
+    { value: 'not_started', label: c.statusNotStarted },
+    { value: 'in_progress', label: c.statusInProgress },
+    { value: 'applied', label: c.statusApplied },
+  ];
+}
 
 const CONFIDENCE_DOT: Record<MatchResult['confidence'], string> = {
   high: 'var(--moss)',
@@ -264,7 +266,7 @@ export function BenefitCard({
               style={{ color: 'var(--ink-3)', fontSize: '0.72rem' }}
               id={`status-label-${match.program_id}`}
             >
-              My status
+              {chrome.myStatus}
             </div>
             <div
               role="group"
@@ -278,7 +280,7 @@ export function BenefitCard({
                 gap: 2,
               }}
             >
-              {STATUS_OPTIONS.map((opt) => {
+              {statusOptions(chrome).map((opt) => {
                 const active = status === opt.value;
                 return (
                   <button

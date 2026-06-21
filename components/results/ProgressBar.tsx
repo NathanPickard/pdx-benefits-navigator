@@ -1,6 +1,19 @@
-export function ProgressBar({ applied, total }: { applied: number; total: number }) {
+import type { Chrome } from '@/lib/i18n';
+
+export function ProgressBar({
+  applied,
+  total,
+  chrome,
+}: {
+  applied: number;
+  total: number;
+  chrome: Chrome;
+}) {
   if (total === 0) return null;
   const pct = Math.round((applied / total) * 100);
+  const appliedLabel = chrome.appliedOfTotalTemplate
+    .replace('{applied}', String(applied))
+    .replace('{total}', String(total));
 
   return (
     <div
@@ -23,13 +36,13 @@ export function ProgressBar({ applied, total }: { applied: number; total: number
             color: 'var(--ink-2)',
           }}
         >
-          Application progress
+          {chrome.applicationProgress}
         </span>
         <span
           className="tag tabular"
           style={{ color: applied === total ? 'var(--moss-2)' : 'var(--ink-3)' }}
         >
-          {applied} of {total} applied
+          {appliedLabel}
         </span>
       </div>
       <div
