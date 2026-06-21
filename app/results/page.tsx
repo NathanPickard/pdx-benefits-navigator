@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, Calendar, Download, KeyRound, Loader2 } from 'lucide-react';
+import { ArrowLeft, Download, KeyRound, Loader2 } from 'lucide-react';
 
 import { AppBar } from '@/components/brand/AppBar';
 import { RoseStamp } from '@/components/brand/RoseStamp';
@@ -14,11 +14,6 @@ import { LanguageToggle } from '@/components/results/LanguageToggle';
 import { NearMissSection } from '@/components/results/NearMissSection';
 import { UrgencyBanner } from '@/components/results/UrgencyBanner';
 import { RenewalCalendar } from '@/components/results/RenewalCalendar';
-import {
-  analyzeEligibilityStream,
-  translatePayload,
-} from '@/lib/claudeBrowser';
-import { buildIcsCalendar, downloadIcsFile } from '@/lib/calendar';
 import { CHROME_EN, type Chrome, type LanguageCode } from '@/lib/i18n';
 import { useApiKey } from '@/lib/userKey';
 import programsData from '@/data/programs.json';
@@ -124,6 +119,7 @@ export default function ResultsPage() {
 
     let cancelled = false;
     (async () => {
+      const { analyzeEligibilityStream } = await import('@/lib/claudeBrowser');
       for await (const event of analyzeEligibilityStream(apiKey, parsed)) {
         if (cancelled) return;
         if (event.type === 'progress') {
@@ -172,6 +168,7 @@ export default function ResultsPage() {
 
       setPendingLang(next);
       try {
+        const { translatePayload } = await import('@/lib/claudeBrowser');
         const translated = await translatePayload(
           apiKey,
           { output: originalData, chrome: CHROME_EN },
@@ -561,11 +558,6 @@ function Dashboard({
     [data]
   );
 
-  const handleExportCalendar = useCallback(() => {
-    const ics = buildIcsCalendar(eligible);
-    downloadIcsFile(ics);
-  }, [eligible]);
-
   const gemCount = eligible.filter((e) => e.program.hidden_gem).length;
   const programsHeading = chrome.programsCountTemplate.replace(
     '{count}',
@@ -603,14 +595,6 @@ function Dashboard({
               <Download size={13} />
             )}
             {packetState === 'loading' ? chrome.buildingPacket : chrome.downloadPacket}
-          </button>
-          <button
-            type="button"
-            onClick={handleExportCalendar}
-            disabled={eligible.length === 0}
-            className="rc-btn rc-btn-outline rc-btn-sm"
-          >
-            <Calendar size={13} /> {chrome.exportCalendar}
           </button>
         </div>
       </div>
