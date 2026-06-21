@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
-import { animate, motion, useMotionValue, useTransform } from 'framer-motion';
+import { animate, motion, useMotionValue, useReducedMotion, useTransform } from 'framer-motion';
 
 export function MoneyCounter({
   value,
@@ -16,13 +16,19 @@ export function MoneyCounter({
   low?: number;
   high?: number;
 }) {
+  const shouldReduceMotion = useReducedMotion();
   const count = useMotionValue(0);
   const formatted = useTransform(count, (v) => Math.round(v).toLocaleString());
 
   useEffect(() => {
+    if (shouldReduceMotion) {
+      // Skip animation — jump straight to final value
+      count.set(value);
+      return;
+    }
     const controls = animate(count, value, { duration, ease: 'easeOut' });
     return controls.stop;
-  }, [value, duration, count]);
+  }, [value, duration, count, shouldReduceMotion]);
 
   const showBand = typeof low === 'number' && typeof high === 'number' && high > low;
 

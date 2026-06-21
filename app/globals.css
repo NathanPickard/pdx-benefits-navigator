@@ -551,6 +551,39 @@
 @media (min-width: 768px) { .rc-hide-md { display: revert; } }
 
 /* ─────────────────────────────────────────────────────────────────────────
+   Reduced-motion — respect OS/browser "Reduce Motion" preference.
+   All content stays fully present; only motion is removed.
+   ─────────────────────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  /* Stop the program-names marquee. The track renders two copies of the
+     items for seamless looping; stopping at translateX(0) shows the first
+     copy with all content visible inside the overflow:hidden wrapper. */
+  .rc-marquee-track {
+    animation: none !important;
+    /* Prevent the duplicated second set from spilling out */
+    width: 100% !important;
+    flex-wrap: wrap !important;
+    gap: 1rem !important;
+  }
+
+  /* Neutralize slide-up reveal transitions — show content at final state */
+  .rc-enter {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  /* Remove comparison-bar width growth transition — bars jump to final width */
+  /* (The React state still sets the final width value after the 180ms timeout;
+     this simply removes the motion so it snaps instantly.) */
+  * {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
    Print stylesheet — clean, ink-friendly output for caseworkers & families.
    ─────────────────────────────────────────────────────────────────────── */
 @media print {

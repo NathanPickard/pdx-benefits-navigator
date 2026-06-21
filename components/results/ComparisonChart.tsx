@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useReducedMotion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 
 export function ComparisonChart({
@@ -20,11 +21,17 @@ export function ComparisonChart({
   pdxLabel: string;
   missLabel: string;
 }) {
-  const [animated, setAnimated] = useState(false);
+  const shouldReduceMotion = useReducedMotion();
+  // animatedState flips true after the 180ms paint delay for the bar growth animation.
+  // When reduce-motion is preferred, we derive animated=true immediately from the hook
+  // without a synchronous setState call inside the effect body.
+  const [animatedState, setAnimatedState] = useState(false);
   useEffect(() => {
-    const t = setTimeout(() => setAnimated(true), 180);
+    const t = setTimeout(() => setAnimatedState(true), 180);
     return () => clearTimeout(t);
   }, []);
+  // Bars are at final width immediately when user prefers reduced motion
+  const animated = !!shouldReduceMotion || animatedState;
 
   const delta = total - federal;
   const max = Math.max(total, 1);
@@ -76,6 +83,7 @@ export function ComparisonChart({
           color="var(--ink-3)"
           animated={animated}
           delay={120}
+          reduceMotion={!!shouldReduceMotion}
         />
         <BarRow
           label={pdxLabel}
@@ -85,6 +93,7 @@ export function ComparisonChart({
           animated={animated}
           delay={500}
           highlight
+          reduceMotion={!!shouldReduceMotion}
         />
       </div>
 
@@ -115,6 +124,7 @@ function BarRow({
   animated,
   delay,
   highlight,
+  reduceMotion,
 }: {
   label: string;
   value: number;
@@ -123,6 +133,7 @@ function BarRow({
   animated: boolean;
   delay: number;
   highlight?: boolean;
+  reduceMotion?: boolean;
 }) {
   return (
     <div>
@@ -160,7 +171,7 @@ function BarRow({
             height: '100%',
             width: animated ? `${widthPct}%` : '0%',
             background: color,
-            transition: `width 1100ms cubic-bezier(0.22, 1, 0.36, 1) ${delay}ms`,
+            transition: reduceMotion ? 'none' : `width 1100ms cubic-bezier(0.22, 1, 0.36, 1) ${delay}ms`,
             borderRadius: 999,
           }}
         />
