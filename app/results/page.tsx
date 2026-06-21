@@ -16,6 +16,7 @@ import { UrgencyBanner } from '@/components/results/UrgencyBanner';
 import { RenewalCalendar } from '@/components/results/RenewalCalendar';
 import { CHROME_EN, type Chrome, type LanguageCode } from '@/lib/i18n';
 import { useApiKey } from '@/lib/userKey';
+import { cacheAnalysis, readCachedAnalysis } from '@/lib/resultsCache';
 import programsData from '@/data/programs.json';
 import type { AnalysisOutput, IntakeData, Program } from '@/types/program';
 
@@ -117,6 +118,12 @@ export default function ResultsPage() {
       return;
     }
 
+    const cached = readCachedAnalysis(parsed);
+    if (cached) {
+      setState({ kind: 'ok', data: cached });
+      return;
+    }
+
     let cancelled = false;
     (async () => {
       const { analyzeEligibilityStream } = await import('@/lib/claudeBrowser');
@@ -129,6 +136,7 @@ export default function ResultsPage() {
               : s
           );
         } else if (event.type === 'complete') {
+          cacheAnalysis(parsed, event.output);
           setState({ kind: 'ok', data: event.output });
         } else {
           setState({ kind: 'error', message: event.message });
