@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useMemo, useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useForm, Controller, type UseFormReturn } from 'react-hook-form';
@@ -56,31 +56,72 @@ const stepFields: Record<number, (keyof FormValues)[]> = {
   4: [],
 };
 
+const DEFAULT_VALUES: FormValues = {
+  household_size: 1,
+  num_children: 0,
+  children_ages: [],
+  annual_income: 0,
+  zip_code: '',
+  housing_status: 'rent',
+  received_eviction_notice: false,
+  has_disability: false,
+  is_veteran: false,
+  is_pregnant: false,
+  has_senior_in_household: false,
+  primary_language: 'en',
+  employment_status: 'employed_ft',
+  citizenship: 'citizen',
+};
+
+function seedFromStorage(): FormValues {
+  if (typeof window === 'undefined') return DEFAULT_VALUES;
+  try {
+    const raw = sessionStorage.getItem('pdx_intake');
+    if (!raw) return DEFAULT_VALUES;
+    const stored = JSON.parse(raw) as Partial<FormValues>;
+    return {
+      household_size: typeof stored.household_size === 'number' ? stored.household_size : DEFAULT_VALUES.household_size,
+      num_children: typeof stored.num_children === 'number' ? stored.num_children : DEFAULT_VALUES.num_children,
+      children_ages: Array.isArray(stored.children_ages) ? stored.children_ages : DEFAULT_VALUES.children_ages,
+      annual_income: typeof stored.annual_income === 'number' ? stored.annual_income : DEFAULT_VALUES.annual_income,
+      zip_code: typeof stored.zip_code === 'string' ? stored.zip_code : DEFAULT_VALUES.zip_code,
+      housing_status: ['rent', 'own', 'unhoused', 'staying_with_others'].includes(stored.housing_status as string) ? (stored.housing_status as FormValues['housing_status']) : DEFAULT_VALUES.housing_status,
+      recent_rent_increase_pct: typeof stored.recent_rent_increase_pct === 'number' ? stored.recent_rent_increase_pct : DEFAULT_VALUES.recent_rent_increase_pct,
+      received_eviction_notice: typeof stored.received_eviction_notice === 'boolean' ? stored.received_eviction_notice : DEFAULT_VALUES.received_eviction_notice,
+      has_disability: typeof stored.has_disability === 'boolean' ? stored.has_disability : DEFAULT_VALUES.has_disability,
+      is_veteran: typeof stored.is_veteran === 'boolean' ? stored.is_veteran : DEFAULT_VALUES.is_veteran,
+      is_pregnant: typeof stored.is_pregnant === 'boolean' ? stored.is_pregnant : DEFAULT_VALUES.is_pregnant,
+      has_senior_in_household: typeof stored.has_senior_in_household === 'boolean' ? stored.has_senior_in_household : DEFAULT_VALUES.has_senior_in_household,
+      primary_language: ['en', 'es', 'vi', 'ru', 'zh', 'so', 'ar'].includes(stored.primary_language as string) ? (stored.primary_language as FormValues['primary_language']) : DEFAULT_VALUES.primary_language,
+      employment_status: ['employed_ft', 'employed_pt', 'self_employed', 'unemployed', 'retired', 'disabled'].includes(stored.employment_status as string) ? (stored.employment_status as FormValues['employment_status']) : DEFAULT_VALUES.employment_status,
+      citizenship: ['citizen', 'lpr', 'other', 'prefer_not_say'].includes(stored.citizenship as string) ? (stored.citizenship as FormValues['citizenship']) : DEFAULT_VALUES.citizenship,
+    };
+  } catch {
+    return DEFAULT_VALUES;
+  }
+}
+
 export function ConversationalForm() {
   const router = useRouter();
   const [step, setStep] = useState(0);
   const [submitting, setSubmitting] = useState(false);
+  const autosaveTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(schema),
     mode: 'onChange',
-    defaultValues: {
-      household_size: 1,
-      num_children: 0,
-      children_ages: [],
-      annual_income: 0,
-      zip_code: '',
-      housing_status: 'rent',
-      received_eviction_notice: false,
-      has_disability: false,
-      is_veteran: false,
-      is_pregnant: false,
-      has_senior_in_household: false,
-      primary_language: 'en',
-      employment_status: 'employed_ft',
-      citizenship: 'citizen',
-    },
+    defaultValues: seedFromStorage(),
   });
+
+  useEffect(() => {
+    const sub = form.watch((values) => {
+      if (autosaveTimer.current) clearTimeout(autosaveTimer.current);
+      autosaveTimer.current = setTimeout(() => {
+        try { sessionStorage.setItem('pdx_intake', JSON.stringify(values)); } catch { /* non-fatal */ }
+      }, 500);
+    });
+    return () => { sub.unsubscribe(); if (autosaveTimer.current) clearTimeout(autosaveTimer.current); };
+  }, [form]);
 
   const next = async () => {
     const fields = stepFields[step];
