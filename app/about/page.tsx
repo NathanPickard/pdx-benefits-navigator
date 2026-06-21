@@ -4,7 +4,7 @@ import { ArrowRight, Check, Code2, ExternalLink, Heart, Lock, MapPin, Sparkles, 
 
 import { AppBar } from "@/components/brand/AppBar";
 import { Wordmark } from "@/components/brand/Wordmark";
-import { RoseStamp, SoftBlobs } from "@/components/brand/RoseStamp";
+import { SoftBlobs } from "@/components/brand/RoseStamp";
 import { JurisdictionPill } from "@/components/brand/JurisdictionPill";
 
 export const metadata: Metadata = {
@@ -69,7 +69,7 @@ export default function AboutPage() {
               >
                 PDX Benefits Navigator is a free, browser-based tool that checks every
                 federal, Oregon, Multnomah County, and City of Portland benefit program
-                against your household's situation — and hands you a clear, actionable
+                against your household&rsquo;s situation — and hands you a clear, actionable
                 packet in about three minutes.
               </p>
             </div>
