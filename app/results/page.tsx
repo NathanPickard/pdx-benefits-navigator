@@ -3,7 +3,8 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, Download, KeyRound, Loader2 } from 'lucide-react';
+import { ArrowLeft, Clipboard, Download, KeyRound, Loader2, Printer } from 'lucide-react';
+import { toast } from 'sonner';
 
 import { AppBar } from '@/components/brand/AppBar';
 import { RoseStamp } from '@/components/brand/RoseStamp';
@@ -590,6 +591,28 @@ function Dashboard({
     [data]
   );
 
+  const handleCopySummary = useCallback(async () => {
+    const total = data.total_estimated_annual_value.toLocaleString();
+    const count = allEligible.length;
+    const lines: string[] = [
+      `PDX Benefits Navigator — estimated $${total}/year across ${count} program${count !== 1 ? 's' : ''}`,
+      '',
+    ];
+    for (const { match, program } of allEligible) {
+      const value = match.estimated_annual_value.toLocaleString();
+      const step = match.next_steps?.[0] ?? program.short_name;
+      lines.push(`• ${program.name} — ~$${value}/yr — ${step}`);
+    }
+    const text = lines.join('\n');
+    try {
+      if (!navigator.clipboard) throw new Error('unavailable');
+      await navigator.clipboard.writeText(text);
+      toast.success('Summary copied to clipboard');
+    } catch {
+      toast.error('Copy not supported — use the PDF instead');
+    }
+  }, [data, allEligible]);
+
   // Use allEligible for hero/progress so counts are stable under filtering
   const gemCount = allEligible.filter((e) => e.program.hidden_gem).length;
   const appliedCount = allEligible.filter((r) => statusFor(r.match.program_id) === 'applied').length;
@@ -603,6 +626,7 @@ function Dashboard({
     <main className="rc-container rc-page-pad">
       <Link
         href="/"
+        data-print="hide"
         className="rc-btn rc-btn-ghost rc-btn-sm mb-6"
         style={{ marginBottom: 24 }}
       >
@@ -611,6 +635,7 @@ function Dashboard({
 
       {/* Top action strip */}
       <div
+        data-print="hide"
         className="flex items-center justify-between flex-wrap mb-8"
         style={{ gap: 12 }}
       >
@@ -630,6 +655,24 @@ function Dashboard({
               <Download size={13} />
             )}
             {packetState === 'loading' ? chrome.buildingPacket : chrome.downloadPacket}
+          </button>
+          <button
+            type="button"
+            onClick={handleCopySummary}
+            className="rc-btn rc-btn-outline rc-btn-sm"
+            aria-label="Copy plain-text summary to clipboard"
+          >
+            <Clipboard size={13} />
+            Copy summary
+          </button>
+          <button
+            type="button"
+            onClick={() => window.print()}
+            className="rc-btn rc-btn-outline rc-btn-sm"
+            aria-label="Print this page"
+          >
+            <Printer size={13} />
+            Print
           </button>
         </div>
       </div>
@@ -916,41 +959,45 @@ function Dashboard({
             </header>
 
             {/* ProgressBar denominator = all eligible (stable under filtering) */}
-            <ProgressBar applied={appliedCount} total={allEligible.length} />
-            <div
-              className="flex items-center justify-between flex-wrap"
-              style={{ gap: 8, marginBottom: 16, fontSize: '0.82rem' }}
-            >
-              <span style={{ color: 'var(--ink-3)' }}>
-                Saved only on this device
-              </span>
-              {hasAny && (
-                <button
-                  type="button"
-                  onClick={clearAll}
-                  style={{
-                    background: 'none',
-                    border: 0,
-                    padding: 0,
-                    cursor: 'pointer',
-                    fontSize: '0.82rem',
-                    color: 'var(--ink-3)',
-                    textDecoration: 'underline',
-                  }}
-                >
-                  Clear my saved progress
-                </button>
-              )}
+            <div data-print="hide">
+              <ProgressBar applied={appliedCount} total={allEligible.length} />
+              <div
+                className="flex items-center justify-between flex-wrap"
+                style={{ gap: 8, marginBottom: 16, fontSize: '0.82rem' }}
+              >
+                <span style={{ color: 'var(--ink-3)' }}>
+                  Saved only on this device
+                </span>
+                {hasAny && (
+                  <button
+                    type="button"
+                    onClick={clearAll}
+                    style={{
+                      background: 'none',
+                      border: 0,
+                      padding: 0,
+                      cursor: 'pointer',
+                      fontSize: '0.82rem',
+                      color: 'var(--ink-3)',
+                      textDecoration: 'underline',
+                    }}
+                  >
+                    Clear my saved progress
+                  </button>
+                )}
+              </div>
             </div>
 
             {/* Filter chips — category and jurisdiction */}
-            <FilterChips
-              rows={allEligible}
-              activeCategory={filterCategory}
-              activeJurisdiction={filterJurisdiction}
-              onCategory={setFilterCategory}
-              onJurisdiction={setFilterJurisdiction}
-            />
+            <div data-print="hide">
+              <FilterChips
+                rows={allEligible}
+                activeCategory={filterCategory}
+                activeJurisdiction={filterJurisdiction}
+                onCategory={setFilterCategory}
+                onJurisdiction={setFilterJurisdiction}
+              />
+            </div>
 
             {/* Showing N of M count */}
             {isFiltered && (

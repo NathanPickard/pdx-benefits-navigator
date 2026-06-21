@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Lora, Plus_Jakarta_Sans } from "next/font/google";
 import { ApiKeyProvider } from "@/lib/userKey";
+import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
 
 const jakarta = Plus_Jakarta_Sans({
@@ -52,6 +53,7 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col">
         <ApiKeyProvider>{children}</ApiKeyProvider>
+        <Toaster />
       </body>
     </html>
   );

@@ -550,3 +550,68 @@
 .rc-hide-md { display: none; }
 @media (min-width: 768px) { .rc-hide-md { display: revert; } }
 
+/* ─────────────────────────────────────────────────────────────────────────
+   Print stylesheet — clean, ink-friendly output for caseworkers & families.
+   ─────────────────────────────────────────────────────────────────────── */
+@media print {
+  /* Hide chrome that has no value on paper */
+  header,
+  [data-print="hide"],
+  .rc-marquee-track,
+  .rc-blob {
+    display: none !important;
+  }
+
+  /* Remove animated/decorative background gradients */
+  body {
+    background: #fff !important;
+    color: #111 !important;
+  }
+
+  /* Reset page container for print */
+  .rc-container {
+    max-width: 100% !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+
+  /* Ink-friendly card: white background, simple border */
+  .rc-card,
+  .rc-card-flat,
+  .rc-card-soft {
+    background: #fff !important;
+    border: 1px solid #ccc !important;
+    box-shadow: none !important;
+    break-inside: avoid;
+  }
+
+  /* Ensure collapsed benefit card content prints expanded */
+  [data-collapsed="true"] {
+    display: block !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  /* Keep colors readable without color ink */
+  .eyebrow,
+  .tag {
+    color: #555 !important;
+  }
+
+  /* Avoid splitting headings from their content */
+  h1, h2, h3, h4 {
+    break-after: avoid;
+  }
+
+  /* Avoid orphaned items at page breaks */
+  li {
+    break-inside: avoid;
+  }
+
+  /* Remove decorative link underlines / hover effects */
+  a {
+    text-decoration: none;
+    color: inherit;
+  }
+}
+
