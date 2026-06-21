@@ -159,7 +159,7 @@ export default function AboutPage() {
             title="Built by a Portlander, for Portland."
           />
 
-          {/* ===== AUTHOR BIO — replace this block with Nathan's bio + links ===== */}
+          {/* ===== AUTHOR BIO ===== */}
           <div
             className="rc-card"
             style={{
@@ -167,27 +167,9 @@ export default function AboutPage() {
               maxWidth: 640,
               position: "relative",
               overflow: "hidden",
-              borderStyle: "dashed",
             }}
-            aria-label="Author bio coming soon"
+            aria-label="About Nathan Pickard, the maker"
           >
-            <div
-              style={{
-                position: "absolute",
-                top: 16,
-                right: 16,
-                background: "var(--sun-soft)",
-                color: "oklch(0.46 0.12 65)",
-                borderRadius: 999,
-                padding: "3px 10px",
-                fontSize: "0.72rem",
-                fontWeight: 600,
-                border: "1px solid oklch(0.86 0.07 75)",
-              }}
-            >
-              Coming soon
-            </div>
-
             <div className="flex items-center gap-4 mb-5">
               <div
                 style={{
@@ -221,15 +203,29 @@ export default function AboutPage() {
               </div>
             </div>
 
-            <p style={{ color: "var(--ink-3)", fontSize: "0.95rem", lineHeight: 1.65, margin: "0 0 16px" }}>
-              Bio and personal links coming soon. Nathan built this tool during the 2026 AI Portland
-              Build Challenge to help Portland residents navigate the city&rsquo;s often-overlooked
-              local benefit programs.
+            <p style={{ color: "var(--ink-2)", fontSize: "0.98rem", lineHeight: 1.7, margin: "0 0 14px" }}>
+              Nathan is a Portland-based senior software engineer who likes pointing technology at
+              problems in his own backyard. His through-line &mdash;{" "}
+              <em>&ldquo;building web experiences that connect great ideas to the people who need
+              them&rdquo;</em> &mdash; is exactly what this is.
+            </p>
+            <p style={{ color: "var(--ink-3)", fontSize: "0.95rem", lineHeight: 1.7, margin: "0 0 20px" }}>
+              He built PDX Benefits Navigator for the 2026 AI Portland Build Challenge to help
+              neighbors find the local benefit programs most tools quietly skip.
             </p>
 
-            <div className="flex items-center gap-3 flex-wrap">
+            <div className="flex items-center gap-2.5 flex-wrap">
               <a
-                href="https://github.com/NathanPickard/pdx-benefits-navigator"
+                href="https://nathanpickard.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="rc-btn rc-btn-outline rc-btn-sm"
+              >
+                <ExternalLink size={14} />
+                nathanpickard.com
+              </a>
+              <a
+                href="https://github.com/NathanPickard"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="rc-btn rc-btn-outline rc-btn-sm"
@@ -237,10 +233,36 @@ export default function AboutPage() {
                 <Code2 size={14} />
                 GitHub
               </a>
-              {/* ── additional personal links go here ── */}
+              <a
+                href="https://www.linkedin.com/in/nathanpickard/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="rc-btn rc-btn-outline rc-btn-sm"
+              >
+                <ExternalLink size={14} />
+                LinkedIn
+              </a>
+              <a
+                href="https://x.com/NathanPickard"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="rc-btn rc-btn-outline rc-btn-sm"
+              >
+                <ExternalLink size={14} />
+                X
+              </a>
+              <a
+                href="https://bsky.app/profile/nathanpickard.bsky.social"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="rc-btn rc-btn-outline rc-btn-sm"
+              >
+                <ExternalLink size={14} />
+                Bluesky
+              </a>
             </div>
           </div>
-          {/* ===== END AUTHOR BIO SLOT ===== */}
+          {/* ===== END AUTHOR BIO ===== */}
         </section>
 
         {/* ─────────────────────── 3. How it works ─────────────────────── */}
