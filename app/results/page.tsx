@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft, Clipboard, Download, KeyRound, Loader2, Printer } from 'lucide-react';
@@ -18,7 +18,7 @@ import { ProgressBar } from '@/components/results/ProgressBar';
 import { UrgencyBanner } from '@/components/results/UrgencyBanner';
 import { RenewalCalendar } from '@/components/results/RenewalCalendar';
 import { useApplicationStatus } from '@/lib/applicationStatus';
-import { CHROME_EN, type Chrome, type LanguageCode } from '@/lib/i18n';
+import { CHROME_EN, LANGUAGES, type Chrome, type LanguageCode } from '@/lib/i18n';
 import { useApiKey } from '@/lib/userKey';
 import { cacheAnalysis, readCachedAnalysis } from '@/lib/resultsCache';
 import programsData from '@/data/programs.json';
@@ -26,6 +26,11 @@ import type { AnalysisOutput, IntakeData, Program } from '@/types/program';
 
 const PROGRAMS = programsData as Program[];
 const PROGRAM_BY_ID = new Map(PROGRAMS.map((p) => [p.id, p]));
+
+// Languages supported by the results translation path (en/es/vi).
+// Used to guard the intake-language auto-select so unsupported languages
+// (ru/zh/so/ar) fall back to English rather than causing a runtime error.
+const SUPPORTED_RESULT_LANGS = new Set(LANGUAGES.map((l) => l.code));
 
 type TranslatedBundle = { output: AnalysisOutput; chrome: Chrome };
 
@@ -51,6 +56,13 @@ export default function ResultsPage() {
   >({});
   const [pendingLang, setPendingLang] = useState<LanguageCode | null>(null);
   const [translateError, setTranslateError] = useState<string | null>(null);
+  // Sync <html lang> with the active results language so screen readers and
+  // the browser's speech engine use the correct language for translated content.
+  // Arabic is not a supported results language yet so no dir="rtl" is needed
+  // here — add that when ar/fa support is added to the translation pipeline.
+  useEffect(() => {
+    document.documentElement.lang = lang;
+  }, [lang]);
 
   // This effect reads browser-only sessionStorage and orchestrates the on-mount
   // data load (demo replay or live streaming analysis), so the synchronous
@@ -202,6 +214,26 @@ export default function ResultsPage() {
     },
     [lang, pendingLang, translations, originalData, apiKey]
   );
+
+  // Auto-select the results language from the intake's primary_language.
+  // Fires once when originalData first becomes available and an API key is
+  // present (so the translation pipeline can run). A ref gates it to initial
+  // load only — subsequent manual toggles via handleLanguageChange win.
+  // Silently skips when no API key is present (demo path) to avoid surfacing
+  // a translation-requires-key error the user didn't ask for.
+  const autoSelectFiredRef = useRef(false);
+  /* eslint-disable react-hooks/set-state-in-effect */
+  useEffect(() => {
+    if (autoSelectFiredRef.current || !originalData || !intake || !apiKey) return;
+    autoSelectFiredRef.current = true;
+    const intakeLang = intake.primary_language;
+    if (intakeLang !== 'en' && SUPPORTED_RESULT_LANGS.has(intakeLang as LanguageCode)) {
+      // handleLanguageChange fetches the translation and then calls setLang.
+      void handleLanguageChange(intakeLang as LanguageCode);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [originalData, intake, apiKey]);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   if (state.kind === 'loading') {
     return (
