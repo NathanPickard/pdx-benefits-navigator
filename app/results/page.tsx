@@ -10,6 +10,7 @@ import { RoseStamp } from '@/components/brand/RoseStamp';
 import { MoneyCounter } from '@/components/results/MoneyCounter';
 import { BenefitCard } from '@/components/results/BenefitCard';
 import { ComparisonChart } from '@/components/results/ComparisonChart';
+import { FilterChips } from '@/components/results/FilterChips';
 import { LanguageToggle } from '@/components/results/LanguageToggle';
 import { NearMissSection } from '@/components/results/NearMissSection';
 import { ProgressBar } from '@/components/results/ProgressBar';
@@ -522,32 +523,52 @@ function Dashboard({
   }, [packetState, originalData]);
 
   const [sortMode, setSortMode] = useState<'gems' | 'amount'>('gems');
+  const [filterCategory, setFilterCategory] = useState<Program['category'] | null>(null);
+  const [filterJurisdiction, setFilterJurisdiction] = useState<Program['jurisdiction'] | null>(null);
+  // collapsed: Set of program_ids that are collapsed; default = all expanded
+  const [collapsed, setCollapsed] = useState<Set<string>>(new Set());
 
-  const eligible = useMemo(() => {
+  const toggleCollapse = useCallback((id: string) => {
+    setCollapsed((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }, []);
+
+  // All eligible rows (unfiltered) — used for ProgressBar denominator + hero totals
+  const allEligible = useMemo(() => {
     const rows = data.matches
       .filter((m) => m.eligible)
       .map((m) => ({ match: m, program: PROGRAM_BY_ID.get(m.program_id) }))
       .filter((row): row is { match: typeof row.match; program: Program } => !!row.program);
+    return rows;
+  }, [data]);
+
+  // Filtered + sorted eligible rows shown in the card grid
+  const eligible = useMemo(() => {
+    let rows = allEligible;
+    if (filterCategory) rows = rows.filter((r) => r.program.category === filterCategory);
+    if (filterJurisdiction) rows = rows.filter((r) => r.program.jurisdiction === filterJurisdiction);
 
     if (sortMode === 'amount') {
-      return rows.sort(
+      return [...rows].sort(
         (a, b) => b.match.estimated_annual_value - a.match.estimated_annual_value
       );
     }
-    return rows.sort((a, b) => {
+    return [...rows].sort((a, b) => {
       if (a.program.hidden_gem !== b.program.hidden_gem) return a.program.hidden_gem ? -1 : 1;
       return b.match.estimated_annual_value - a.match.estimated_annual_value;
     });
-  }, [data, sortMode]);
+  }, [allEligible, sortMode, filterCategory, filterJurisdiction]);
 
-  // Confidence band: sum the program-level min/max ranges over eligible rows.
-  // Falls back to the match's point-value for both low and high when the
-  // program's structured range is somehow absent (defensive; the type requires
-  // it, but translated bundles may vary).
+  // Confidence band: sum the program-level min/max ranges over all eligible rows
+  // (unfiltered — matches the hero total which counts all eligible programs).
   const { bandLow, bandHigh } = useMemo(() => {
     let low = 0;
     let high = 0;
-    for (const { match, program } of eligible) {
+    for (const { match, program } of allEligible) {
       const range = program?.estimated_annual_value;
       if (range && typeof range.min === 'number' && typeof range.max === 'number') {
         low += range.min;
@@ -558,7 +579,7 @@ function Dashboard({
       }
     }
     return { bandLow: low, bandHigh: high };
-  }, [eligible]);
+  }, [allEligible]);
 
   // Near-misses: ineligible matches. Computed separately so they can be
   // surfaced below the eligible card grid — or front-and-center in the
@@ -569,12 +590,14 @@ function Dashboard({
     [data]
   );
 
-  const gemCount = eligible.filter((e) => e.program.hidden_gem).length;
-  const appliedCount = eligible.filter((r) => statusFor(r.match.program_id) === 'applied').length;
+  // Use allEligible for hero/progress so counts are stable under filtering
+  const gemCount = allEligible.filter((e) => e.program.hidden_gem).length;
+  const appliedCount = allEligible.filter((r) => statusFor(r.match.program_id) === 'applied').length;
   const programsHeading = chrome.programsCountTemplate.replace(
     '{count}',
-    String(eligible.length)
+    String(allEligible.length)
   );
+  const isFiltered = filterCategory !== null || filterJurisdiction !== null;
 
   return (
     <main className="rc-container rc-page-pad">
@@ -645,7 +668,7 @@ function Dashboard({
 
       {/* Hero — only shown when there are eligible programs; the $0/0-program
           state is degenerate and replaced by the empty state below. */}
-      {eligible.length > 0 && (
+      {allEligible.length > 0 && (
         <section className="rc-results-hero mb-10">
           <div>
             <div className="eyebrow mb-3" style={{ color: 'var(--moss-2)' }}>
@@ -665,7 +688,7 @@ function Dashboard({
               }}
             >
               across{' '}
-              <strong style={{ color: 'var(--ink)' }}>{eligible.length} programs</strong>
+              <strong style={{ color: 'var(--ink)' }}>{allEligible.length} programs</strong>
               {gemCount > 0 && (
                 <>
                   , including{' '}
@@ -731,7 +754,7 @@ function Dashboard({
 
       {/* ComparisonChart is only meaningful when there are eligible programs;
           a 0-vs-0 chart is misleading on the zero-eligible path. */}
-      {eligible.length > 0 && (
+      {allEligible.length > 0 && (
         <ComparisonChart
           federal={data.federal_only_value}
           total={data.total_estimated_annual_value}
@@ -800,7 +823,7 @@ function Dashboard({
         </section>
       )}
 
-      {eligible.length === 0 ? (
+      {allEligible.length === 0 ? (
         /* ── Zero-eligible empty state ── */
         // TODO(phase-2 i18n): strings below are English-only; Phase 2 will
         // wire them into the Chrome bundle and translation pipeline.
@@ -873,7 +896,7 @@ function Dashboard({
             <header className="flex items-end justify-between gap-6 flex-wrap mb-8">
               <div>
                 <div className="eyebrow mb-2">
-                  {eligible.length} programs ·{' '}
+                  {allEligible.length} programs ·{' '}
                   {sortMode === 'gems' ? 'hidden gems first' : 'largest amount first'}
                 </div>
                 <h2
@@ -892,7 +915,8 @@ function Dashboard({
               <SortToggle value={sortMode} onChange={setSortMode} />
             </header>
 
-            <ProgressBar applied={appliedCount} total={eligible.length} />
+            {/* ProgressBar denominator = all eligible (stable under filtering) */}
+            <ProgressBar applied={appliedCount} total={allEligible.length} />
             <div
               className="flex items-center justify-between flex-wrap"
               style={{ gap: 8, marginBottom: 16, fontSize: '0.82rem' }}
@@ -919,24 +943,84 @@ function Dashboard({
               )}
             </div>
 
-            <div
-              className="grid"
-              style={{ gridTemplateColumns: '1fr', gap: 16 }}
-            >
-              {eligible.map(({ match, program }) => (
-                <BenefitCard
-                  key={lang + '-' + match.program_id}
-                  match={match}
-                  program={program}
-                  chrome={chrome}
-                  status={statusFor(match.program_id)}
-                  onStatusChange={(s) => setStatus(match.program_id, s)}
-                />
-              ))}
-            </div>
+            {/* Filter chips — category and jurisdiction */}
+            <FilterChips
+              rows={allEligible}
+              activeCategory={filterCategory}
+              activeJurisdiction={filterJurisdiction}
+              onCategory={setFilterCategory}
+              onJurisdiction={setFilterJurisdiction}
+            />
+
+            {/* Showing N of M count */}
+            {isFiltered && (
+              <div
+                style={{
+                  fontSize: '0.82rem',
+                  color: 'var(--ink-3)',
+                  marginBottom: 12,
+                }}
+              >
+                Showing {eligible.length} of {allEligible.length}
+              </div>
+            )}
+
+            {/* Filtered-to-zero: distinct from zero-eligible empty state */}
+            {isFiltered && eligible.length === 0 ? (
+              <div
+                style={{
+                  padding: 'clamp(20px, 4vw, 28px)',
+                  borderRadius: 16,
+                  border: '1px solid var(--rule-2)',
+                  background: 'var(--paper-2)',
+                  textAlign: 'center',
+                  fontSize: '0.96rem',
+                  color: 'var(--ink-2)',
+                }}
+              >
+                No programs match this filter.{' '}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setFilterCategory(null);
+                    setFilterJurisdiction(null);
+                  }}
+                  style={{
+                    background: 'none',
+                    border: 0,
+                    padding: 0,
+                    cursor: 'pointer',
+                    fontSize: 'inherit',
+                    color: 'var(--rose)',
+                    fontWeight: 600,
+                    textDecoration: 'underline',
+                  }}
+                >
+                  Clear filters
+                </button>
+              </div>
+            ) : (
+              <div
+                className="grid"
+                style={{ gridTemplateColumns: '1fr', gap: 16 }}
+              >
+                {eligible.map(({ match, program }) => (
+                  <BenefitCard
+                    key={lang + '-' + match.program_id}
+                    match={match}
+                    program={program}
+                    chrome={chrome}
+                    status={statusFor(match.program_id)}
+                    onStatusChange={(s) => setStatus(match.program_id, s)}
+                    collapsed={collapsed.has(match.program_id)}
+                    onToggleCollapse={() => toggleCollapse(match.program_id)}
+                  />
+                ))}
+              </div>
+            )}
           </section>
 
-          <RenewalCalendar entries={eligible} chrome={chrome} lang={lang} />
+          <RenewalCalendar entries={allEligible} chrome={chrome} lang={lang} />
 
           {nearMisses.length > 0 && (
             <NearMissSection
