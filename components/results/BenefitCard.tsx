@@ -11,8 +11,15 @@ import {
 } from 'lucide-react';
 
 import { JurisdictionPill } from '@/components/brand/JurisdictionPill';
+import type { AppStatus } from '@/lib/applicationStatus';
 import type { Chrome } from '@/lib/i18n';
 import type { MatchResult, Program } from '@/types/program';
+
+const STATUS_OPTIONS: { value: AppStatus; label: string }[] = [
+  { value: 'not_started', label: 'Not started' },
+  { value: 'in_progress', label: 'In progress' },
+  { value: 'applied', label: 'Applied' },
+];
 
 const CONFIDENCE_DOT: Record<MatchResult['confidence'], string> = {
   high: 'var(--moss)',
@@ -48,13 +55,26 @@ export function BenefitCard({
   match,
   program,
   chrome,
+  status = 'not_started',
+  onStatusChange,
 }: {
   match: MatchResult;
   program: Program;
   chrome: Chrome;
+  status?: AppStatus;
+  onStatusChange?: (s: AppStatus) => void;
 }) {
+  const isApplied = status === 'applied';
   return (
-    <article className="rc-card" style={{ padding: 0, overflow: 'hidden' }}>
+    <article
+      className="rc-card"
+      style={{
+        padding: 0,
+        overflow: 'hidden',
+        opacity: isApplied ? 0.72 : 1,
+        transition: 'opacity 0.2s ease',
+      }}
+    >
       <header
         className="rc-benefit-header"
         style={{ padding: 'clamp(20px, 4vw, 28px)' }}
@@ -321,6 +341,66 @@ export function BenefitCard({
               >
                 {chrome.applyNow} <ExternalLink size={13} />
               </a>
+
+              {/* Application status segmented control */}
+              <div style={{ marginTop: 14 }}>
+                <div
+                  className="eyebrow mb-2"
+                  style={{ color: 'var(--ink-3)', fontSize: '0.72rem' }}
+                  id={`status-label-${match.program_id}`}
+                >
+                  My status
+                </div>
+                <div
+                  role="group"
+                  aria-labelledby={`status-label-${match.program_id}`}
+                  className="flex"
+                  style={{
+                    border: '1px solid var(--rule-2)',
+                    borderRadius: 999,
+                    padding: 3,
+                    background: 'var(--paper)',
+                    gap: 2,
+                  }}
+                >
+                  {STATUS_OPTIONS.map((opt) => {
+                    const active = status === opt.value;
+                    return (
+                      <button
+                        key={opt.value}
+                        type="button"
+                        aria-pressed={active}
+                        onClick={() => onStatusChange?.(opt.value)}
+                        style={{
+                          flex: 1,
+                          padding: '5px 6px',
+                          borderRadius: 999,
+                          fontSize: '0.69rem',
+                          fontWeight: 600,
+                          lineHeight: 1.3,
+                          background: active
+                            ? opt.value === 'applied'
+                              ? 'var(--moss-soft)'
+                              : 'var(--card-rose)'
+                            : 'transparent',
+                          color: active
+                            ? opt.value === 'applied'
+                              ? 'var(--moss-2)'
+                              : 'var(--ink)'
+                            : 'var(--ink-3)',
+                          border: 0,
+                          cursor: active ? 'default' : 'pointer',
+                          whiteSpace: 'nowrap',
+                          transition: 'background 0.15s, color 0.15s',
+                          textAlign: 'center',
+                        }}
+                      >
+                        {opt.label}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
             </aside>
           </div>
         </div>

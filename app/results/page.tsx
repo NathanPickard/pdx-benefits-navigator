@@ -12,8 +12,10 @@ import { BenefitCard } from '@/components/results/BenefitCard';
 import { ComparisonChart } from '@/components/results/ComparisonChart';
 import { LanguageToggle } from '@/components/results/LanguageToggle';
 import { NearMissSection } from '@/components/results/NearMissSection';
+import { ProgressBar } from '@/components/results/ProgressBar';
 import { UrgencyBanner } from '@/components/results/UrgencyBanner';
 import { RenewalCalendar } from '@/components/results/RenewalCalendar';
+import { useApplicationStatus } from '@/lib/applicationStatus';
 import { CHROME_EN, type Chrome, type LanguageCode } from '@/lib/i18n';
 import { useApiKey } from '@/lib/userKey';
 import { cacheAnalysis, readCachedAnalysis } from '@/lib/resultsCache';
@@ -484,6 +486,7 @@ function Dashboard({
 }) {
   const [packetState, setPacketState] = useState<'idle' | 'loading' | 'error'>('idle');
   const [packetError, setPacketError] = useState<string | null>(null);
+  const { statusFor, setStatus, clearAll } = useApplicationStatus();
 
   const handleDownloadPacket = useCallback(async () => {
     if (packetState === 'loading') return;
@@ -567,6 +570,7 @@ function Dashboard({
   );
 
   const gemCount = eligible.filter((e) => e.program.hidden_gem).length;
+  const appliedCount = eligible.filter((r) => statusFor(r.match.program_id) === 'applied').length;
   const programsHeading = chrome.programsCountTemplate.replace(
     '{count}',
     String(eligible.length)
@@ -888,6 +892,33 @@ function Dashboard({
               <SortToggle value={sortMode} onChange={setSortMode} />
             </header>
 
+            <ProgressBar applied={appliedCount} total={eligible.length} />
+            <div
+              className="flex items-center justify-between flex-wrap"
+              style={{ gap: 8, marginBottom: 16, fontSize: '0.82rem' }}
+            >
+              <span style={{ color: 'var(--ink-3)' }}>
+                Saved only on this device
+              </span>
+              {appliedCount > 0 && (
+                <button
+                  type="button"
+                  onClick={clearAll}
+                  style={{
+                    background: 'none',
+                    border: 0,
+                    padding: 0,
+                    cursor: 'pointer',
+                    fontSize: '0.82rem',
+                    color: 'var(--ink-3)',
+                    textDecoration: 'underline',
+                  }}
+                >
+                  Clear my saved progress
+                </button>
+              )}
+            </div>
+
             <div
               className="grid"
               style={{ gridTemplateColumns: '1fr', gap: 16 }}
@@ -898,6 +929,8 @@ function Dashboard({
                   match={match}
                   program={program}
                   chrome={chrome}
+                  status={statusFor(match.program_id)}
+                  onStatusChange={(s) => setStatus(match.program_id, s)}
                 />
               ))}
             </div>
