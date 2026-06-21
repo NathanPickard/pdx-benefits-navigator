@@ -41,6 +41,32 @@ export const metadata: Metadata = {
   },
 };
 
+// Static JSON-LD — WebApplication structured data for search engines
+const LD = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: "PDX Benefits Navigator",
+  description: SITE_DESCRIPTION,
+  url: SITE_URL,
+  applicationCategory: "GovernmentBenefitsApplication",
+  operatingSystem: "Web",
+  offers: {
+    "@type": "Offer",
+    price: "0",
+    priceCurrency: "USD",
+  },
+  inLanguage: ["en", "es", "vi"],
+  featureList: [
+    "Screens all 20 federal, Oregon, Multnomah County, and City of Portland benefit programs",
+    "Highlights 8 locally-funded hidden-gem programs most national tools miss",
+    "No login required — answers stay in your browser session",
+    "AI-powered eligibility analysis in plain language",
+    "Printable PDF packet with program links, deadlines, and document checklists",
+    "Renewal calendar download (.ics)",
+    "Available in English, Spanish, and Vietnamese",
+  ],
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -54,6 +80,25 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col">
         <ApiKeyProvider>{children}</ApiKeyProvider>
         <Toaster />
+        {/* No-tracking badge — site-wide, truthful: no analytics, no cookies, no server storage */}
+        <div
+          style={{
+            borderTop: "1px solid var(--rule)",
+            background: "var(--paper-2)",
+            padding: "10px 16px",
+            textAlign: "center",
+            fontSize: "0.78rem",
+            color: "var(--ink-4)",
+            letterSpacing: "0.01em",
+          }}
+          data-print="hide"
+        >
+          No tracking · No cookies · Nothing stored on our servers
+        </div>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(LD) }}
+        />
       </body>
     </html>
   );
