@@ -33,11 +33,6 @@ export function useApplicationStatus() {
   }, []);
 
   const statusFor = (id: string): AppStatus => map[id] ?? 'not_started';
-  const values = Object.values(map);
-  const counts = {
-    applied: values.filter((s) => s === 'applied').length,
-    in_progress: values.filter((s) => s === 'in_progress').length,
-    not_started: 0, // computed against eligible list by the caller
-  };
-  return { statusFor, setStatus, clearAll, counts };
+  const hasAny = Object.keys(map).length > 0;
+  return { statusFor, setStatus, clearAll, hasAny };
 }

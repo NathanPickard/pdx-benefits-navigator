@@ -486,7 +486,7 @@ function Dashboard({
 }) {
   const [packetState, setPacketState] = useState<'idle' | 'loading' | 'error'>('idle');
   const [packetError, setPacketError] = useState<string | null>(null);
-  const { statusFor, setStatus, clearAll } = useApplicationStatus();
+  const { statusFor, setStatus, clearAll, hasAny } = useApplicationStatus();
 
   const handleDownloadPacket = useCallback(async () => {
     if (packetState === 'loading') return;
@@ -900,7 +900,7 @@ function Dashboard({
               <span style={{ color: 'var(--ink-3)' }}>
                 Saved only on this device
               </span>
-              {appliedCount > 0 && (
+              {hasAny && (
                 <button
                   type="button"
                   onClick={clearAll}
