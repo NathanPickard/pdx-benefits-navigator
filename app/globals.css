@@ -507,6 +507,9 @@
   .rc-benefit-detail { grid-template-columns: 1.4fr 1fr; gap: 28px; }
 }
 
+/* BenefitCard collapsible body — always in DOM, hidden via CSS so print can reveal */
+.rc-card-body[data-collapsed="true"] { display: none; }
+
 /* Comparison chart 3-mini stat row */
 .rc-mini-row {
   display: grid;
@@ -588,7 +591,6 @@
    ─────────────────────────────────────────────────────────────────────── */
 @media print {
   /* Hide chrome that has no value on paper */
-  header,
   [data-print="hide"],
   .rc-marquee-track,
   .rc-blob {
@@ -618,8 +620,8 @@
     break-inside: avoid;
   }
 
-  /* Ensure collapsed benefit card content prints expanded */
-  [data-collapsed="true"] {
+  /* Ensure collapsed benefit card bodies print fully expanded */
+  .rc-card-body[data-collapsed="true"] {
     display: block !important;
     height: auto !important;
     overflow: visible !important;

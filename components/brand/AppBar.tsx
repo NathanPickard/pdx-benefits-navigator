@@ -5,6 +5,7 @@ export function AppBar({ children }: { children?: React.ReactNode }) {
   return (
     <header
       className="w-full"
+      data-print="hide"
       style={{
         background: "oklch(0.99 0.014 70 / 0.85)",
         borderBottom: "1px solid var(--rule)",
