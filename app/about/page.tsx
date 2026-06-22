@@ -114,7 +114,7 @@ export default function AboutPage() {
               aria-label="Examples of hidden-gem programs"
             >
               <div className="eyebrow mb-4" style={{ color: "var(--rose)" }}>
-                6 of 8 hidden gems
+                6 of 11 hidden gems
               </div>
               <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
                 {HIDDEN_GEM_PROGRAMS.map((p) => (

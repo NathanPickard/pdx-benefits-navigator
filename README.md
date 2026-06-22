@@ -104,7 +104,7 @@ To run the full intake with your own answers, click the **key icon** in the top 
 | **Rose** | Senior widow, Social Security only, owns home in Lents, Vietnamese-speaking | $12,887/yr | **$20,787/yr** across 11 programs |
 <!-- README:TABLE:END -->
 
-The gap comes from **hidden-gem** programs — 8 of our 20 are flagged this way, and no national tool surfaces them. Numbers are pulled directly from the [`data/scenarios/*.json`](data/scenarios/) fixtures; the source of truth for ranges is [`data/programs.seed.json`](data/programs.seed.json).
+The gap comes from **hidden-gem** programs — 11 of our 24 are flagged this way, and no national tool surfaces them. Numbers are pulled directly from the [`data/scenarios/*.json`](data/scenarios/) fixtures; the source of truth for ranges is [`data/programs.seed.json`](data/programs.seed.json).
 
 ---
 
