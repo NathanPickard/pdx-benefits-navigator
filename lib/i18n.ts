@@ -69,6 +69,21 @@ export interface Chrome {
   // Copy-summary toast messages
   copySummarySuccess: string;
   copySummaryFallback: string;
+  // Near-miss section (NearMissSection)
+  nearMissHeaderLabel: string;
+  nearMissSuffixSingular: string; // exactly "1 program close but not yet qualifying"
+  nearMissSuffixTemplate: string; // contains "{count}" — plural form
+  nearMissIntro: string;
+  nearMissVerifyNote: string;
+  nearMissReferral211: string;
+  nearMissNoReasonKnown: string;
+  nearMissWhyNotYet: string;
+  // Per-requirement breakdown eyebrow (BenefitCard)
+  whatYouQualifyOn: string;
+  // Zero-eligible empty state (results/page.tsx)
+  emptyStateHeading: string;
+  emptyStateBody: string;
+  emptyStateCta: string;
 }
 
 export const CHROME_EN: Chrome = {
@@ -138,4 +153,25 @@ export const CHROME_EN: Chrome = {
   // Copy-summary toast messages
   copySummarySuccess: 'Summary copied to clipboard',
   copySummaryFallback: 'Copy not supported — use the PDF instead',
+  // Near-miss section (NearMissSection)
+  nearMissHeaderLabel: 'Programs you just missed',
+  nearMissSuffixSingular: '1 program close but not yet qualifying',
+  nearMissSuffixTemplate: '{count} programs close but not yet qualifying',
+  nearMissIntro:
+    "You're close on these programs. A small change in income, household size, or enrollment in another program could open the door.",
+  nearMissVerifyNote:
+    'These are estimates — a caseworker may see options the tool missed.',
+  nearMissReferral211:
+    'Call 211 (Oregon 2-1-1) or visit 211info.org to connect with a navigator who can confirm your eligibility in person.',
+  nearMissNoReasonKnown:
+    'Specific reason not available — contact the program directly to ask.',
+  nearMissWhyNotYet: 'Why not yet',
+  // Per-requirement breakdown eyebrow (BenefitCard)
+  whatYouQualifyOn: 'What you qualify on',
+  // Zero-eligible empty state (results/page.tsx)
+  emptyStateHeading: 'No programs matched this time',
+  emptyStateBody:
+    'That can change — income, household size, and life events all affect eligibility. A local caseworker often finds options the tool misses, especially for locally-funded programs.',
+  emptyStateCta:
+    'Call 211 or visit 211info.org — free, confidential, available in your language',
 };

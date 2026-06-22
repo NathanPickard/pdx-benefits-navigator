@@ -6,32 +6,21 @@ import { ChevronDown, ChevronUp, Phone } from 'lucide-react';
 import type { Chrome } from '@/lib/i18n';
 import type { EligibilityRequirement, MatchResult, Program } from '@/types/program';
 
-// TODO(phase-2 i18n): Near-miss section strings are English-only for now.
-// Full i18n deferred to Phase 2 — see Chrome interface for the pattern.
-const STRINGS = {
-  headerLabel: 'Programs you just missed',
-  headerSuffix: (n: number) => (n === 1 ? '1 program close but not yet qualifying' : `${n} programs close but not yet qualifying`),
-  intro: "You're close on these programs. A small change in income, household size, or enrollment in another program could open the door.",
-  fallbackReason: (reasoning: string) => firstSentence(reasoning),
-  verifyNote: 'These are estimates — a caseworker may see options the tool missed.',
-  referral211: 'Call 211 (Oregon 2-1-1) or visit 211info.org to connect with a navigator who can confirm your eligibility in person.',
-  noReasonKnown: 'Specific reason not available — contact the program directly to ask.',
-};
 
 function firstSentence(text: string): string {
   const match = text.match(/^[^.!?]+[.!?]/);
   return match ? match[0].trim() : text.slice(0, 120).trim();
 }
 
-function failingReason(match: MatchResult): string {
+function failingReason(match: MatchResult, noReasonKnown: string): string {
   if (match.requirements?.length) {
     const failing = match.requirements.find(
       (r: EligibilityRequirement) => r.met === 'no'
     );
     if (failing) return failing.detail;
   }
-  if (match.reasoning) return STRINGS.fallbackReason(match.reasoning);
-  return STRINGS.noReasonKnown;
+  if (match.reasoning) return firstSentence(match.reasoning);
+  return noReasonKnown;
 }
 
 interface NearMissSectionProps {
@@ -40,7 +29,7 @@ interface NearMissSectionProps {
   chrome: Chrome;
 }
 
-export function NearMissSection({ matches, programById }: NearMissSectionProps) {
+export function NearMissSection({ matches, programById, chrome }: NearMissSectionProps) {
   const [open, setOpen] = useState(false);
 
   // Caller (results/page.tsx) pre-filters to ineligible matches; map to programs here.
@@ -80,7 +69,7 @@ export function NearMissSection({ matches, programById }: NearMissSectionProps) 
       >
         <div>
           <div className="eyebrow mb-1" style={{ color: 'var(--ink-3)' }}>
-            {STRINGS.headerLabel}
+            {chrome.nearMissHeaderLabel}
           </div>
           <div
             className="font-display"
@@ -91,7 +80,9 @@ export function NearMissSection({ matches, programById }: NearMissSectionProps) 
               letterSpacing: '-0.012em',
             }}
           >
-            {STRINGS.headerSuffix(rows.length)}
+            {rows.length === 1
+              ? chrome.nearMissSuffixSingular
+              : chrome.nearMissSuffixTemplate.replace('{count}', String(rows.length))}
           </div>
         </div>
         <span
@@ -129,7 +120,7 @@ export function NearMissSection({ matches, programById }: NearMissSectionProps) 
               lineHeight: 1.55,
             }}
           >
-            {STRINGS.intro}
+            {chrome.nearMissIntro}
           </p>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
@@ -176,7 +167,7 @@ export function NearMissSection({ matches, programById }: NearMissSectionProps) 
                         className="eyebrow mb-1"
                         style={{ color: 'var(--ink-3)', fontSize: '0.7rem' }}
                       >
-                        Why not yet
+                        {chrome.nearMissWhyNotYet}
                       </div>
                       <p
                         style={{
@@ -186,7 +177,7 @@ export function NearMissSection({ matches, programById }: NearMissSectionProps) 
                           lineHeight: 1.5,
                         }}
                       >
-                        {failingReason(match)}
+                        {failingReason(match, chrome.nearMissNoReasonKnown)}
                       </p>
                     </div>
                   </div>
@@ -214,7 +205,7 @@ export function NearMissSection({ matches, programById }: NearMissSectionProps) 
                 lineHeight: 1.55,
               }}
             >
-              {STRINGS.verifyNote}
+              {chrome.nearMissVerifyNote}
             </p>
             <div
               style={{
@@ -230,7 +221,7 @@ export function NearMissSection({ matches, programById }: NearMissSectionProps) 
                 size={14}
                 style={{ flexShrink: 0, marginTop: 2, color: 'var(--moss-2)' }}
               />
-              <span>{STRINGS.referral211}</span>
+              <span>{chrome.nearMissReferral211}</span>
             </div>
           </div>
         </div>

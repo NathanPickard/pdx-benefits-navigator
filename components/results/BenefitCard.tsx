@@ -174,58 +174,65 @@ export function BenefitCard({
             </p>
             {/* Per-requirement breakdown — only rendered when present (post-rebake fixtures).
                 On eligible cards we show only met=yes and met=unknown rows.
-                met=no rows are the near-miss domain and are not shown here.
-                TODO(phase-2 i18n): eyebrow label is English-only */}
+                met=no rows are the near-miss domain and are not shown here. */}
             {match.requirements && match.requirements.length > 0 && (
-              <ul
-                style={{
-                  margin: '10px 0 0',
-                  padding: 0,
-                  listStyle: 'none',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: 5,
-                }}
-              >
-                {match.requirements
-                  .filter((r) => r.met === 'yes' || r.met === 'unknown')
-                  .map((r, i) => (
-                    <li
-                      key={i}
-                      style={{
-                        display: 'flex',
-                        alignItems: 'flex-start',
-                        gap: 7,
-                        fontSize: '0.82rem',
-                        color: 'var(--ink-3)',
-                        lineHeight: 1.45,
-                      }}
-                    >
-                      {r.met === 'yes' ? (
-                        <CheckCircle2
-                          size={13}
-                          style={{
-                            flexShrink: 0,
-                            marginTop: 2,
-                            color: 'var(--moss)',
-                          }}
-                          aria-label="Met"
-                        />
-                      ) : (
-                        <HelpCircle
-                          size={13}
-                          style={{
-                            flexShrink: 0,
-                            marginTop: 2,
-                            color: 'var(--sun)',
-                          }}
-                          aria-label="Unknown"
-                        />
-                      )}
-                      <span>{r.detail}</span>
-                    </li>
-                  ))}
-              </ul>
+              <>
+                <div
+                  className="eyebrow mb-1"
+                  style={{ color: 'var(--ink-3)', fontSize: '0.7rem', marginTop: 10 }}
+                >
+                  {chrome.whatYouQualifyOn}
+                </div>
+                <ul
+                  style={{
+                    margin: '4px 0 0',
+                    padding: 0,
+                    listStyle: 'none',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 5,
+                  }}
+                >
+                  {match.requirements
+                    .filter((r) => r.met === 'yes' || r.met === 'unknown')
+                    .map((r, i) => (
+                      <li
+                        key={i}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'flex-start',
+                          gap: 7,
+                          fontSize: '0.82rem',
+                          color: 'var(--ink-3)',
+                          lineHeight: 1.45,
+                        }}
+                      >
+                        {r.met === 'yes' ? (
+                          <CheckCircle2
+                            size={13}
+                            style={{
+                              flexShrink: 0,
+                              marginTop: 2,
+                              color: 'var(--moss)',
+                            }}
+                            aria-label="Met"
+                          />
+                        ) : (
+                          <HelpCircle
+                            size={13}
+                            style={{
+                              flexShrink: 0,
+                              marginTop: 2,
+                              color: 'var(--sun)',
+                            }}
+                            aria-label="Unknown"
+                          />
+                        )}
+                        <span>{r.detail}</span>
+                      </li>
+                    ))}
+                </ul>
+              </>
             )}
           </div>
         </div>

@@ -900,8 +900,6 @@ function Dashboard({
 
       {allEligible.length === 0 ? (
         /* ── Zero-eligible empty state ── */
-        // TODO(phase-2 i18n): strings below are English-only; Phase 2 will
-        // wire them into the Chrome bundle and translation pipeline.
         <section className="mb-10">
           <div
             className="rc-card"
@@ -925,7 +923,7 @@ function Dashboard({
                 margin: '0 0 10px',
               }}
             >
-              No programs matched this time
+              {chrome.emptyStateHeading}
             </h2>
             <p
               style={{
@@ -936,7 +934,7 @@ function Dashboard({
                 lineHeight: 1.6,
               }}
             >
-              That can change — income, household size, and life events all affect eligibility. A local caseworker often finds options the tool misses, especially for locally-funded programs.
+              {chrome.emptyStateBody}
             </p>
             <div
               style={{
@@ -952,7 +950,7 @@ function Dashboard({
               }}
             >
               <span>📞</span>
-              <span>Call <strong>211</strong> or visit <strong>211info.org</strong> — free, confidential, available in your language</span>
+              <span>{chrome.emptyStateCta}</span>
             </div>
           </div>
 
