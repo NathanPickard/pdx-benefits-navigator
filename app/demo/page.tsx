@@ -112,7 +112,7 @@ export default function DemoHubPage() {
           Three real Portland situations.
         </h1>
         <p className="max-w-2xl text-muted-foreground">
-          Each scenario runs against all 20 federal, Oregon, Multnomah County, and Portland
+          Each scenario runs against all 24 federal, Oregon, Multnomah County, and Portland
           programs in a single pass. Pick one — we&rsquo;ll show exactly what they qualify
           for and how to apply.
         </p>

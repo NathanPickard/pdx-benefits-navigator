@@ -71,7 +71,7 @@ For a typical Portland family, that gap is **$10,000–$25,000 per year**.
 
 ## ✨ What it does
 
-- 🤖 **Evaluates all 20 programs at once** — federal + state + county + city, in a single Claude call
+- 🤖 **Evaluates all 24 programs at once** — federal + state + county + city, in a single Claude call
 - 🌍 **Speaks 3 languages** — English, Spanish, and Vietnamese, with AI-generated translation of the full results page
 - 📋 **Conversational intake** — 12 gentle questions, mobile-first, takes ~3 minutes
 - 💰 **Per-program dollar estimates** — grounded in official program ranges, with plain-language reasoning
@@ -168,7 +168,7 @@ Personalized analyses run **client-side** with a key you provide. The browser-si
 
 - 2026 Federal Poverty Level tables
 - Portland ZIP-code map (so Claude knows `97203` = St. Johns, not Gresham)
-- All 20 program rules — income limits, jurisdiction requirements, event triggers
+- All 24 program rules — income limits, jurisdiction requirements, event triggers
 - Confidence-level guidance (`high` / `medium` / `low`)
 
 Prompt caching (`cache_control: { type: 'ephemeral' }`) is applied to the system prompt, so subsequent requests on the same key are cheap.
@@ -197,16 +197,16 @@ The full programs database is stuffed into the system prompt. Claude has the ent
 
 ---
 
-## 📋 The 20 programs
+## 📋 The 24 programs
 
 | Jurisdiction | Programs |
 |---|---|
 | **Federal** | SNAP · OHP/Medicaid · WIC · School Meals · ACP Internet |
-| **Oregon** | ERDC childcare · Oregon EITC + Kids' Credit · PGE Income Discount · NW Natural GAP · LIHEAP + Energy Trust · Senior/Disabled Property Tax Deferral · Veterans Property Tax Exemption |
-| **Multnomah County** | Eviction Prevention Funds · SUN Service System · ADVSD case management |
+| **Oregon** | ERDC childcare · Oregon EITC + Kids' Credit · PGE Income Discount · NW Natural GAP · LIHEAP + Energy Trust · Senior/Disabled Property Tax Deferral · Veterans Property Tax Exemption · Oregon TANF · 💎 Double Up Food Bucks |
+| **Multnomah County** | Eviction Prevention Funds · SUN Service System · ADVSD case management · 💎 Multnomah Preschool for All · 💎 TriMet Low-Income Fare |
 | **City of Portland** | 💎 Renter Relocation Assistance · 💎 Water Bureau Discount · 💎 PCEF Home Energy · 💎 Transportation Wallet · 💎 Inclusionary Housing |
 
-💎 = **hidden gem** — 8 of the 20 programs are flagged this way. They're the ones no national tool surfaces, and they drive most of the dollar gap.
+💎 = **hidden gem** — 11 of the 24 programs are flagged this way. They're the ones no national tool surfaces, and they drive most of the dollar gap.
 
 ---
 
@@ -274,7 +274,7 @@ components/
 └── ui/                       # shadcn primitives
 
 data/
-├── programs.json             # 20 programs (live database)
+├── programs.json             # 24 programs (live database)
 ├── programs.seed.json        # Hand-curated source of truth
 └── scenarios/                # Pre-baked demo AnalysisOutput JSON
 

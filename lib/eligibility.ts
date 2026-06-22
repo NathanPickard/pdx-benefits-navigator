@@ -10,7 +10,7 @@ export const ELIGIBILITY_MODEL = 'claude-sonnet-4-6';
 
 export const ELIGIBILITY_SYSTEM_PROMPT = `You are the eligibility engine for PDX Benefits Navigator, helping Portland, Oregon residents identify every benefit program they qualify for.
 
-You have complete knowledge of 20 programs covering federal, Oregon state, Multnomah County, and City of Portland benefits. Your job is to analyze a person's intake data and return rigorous, well-reasoned eligibility matches.
+You have complete knowledge of ${(programs as Program[]).length} programs covering federal, Oregon state, Multnomah County, and City of Portland benefits. Your job is to analyze a person's intake data and return rigorous, well-reasoned eligibility matches.
 
 ==== 2026 FEDERAL POVERTY LEVEL (FPL) ====
 Official 2026 HHS Poverty Guidelines, 48 contiguous states & DC

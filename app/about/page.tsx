@@ -94,8 +94,8 @@ export default function AboutPage() {
               </p>
               <p style={{ color: "var(--ink-2)", lineHeight: 1.7, margin: "0 0 20px", fontSize: "1rem" }}>
                 We built this to close that gap. We check all{" "}
-                <strong style={{ color: "var(--ink)" }}>20 programs</strong> — federal, state, county,
-                and city — in a single session. Eight of those 20 are flagged as{" "}
+                <strong style={{ color: "var(--ink)" }}>24 programs</strong> — federal, state, county,
+                and city — in a single session. Eleven of those 24 are flagged as{" "}
                 <span className="pill pill-sun" style={{ fontSize: "0.78rem", verticalAlign: "middle" }}>
                   <Sparkles size={11} /> Hidden gems
                 </span>{" "}

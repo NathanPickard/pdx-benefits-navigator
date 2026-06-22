@@ -57,8 +57,8 @@ const LD = {
   },
   inLanguage: ["en", "es", "vi"],
   featureList: [
-    "Screens all 20 federal, Oregon, Multnomah County, and City of Portland benefit programs",
-    "Highlights 8 locally-funded hidden-gem programs most national tools miss",
+    "Screens all 24 federal, Oregon, Multnomah County, and City of Portland benefit programs",
+    "Highlights 11 locally-funded hidden-gem programs most national tools miss",
     "No login required — answers stay in your browser session",
     "AI-powered eligibility analysis in plain language",
     "Printable PDF packet with program links, deadlines, and document checklists",

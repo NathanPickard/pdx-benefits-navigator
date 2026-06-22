@@ -197,7 +197,7 @@ export default async function Image() {
             }}
           >
             <span style={{ opacity: 0.7, fontWeight: 400 }}>
-              20 programs · 3 minutes · Bring your own AI key
+              24 programs · 3 minutes · Bring your own AI key
             </span>
             <span style={{ color: MOSS_DEEP, fontWeight: 700 }}>
               pdx-benefits-navigator.vercel.app

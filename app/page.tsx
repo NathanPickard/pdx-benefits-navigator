@@ -402,7 +402,7 @@ export default function HomePage() {
             <Step
               n="2"
               tone="moss"
-              title="We check all 20 programs at once"
+              title="We check all 24 programs at once"
               body="An AI reads the 2026 poverty tables and every active rule — ORS, City Code, county ordinances — and writes you a brief in plain language."
             />
             <Step
