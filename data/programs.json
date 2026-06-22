@@ -1111,5 +1111,237 @@
         }
       ]
     }
+  },
+  {
+    "id": "multco-preschool-for-all",
+    "name": "Multnomah County Preschool for All",
+    "short_name": "Preschool for All",
+    "category": "childcare",
+    "jurisdiction": "multnomah",
+    "hidden_gem": true,
+    "urgency": "time_sensitive",
+    "description": "Tuition-free, culturally responsive preschool for 3- and 4-year-olds whose parent or legal guardian lives in Multnomah County. There is no income test — any family meeting the age and residency requirements may apply. Funded by a county personal income tax on high earners.",
+    "legal_basis": "Multnomah County Measure 26-214 (Nov 2020); Preschool for All Personal Income Tax (eff. Jan 1, 2021)",
+    "estimated_annual_value": {
+      "min": 17532,
+      "max": 25008,
+      "median": 21270
+    },
+    "benefit_schedule": {
+      "description": "County per-slot funding (≈ market value of the free seat). School-year/school-day slots (~6 hrs/day) vs full-year/full-day slots (~10 hrs/day), 2025-26 rates.",
+      "unit": "usd_annual",
+      "amounts": [
+        {
+          "condition": "School year, school day (~6 hrs/day)",
+          "value": 17532
+        },
+        {
+          "condition": "Full year, full day (~10 hrs/day)",
+          "value": 25008
+        }
+      ]
+    },
+    "eligibility": {
+      "must_reside_in": [
+        "multnomah"
+      ],
+      "must_have_children_under": 5,
+      "other_requirements": [
+        "Child must be 3 or 4 years old on or before September 1 of the preschool year",
+        "Parent or legal guardian must reside in Multnomah County",
+        "No income requirement — open to all qualifying families regardless of income",
+        "Annual application lottery (not first-come); apply during the spring window"
+      ]
+    },
+    "application_url": "https://pfa.multco.us/",
+    "application_method": "online",
+    "documents_required": [
+      "Child's date of birth documentation",
+      "Proof of Multnomah County residency"
+    ],
+    "processing_time": "Annual lottery; placement decisions in spring",
+    "renewal_cycle": "Annual — reapply each school year",
+    "contact_phone": "503-988-1280",
+    "contact_org": "Multnomah County Preschool for All",
+    "source_url": "https://multco.us/programs/preschool-all",
+    "last_verified": "2026-06-22"
+  },
+  {
+    "id": "trimet-low-income-fare",
+    "name": "TriMet Reduced Fare for Low-Income Riders",
+    "short_name": "TriMet Low-Income Fare",
+    "category": "transportation",
+    "jurisdiction": "multnomah",
+    "hidden_gem": true,
+    "urgency": "standard",
+    "description": "Income-qualified Oregon residents ages 18–64 pay up to 72% less on TriMet buses and MAX ($1.40 per trip vs $2.80, or $28/month vs $100) via a personalized Honored Citizen Hop card. Enrollment in SNAP, OHP/Medicaid, TANF, WIC, LIHEAP, or a HUD voucher qualifies you automatically.",
+    "estimated_annual_value": {
+      "min": 364,
+      "max": 864,
+      "median": 720
+    },
+    "benefit_schedule": {
+      "description": "Reduced fares vs regular adult fares for income-qualified Honored Citizen cardholders.",
+      "unit": "percent_discount",
+      "amounts": [
+        {
+          "condition": "2.5-hour single fare ($1.40 vs $2.80)",
+          "value": 50
+        },
+        {
+          "condition": "Monthly pass ($28 vs $100)",
+          "value": 72
+        }
+      ]
+    },
+    "eligibility": {
+      "income_max_pct_fpl": 200,
+      "age_min": 18,
+      "age_max": 64,
+      "must_reside_in": [
+        "multnomah"
+      ],
+      "other_requirements": [
+        "Serves the full TriMet district (Multnomah, Washington, and Clackamas counties)",
+        "Must be an Oregon resident; no citizenship/immigration requirement",
+        "Seniors 65+ and Medicare recipients qualify separately without income verification",
+        "Active enrollment in OHP/Medicaid, SNAP, TANF, WIC, LIHEAP, free/reduced lunch, or a HUD Housing Choice Voucher satisfies income verification without income documents"
+      ]
+    },
+    "application_url": "https://trimet.org/income/",
+    "application_method": "online",
+    "documents_required": [
+      "Valid photo ID",
+      "Proof of income (paystubs/1040/benefit letter) OR a qualifying-program benefit letter"
+    ],
+    "processing_time": "Same day if applied in person",
+    "renewal_cycle": "Annual",
+    "contact_phone": "503-962-2455",
+    "contact_org": "TriMet",
+    "source_url": "https://trimet.org/income/",
+    "last_verified": "2026-06-22"
+  },
+  {
+    "id": "double-up-food-bucks",
+    "name": "Double Up Food Bucks Oregon",
+    "short_name": "Double Up Food Bucks",
+    "category": "food",
+    "jurisdiction": "oregon",
+    "hidden_gem": true,
+    "urgency": "standard",
+    "description": "Oregon SNAP/EBT shoppers get a dollar-for-dollar match (up to $20 per day or per transaction) on fresh fruits and vegetables at 100+ participating farmers markets, farm stands, CSA farms, and grocery stores. No separate application — use your Oregon Trail Card at a participating location.",
+    "estimated_annual_value": {
+      "min": 120,
+      "max": 1440,
+      "median": 480
+    },
+    "eligibility": {
+      "must_reside_in": [
+        "oregon"
+      ],
+      "other_requirements": [
+        "Must be a current SNAP/EBT-food recipient (Oregon Trail Card); EBT Cash does not qualify",
+        "Dollar-for-dollar produce match, up to $20 per day (markets) or per transaction (grocery)",
+        "No separate income test — SNAP enrollment is the sole eligibility gate",
+        "Shop at a participating Oregon farmers market, farm stand, CSA, or grocery store"
+      ]
+    },
+    "application_url": "https://doubleuporegon.org/how-it-works/",
+    "application_method": "in_person",
+    "documents_required": [
+      "Oregon Trail Card (SNAP/EBT-food)"
+    ],
+    "processing_time": "Immediate at point of sale; no advance application",
+    "contact_org": "Farmers Market Fund",
+    "contact_phone": "503-208-4495",
+    "source_url": "https://doubleuporegon.org/",
+    "last_verified": "2026-06-22"
+  },
+  {
+    "id": "oregon-tanf",
+    "name": "Temporary Assistance for Needy Families (TANF)",
+    "short_name": "TANF",
+    "category": "cash",
+    "jurisdiction": "oregon",
+    "hidden_gem": false,
+    "urgency": "standard",
+    "description": "Monthly cash assistance for Oregon families with children (or pregnant individuals) who have little or no income. State-administered, federally funded; benefits load onto an Oregon Trail EBT card, plus a clothing allowance three times a year.",
+    "legal_basis": "42 U.S.C. § 601 et seq.; ORS 412; OAR 461-155-0030",
+    "estimated_annual_value": {
+      "min": 2028,
+      "max": 12360,
+      "median": 6072
+    },
+    "benefit_schedule": {
+      "description": "Maximum monthly TANF cash payment by household size (OAR 461-155-0030 payment standard). Actual benefit = payment standard minus net countable income. Family-of-3 figure ($506) is officially confirmed by ODHS; other sizes per the OAR table.",
+      "unit": "usd_monthly",
+      "amounts": [
+        {
+          "condition": "Household of 1",
+          "value": 339
+        },
+        {
+          "condition": "Household of 2",
+          "value": 432
+        },
+        {
+          "condition": "Household of 3",
+          "value": 506
+        },
+        {
+          "condition": "Household of 4",
+          "value": 621
+        },
+        {
+          "condition": "Household of 5",
+          "value": 721
+        },
+        {
+          "condition": "Household of 6",
+          "value": 833
+        },
+        {
+          "condition": "Household of 7",
+          "value": 923
+        },
+        {
+          "condition": "Household of 8",
+          "value": 1030
+        }
+      ]
+    },
+    "eligibility": {
+      "must_have_children_under": 18,
+      "must_reside_in": [
+        "oregon"
+      ],
+      "citizenship_status": "lpr_or_citizen",
+      "other_requirements": [
+        "Must have a dependent child under 18 in the home, or be pregnant",
+        "Countable income must be at or below the monthly payment standard for the household size (≈$506/mo for a family of 3)",
+        "Resource/asset limit: $2,500 for new applicants, $10,000 for ongoing recipients",
+        "Qualified noncitizens (LPRs, refugees, asylees, VAWA/T-visa, certain parolees) are eligible with no 5-year waiting period",
+        "60-month lifetime limit on federally funded TANF; JOBS participation usually required",
+        "Includes a clothing allowance of ~$270/year (paid 3× via EBT)"
+      ]
+    },
+    "application_url": "https://benefits.oregon.gov",
+    "info_urls": [
+      "https://www.oregon.gov/odhs/cash/pages/tanf.aspx"
+    ],
+    "application_method": "online",
+    "documents_required": [
+      "Photo ID",
+      "Proof of income",
+      "Proof of Oregon residency",
+      "Children's birth certificates/SSNs",
+      "Immigration documents if applicable"
+    ],
+    "processing_time": "30 days (up to 45 if incomplete)",
+    "renewal_cycle": "Periodic eligibility review",
+    "contact_phone": "1-800-699-9075",
+    "contact_org": "Oregon Department of Human Services (ODHS)",
+    "source_url": "https://www.oregon.gov/odhs/cash/pages/tanf.aspx",
+    "last_verified": "2026-06-22"
   }
 ]
