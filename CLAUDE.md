@@ -31,7 +31,7 @@ Built for the 2026 AI Portland Build Challenge. The hackathon submission is froz
 
 ## Hard rules
 
-1. **Hidden-gem programs always evaluated.** 8 of the 20 programs are flagged `hidden_gem: true` — they're the differentiator. Never narrow the evaluation set based on heuristics; always send the full database to Claude.
+1. **Hidden-gem programs always evaluated.** 11 of the 24 programs are flagged `hidden_gem: true` — they're the differentiator. Never narrow the evaluation set based on heuristics; always send the full database to Claude.
 2. **Dollar values grounded in `programs.json`.** Every estimate must come from the official `amount_range` of a program. Never let Claude invent dollar figures.
 3. **No server-side `ANTHROPIC_API_KEY` in the hot path.** Personalized analysis runs in the browser with the user's key. Adding a server-side AI route reintroduces cost and privacy concerns. `/api/packet` is the only server route and it does PDF rendering, not AI.
 4. **Intake answers never persist server-side.** Stored only in `sessionStorage`. No database, no logging, no analytics on responses.

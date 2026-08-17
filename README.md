@@ -9,6 +9,7 @@
 </p>
 
 <p align="center">
+  <a href="https://github.com/NathanPickard/pdx-benefits-navigator/actions/workflows/ci.yml"><img src="https://github.com/NathanPickard/pdx-benefits-navigator/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <img src="https://img.shields.io/badge/Next.js-16-black?logo=next.js" alt="Next.js 16">
   <img src="https://img.shields.io/badge/React-19-61dafb?logo=react" alt="React 19">
   <img src="https://img.shields.io/badge/TypeScript-5-3178c6?logo=typescript" alt="TypeScript">
@@ -183,6 +184,17 @@ The full programs database is stuffed into the system prompt. Claude has the ent
 
 ---
 
+## ✅ Keeping the numbers honest
+
+An AI eligibility tool is only as trustworthy as its data, so the repo gates itself:
+
+- **Schema + invariant gate** — [`npm run validate:data`](scripts/validate-data.ts) validates both the curated seed and the merged runtime database with Zod, and asserts the merge step never altered curated eligibility policy (income bases, thresholds, flags). CI fails if it does.
+- **Fixture regression tests** — the test suite (50 tests) checks each demo persona's totals add up and that signature programs (like Renter Relocation for María) stay eligible after prompt or data changes.
+- **Script-maintained README numbers** — every dollar figure in this README's persona table is rewritten from the baked fixtures by [`npm run sync:readme`](scripts/sync-readme-numbers.ts), never hand-typed.
+- **CI on every push** — lint, typecheck, data validation, tests, and a production build ([workflow](.github/workflows/ci.yml)).
+
+---
+
 ## 🛠️ Tech stack
 
 - **[Next.js 16](https://nextjs.org/)** App Router on **[Vercel](https://vercel.com/)**
@@ -225,6 +237,7 @@ Then open [http://localhost:3000](http://localhost:3000). Click the **key icon**
 
 | Variable | Required? | Used by |
 |---|---|---|
+| `ANTHROPIC_API_KEY` | Only for re-baking demo fixtures (`.env.local`) | [`scripts/precompute-scenarios.ts`](scripts/precompute-scenarios.ts) |
 | `FIRECRAWL_API_KEY` | Only for re-scraping program data | [`scripts/scrape-programs.ts`](scripts/scrape-programs.ts) |
 
 No server-side `ANTHROPIC_API_KEY` is needed for normal operation. The personalized analysis path uses a key the user provides in their browser.
@@ -232,10 +245,13 @@ No server-side `ANTHROPIC_API_KEY` is needed for normal operation. The personali
 <details>
 <summary><strong>Advanced: re-baking the demo fixtures</strong></summary>
 
-If you change the system prompt or the program data, you'll want to regenerate `data/scenarios/*.json`. The precompute script ([`scripts/precompute-scenarios.ts`](scripts/precompute-scenarios.ts)) was written against an earlier server-side route; to use it, either:
+If you change the system prompt, the model, or the program data, regenerate `data/scenarios/*.json` so the demos match live results:
 
-1. Restore `app/api/analyze/route.ts` from git history and run `npx tsx scripts/precompute-scenarios.ts`, **or**
-2. Update the script to call `analyzeEligibility()` from [`lib/claudeBrowser.ts`](lib/claudeBrowser.ts) directly (with `ANTHROPIC_API_KEY` from env, in a Node context).
+```bash
+npm run bake
+```
+
+The script ([`scripts/precompute-scenarios.ts`](scripts/precompute-scenarios.ts)) calls `analyzeEligibilityStream()` from [`lib/claudeBrowser.ts`](lib/claudeBrowser.ts) directly in Node, using `ANTHROPIC_API_KEY` from `.env.local` and the same `ELIGIBILITY_MODEL` as the runtime. Afterward, `npm run sync:readme` rewrites the persona dollar figures in this README from the fresh fixtures.
 
 The seed file [`data/programs.seed.json`](data/programs.seed.json) is the source of truth for program rules — `data/programs.json` is the live build artifact.
 </details>
