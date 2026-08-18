@@ -51,3 +51,47 @@ test('renderReport marks errored and unstable cases', () => {
   assert.ok(md.includes('API exploded'));
   assert.ok(md.toLowerCase().includes('unstable'));
 });
+
+function countUnescapedPipes(line: string): number {
+  return (line.match(/(?<!\\)\|/g) ?? []).length;
+}
+
+test('renderReport escapes pipes and newlines in an error string so the table stays well-formed', () => {
+  const run = makeRun();
+  run.cases.push({
+    id: 'broken',
+    title: 'Broken case',
+    error: 'boom | broken\nsecond line',
+    unstable: false,
+    attempts: [],
+  });
+  const md = renderReport(run);
+  const lines = md.split('\n');
+  const brokenRow = lines.find((l) => l.startsWith('| broken '));
+  assert.ok(brokenRow, 'expected a scoreboard row for the broken case');
+  // The raw pipe from the error text must be escaped, not a live column delimiter.
+  assert.ok(brokenRow!.includes('boom \\| broken second line'));
+  // Header has 8 columns → 9 unescaped pipe delimiters; the broken row must match.
+  const headerRow = lines.find((l) => l.startsWith('| case '));
+  assert.equal(countUnescapedPipes(brokenRow!), countUnescapedPipes(headerRow!));
+});
+
+test('renderReport renders a dash Aggregate row when every case errored', () => {
+  const run: RunData = {
+    date: '2026-08-18T00:00:00Z',
+    model: 'claude-sonnet-4-6',
+    judgeModel: 'claude-haiku-4-5-20251001',
+    gitSha: 'abc1234',
+    runsPerCase: 1,
+    cases: [
+      { id: 'maria', title: 'Maria persona', error: 'API exploded', unstable: false, attempts: [] },
+      { id: 'james', title: 'James persona', error: 'timeout', unstable: false, attempts: [] },
+    ],
+  };
+  const md = renderReport(run);
+  const aggregateRow = md.split('\n').find((l) => l.startsWith('| Aggregate'));
+  assert.ok(aggregateRow, 'expected an Aggregate row');
+  assert.ok(!aggregateRow!.includes('0.00'));
+  assert.ok(!aggregateRow!.includes('0%'));
+  assert.match(aggregateRow!, /^\| Aggregate \| — \| — \| — \| — \| — \| — \|\s*\|$/);
+});

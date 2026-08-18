@@ -80,17 +80,21 @@ function attemptRow(caseResult: CaseResult, attempt: AttemptResult, attemptIndex
   };
 }
 
-function erroredRow(caseResult: CaseResult): ScoreboardRow {
+function dashRow(label: string, flags: string): ScoreboardRow {
   return {
-    label: caseResult.id,
+    label,
     f1: NUMERIC_PLACEHOLDER,
     precision: NUMERIC_PLACEHOLDER,
     recall: NUMERIC_PLACEHOLDER,
     dollarsInRange: NUMERIC_PLACEHOLDER,
     confAgree: NUMERIC_PLACEHOLDER,
     reasoningPass: NUMERIC_PLACEHOLDER,
-    flags: caseFlags(caseResult),
+    flags,
   };
+}
+
+function erroredRow(caseResult: CaseResult): ScoreboardRow {
+  return dashRow(caseResult.id, caseFlags(caseResult));
 }
 
 function scoreboardRowsFor(caseResult: CaseResult): ScoreboardRow[] {
@@ -111,6 +115,7 @@ function firstAttempts(cases: CaseResult[]): AttemptResult[] {
 
 function aggregateRow(cases: CaseResult[]): ScoreboardRow {
   const attempts = firstAttempts(cases);
+  if (attempts.length === 0) return dashRow('Aggregate', '');
   return {
     label: 'Aggregate',
     f1: toFixed2(mean(attempts.map((a) => a.programSet.f1))),
@@ -123,8 +128,25 @@ function aggregateRow(cases: CaseResult[]): ScoreboardRow {
   };
 }
 
+/** Escapes characters that would corrupt a Markdown table cell: pipes (column
+ *  delimiters) and newlines (row delimiters). Applied to every cell so any
+ *  free-text field — most notably an error message — can't split the table. */
+function sanitizeCell(text: string): string {
+  return text.replace(/\n/g, ' ').replace(/\|/g, '\\|');
+}
+
 function renderScoreboardRow(row: ScoreboardRow): string {
-  return `| ${row.label} | ${row.f1} | ${row.precision} | ${row.recall} | ${row.dollarsInRange} | ${row.confAgree} | ${row.reasoningPass} | ${row.flags} |`;
+  const cells = [
+    row.label,
+    row.f1,
+    row.precision,
+    row.recall,
+    row.dollarsInRange,
+    row.confAgree,
+    row.reasoningPass,
+    row.flags,
+  ].map(sanitizeCell);
+  return `| ${cells.join(' | ')} |`;
 }
 
 function renderHeader(run: RunData): string {
