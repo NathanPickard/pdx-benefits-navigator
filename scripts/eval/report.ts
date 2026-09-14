@@ -67,6 +67,10 @@ function caseFlags(caseResult: CaseResult): string {
   return flags.join('; ');
 }
 
+function confAgreeCell(confidence: ConfidenceScore): string {
+  return confidence.checked === 0 ? NUMERIC_PLACEHOLDER : toPercent(confidence.agreementRate);
+}
+
 function attemptRow(caseResult: CaseResult, attempt: AttemptResult, attemptIndex: number): ScoreboardRow {
   return {
     label: attemptLabel(caseResult.id, attemptIndex, caseResult.attempts.length),
@@ -74,7 +78,7 @@ function attemptRow(caseResult: CaseResult, attempt: AttemptResult, attemptIndex
     precision: toFixed2(attempt.programSet.precision),
     recall: toFixed2(attempt.programSet.recall),
     dollarsInRange: toPercent(attempt.dollars.inRangeRate),
-    confAgree: toPercent(attempt.confidence.agreementRate),
+    confAgree: confAgreeCell(attempt.confidence),
     reasoningPass: toPercent(attempt.reasoning.passRate),
     flags: caseFlags(caseResult),
   };
@@ -113,6 +117,12 @@ function firstAttempts(cases: CaseResult[]): AttemptResult[] {
     .map((c) => c.attempts[0]);
 }
 
+function aggregateConfAgreeCell(attempts: AttemptResult[]): string {
+  const checkedAttempts = attempts.filter((a) => a.confidence.checked > 0);
+  if (checkedAttempts.length === 0) return NUMERIC_PLACEHOLDER;
+  return toPercent(mean(checkedAttempts.map((a) => a.confidence.agreementRate)));
+}
+
 function aggregateRow(cases: CaseResult[]): ScoreboardRow {
   const attempts = firstAttempts(cases);
   if (attempts.length === 0) return dashRow('Aggregate', '');
@@ -122,7 +132,7 @@ function aggregateRow(cases: CaseResult[]): ScoreboardRow {
     precision: toFixed2(mean(attempts.map((a) => a.programSet.precision))),
     recall: toFixed2(mean(attempts.map((a) => a.programSet.recall))),
     dollarsInRange: toPercent(mean(attempts.map((a) => a.dollars.inRangeRate))),
-    confAgree: toPercent(mean(attempts.map((a) => a.confidence.agreementRate))),
+    confAgree: aggregateConfAgreeCell(attempts),
     reasoningPass: toPercent(mean(attempts.map((a) => a.reasoning.passRate))),
     flags: '',
   };
