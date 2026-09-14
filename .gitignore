@@ -44,3 +44,6 @@ next-env.d.ts
 # local-only docs (build plan, demo script, design exports)
 /docs
 
+# eval run artifacts (REPORT.md is the committed record)
+/evals/runs/
+

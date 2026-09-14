@@ -11,6 +11,7 @@
     "merge": "tsx scripts/merge-scraped.ts",
     "typecheck": "tsc --noEmit",
     "bake": "tsx scripts/precompute-scenarios.ts",
+    "eval": "tsx scripts/eval/run-eval.ts",
     "sync:readme": "tsx scripts/sync-readme-numbers.ts",
     "test": "node --import tsx --test \"lib/__tests__/*.test.ts\" \"scripts/__tests__/*.test.ts\""
   },
