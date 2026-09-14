@@ -1,7 +1,26 @@
 import Anthropic from '@anthropic-ai/sdk';
+import { ELIGIBILITY_SYSTEM_PROMPT } from '../../lib/eligibility';
 import type { IntakeData, MatchResult, Program } from '../../types/program';
 
 export const JUDGE_MODEL = 'claude-haiku-4-5-20251001';
+
+const REFERENCE_TABLES_START_MARKER = '==== 2026 FEDERAL POVERTY LEVEL';
+const REFERENCE_TABLES_END_MARKER = '==== PROGRAMS DATABASE';
+
+function extractReferenceTables(): string {
+  const startIndex = ELIGIBILITY_SYSTEM_PROMPT.indexOf(REFERENCE_TABLES_START_MARKER);
+  const endIndex = ELIGIBILITY_SYSTEM_PROMPT.indexOf(REFERENCE_TABLES_END_MARKER);
+  if (startIndex === -1 || endIndex === -1) {
+    throw new Error(
+      'judge.ts: could not find reference table markers in ELIGIBILITY_SYSTEM_PROMPT ' +
+        `(expected "${REFERENCE_TABLES_START_MARKER}" and "${REFERENCE_TABLES_END_MARKER}"). ` +
+        'lib/eligibility.ts may have been restructured — update these markers to match.',
+    );
+  }
+  return ELIGIBILITY_SYSTEM_PROMPT.slice(startIndex, endIndex).trim();
+}
+
+const REFERENCE_TABLES = extractReferenceTables();
 
 export function buildJudgePrompt(
   intake: IntakeData,
@@ -10,10 +29,16 @@ export function buildJudgePrompt(
 ): string {
   return [
     'You are auditing one eligibility determination made by another AI.',
-    'Judge ONE narrow question: does the reasoning below cite the correct decisive facts',
-    'for this household and this program, without fabricating numbers?',
-    'Do NOT re-decide eligibility. Fail only for: wrong/fabricated numbers, citing a rule',
-    'this program does not have, or reasoning about a different household than the one given.',
+    'Judge ONE narrow question: does the reasoning AFFIRMATIVELY CONTRADICT the household facts,',
+    'the program definition, or the official reference tables below?',
+    'Fail ONLY for: a number that contradicts the program data or reference tables; a rule',
+    'attributed to this program that it does not have; or reasoning about a different household',
+    'than the one given.',
+    'Do NOT fail for: values that match the reference tables; derived arithmetic consistent with',
+    'them; hedged assumptions about facts the intake does not capture (the intake has no age',
+    'field, no utility-account fields); estimates within the program’s stated range; or facts you',
+    'merely cannot verify. Unverifiable-but-plausible is a pass.',
+    'Do NOT re-decide eligibility.',
     '',
     '== HOUSEHOLD (intake) ==',
     JSON.stringify(intake, null, 2),
@@ -25,11 +50,14 @@ export function buildJudgePrompt(
       2,
     ),
     '',
+    '== OFFICIAL REFERENCE TABLES (the engine under audit was given these) ==',
+    REFERENCE_TABLES,
+    '',
     '== DETERMINATION UNDER AUDIT ==',
     `eligible: ${match.eligible}, confidence: ${match.confidence}, estimated_annual_value: ${match.estimated_annual_value}`,
     `reasoning: ${match.reasoning}`,
     '',
-    'Reply with ONLY a JSON object: {"verdict": "pass"} or {"verdict": "fail", "issue": "<one short sentence>"}',
+    'Reply with ONLY the JSON object: {"verdict": "pass"} or {"verdict": "fail", "issue": "<one short sentence>"}',
   ].join('\n');
 }
 

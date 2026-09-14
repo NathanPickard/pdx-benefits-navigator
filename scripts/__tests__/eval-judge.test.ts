@@ -24,6 +24,18 @@ test('buildJudgePrompt includes the facts the judge needs', () => {
   assert.ok(p.includes('income_max_pct_fpl'));
 });
 
+test('buildJudgePrompt includes the official reference tables from the eligibility engine', () => {
+  const p = buildJudgePrompt(intake, program, match);
+  assert.ok(p.includes('OFFICIAL REFERENCE TABLES'));
+  assert.ok(p.includes('$38,384'));
+});
+
+test('buildJudgePrompt states the tightened contradiction-only failure standard', () => {
+  const p = buildJudgePrompt(intake, program, match);
+  assert.ok(p.includes('AFFIRMATIVELY CONTRADICT'));
+  assert.ok(p.includes('Unverifiable-but-plausible is a pass'));
+});
+
 test('parseJudgeResponse handles clean JSON', () => {
   assert.deepEqual(parseJudgeResponse('{"verdict":"pass"}'), { verdict: 'pass', issue: undefined });
 });
