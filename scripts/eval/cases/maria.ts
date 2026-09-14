@@ -31,7 +31,6 @@ export const maria: EvalCase = {
       'transportation-wallet',  // Portland, 145.5% < 200% FPL
       'inclusionary-housing',   // Portland renter, $48,000 < $102,650 (80% AMI, hh4)
       'sun-service-system',     // Multnomah, school-age kids
-      'lifeline',               // over 135% FPL standalone but OHP enrollment qualifies
       'trimet-low-income-fare', // Multnomah, 145.5% < 200% FPL, adult 18-64
     ],
     uncertain: [
@@ -39,6 +38,7 @@ export const maria: EvalCase = {
       'nw-natural-bill-discount', // same — NW Natural customership unknown
       'cep-weatherization',       // renter: flagship needs owner-occupant 55+/disabled; other PCEF services vary
       'advsd',                    // ADRC helpline open to all, but no 60+/disability/veteran priority in household
+      'lifeline', // qualifies only via the "enrolled in qualifying program" path — prospective OHP eligibility vs actual enrollment is genuinely ambiguous
     ],
     confidence: {
       'pdx-renter-relocation': ['high'],  // trigger facts are explicit in intake
@@ -51,5 +51,6 @@ export const maria: EvalCase = {
     'Oregon EITC ineligible: $48,000 > $30,000 cap. TANF ineligible: far over payment standard. ' +
     'Preschool for All ineligible: kids 5 and 8 (needs age 3-4). Double Up ineligible: requires SNAP. ' +
     'Veterans exemption / senior deferral ineligible: not veteran, no senior, renter. ' +
-    'Eviction prevention ineligible: no eviction notice. Renter Relocation: PCC 30.01.085, >10% increase.',
+    'Eviction prevention ineligible: no eviction notice. Renter Relocation: PCC 30.01.085, >10% increase. ' +
+    'Lifeline moved to uncertain after eval run 1 (2026-09-14): the seed\'s program-based path says ENROLLED, not eligible-for — either verdict is defensible.',
 };

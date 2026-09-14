@@ -28,12 +28,14 @@ export const rose: EvalCase = {
       'senior-prop-tax-deferral', // 62+, homeowner, income < $70k
       'transportation-wallet',    // Portland, 135.3% < 200% FPL
       'advsd',                    // 60+ = ADRC priority group
-      'lifeline',                 // over 135% standalone but OHP enrollment qualifies
     ],
     uncertain: [
       'pge-iqbd',
       'nw-natural-bill-discount',
       'trimet-low-income-fare',   // seed caps at age 64; seniors 65+ qualify via a separate honored-citizen path
+      'lifeline', // qualifies only via the "enrolled in qualifying program" path — prospective OHP eligibility vs actual enrollment is genuinely ambiguous
+      'snap', // 135.3% FPL is over the seed's flat 130% cap, but real federal rules waive the gross-income test for elderly households — wrong vs seed, defensible vs reality
+      'double-up-food-bucks', // rides on snap
     ],
   },
   notes:
@@ -41,5 +43,7 @@ export const rose: EvalCase = {
     'OHP eligible by $425 (138% adult cap = $22,025) — a real boundary the model must get right. ' +
     'Lifeline: standalone 135% cap = $21,546 (over by $54), but OHP/Medicaid enrollment satisfies the program-based path. ' +
     'Double Up ineligible: requires SNAP. Renter-only and child programs ineligible (homeowner, no children). ' +
-    'Oregon EITC ineligible: retired, no earned income.',
+    'Oregon EITC ineligible: retired, no earned income. ' +
+    'After eval run 1 (2026-09-14): lifeline moved to uncertain (enrollment-vs-eligibility ambiguity); ' +
+    'snap + Double Up moved to uncertain (model applied the real elderly-household gross-income-test waiver the seed does not encode).',
 };

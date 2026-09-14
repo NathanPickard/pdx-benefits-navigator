@@ -27,14 +27,20 @@ export const cliffOhpUnder: EvalCase = {
       'pdx-water-fa',           // Portland renter (landlord verification), under $53,940
       'transportation-wallet',  // Portland, under 200% FPL
       'inclusionary-housing',   // Portland renter, under $71,900 (80% AMI, hh1)
-      'lifeline',               // over 135% standalone ($21,546) but OHP enrollment qualifies
       'trimet-low-income-fare', // under 200% FPL, adult 18-64
     ],
-    uncertain: ['pge-iqbd', 'nw-natural-bill-discount', 'cep-weatherization', 'advsd'],
+    uncertain: [
+      'pge-iqbd',
+      'nw-natural-bill-discount',
+      'cep-weatherization',
+      'advsd',
+      'lifeline', // qualifies only via the "enrolled in qualifying program" path — prospective OHP eligibility vs actual enrollment is genuinely ambiguous
+    ],
   },
   notes:
     'FPL hh1 = $15,960. OHP adult cap 138% = $22,025; $21,800 is $225 under → eligible. ' +
     'SNAP ineligible both sides of this pair: 130% cap = $20,748. ' +
     'Lifeline: over the 135% standalone cap ($21,546) but qualifies via OHP/Medicaid enrollment — ' +
-    'this coupling flips in cliff-ohp-over. Child/senior/veteran/homeowner programs ineligible.',
+    'this coupling flips in cliff-ohp-over. Child/senior/veteran/homeowner programs ineligible. ' +
+    'Lifeline moved to uncertain after eval run 1 (2026-09-14): the seed\'s program-based path says ENROLLED, not eligible-for — either verdict is defensible.',
 };

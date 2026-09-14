@@ -28,10 +28,15 @@ export const pregnantHousehold: EvalCase = {
       'pdx-water-fa',           // Portland, under $61,620 (60% AMI, hh2)
       'transportation-wallet',  // Portland, under $43,280 (200% FPL, hh2)
       'inclusionary-housing',   // Portland renter, under $82,150 (80% AMI, hh2)
-      'lifeline',               // over $29,214 (135% FPL, hh2) standalone, but OHP enrollment qualifies
       'trimet-low-income-fare', // under 200% FPL, adult 18-64
     ],
-    uncertain: ['pge-iqbd', 'nw-natural-bill-discount', 'cep-weatherization', 'advsd'],
+    uncertain: [
+      'pge-iqbd',
+      'nw-natural-bill-discount',
+      'cep-weatherization',
+      'advsd',
+      'lifeline', // qualifies only via the "enrolled in qualifying program" path — prospective OHP eligibility vs actual enrollment is genuinely ambiguous
+    ],
   },
   notes:
     'FPL hh2 = $21,640. The point: OHP is eligible not through the 138% adult cap ($29,863, which ' +
@@ -43,5 +48,6 @@ export const pregnantHousehold: EvalCase = {
     'sun-service-system and multco-preschool-for-all (no children), oregon-eitc ($35,000 > $30,000 ' +
     'earned-income cap), oregon-tanf (pregnancy qualifies categorically but income far exceeds the ' +
     'payment standard), pdx-renter-relocation and multco-eviction-prev (no triggering event), and ' +
-    'veteran/senior programs (none apply).',
+    'veteran/senior programs (none apply). ' +
+    'Lifeline moved to uncertain after eval run 1 (2026-09-14): the seed\'s program-based path says ENROLLED, not eligible-for — either verdict is defensible.',
 };
