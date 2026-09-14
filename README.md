@@ -192,6 +192,7 @@ An AI eligibility tool is only as trustworthy as its data, so the repo gates its
 - **Fixture regression tests** — the test suite (50 tests) checks each demo persona's totals add up and that signature programs (like Renter Relocation for María) stay eligible after prompt or data changes.
 - **Script-maintained README numbers** — every dollar figure in this README's persona table is rewritten from the baked fixtures by [`npm run sync:readme`](scripts/sync-readme-numbers.ts), never hand-typed.
 - **CI on every push** — lint, typecheck, data validation, tests, and a production build ([workflow](.github/workflows/ci.yml)).
+- **Eligibility evals** — [`npm run eval`](scripts/eval/run-eval.ts) scores the live engine against 14 hand-derived ground-truth households (income cliffs, jurisdiction traps, trigger events) across program-set accuracy, dollar plausibility, confidence calibration, and LLM-judged reasoning quality. Latest scoreboard: [`evals/REPORT.md`](evals/REPORT.md).
 
 ---
 
