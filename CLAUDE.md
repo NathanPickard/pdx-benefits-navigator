@@ -6,6 +6,8 @@ Built for the 2026 AI Portland Build Challenge. The hackathon submission is froz
 
 ## Architecture
 
+Before editing code, read `ARCHITECTURE.md`: request flow, browser-state keys, data pipeline, invariants, and which files to touch for common changes.
+
 **Bring-your-own-key, browser-side.** Personalized eligibility analyses are streamed directly from the user's browser to Anthropic with a key they paste into the UI. The app server never sees the key or the intake answers. The only server route is `/api/packet`, which renders a PDF from data POSTed back.
 
 **No vector DB, no workflow engine.** The full programs database is embedded in the system prompt. Claude has the entire eligibility picture in context for every request. Iterate on rules by editing JSON, not pipelines.
