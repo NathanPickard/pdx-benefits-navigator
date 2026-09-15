@@ -133,7 +133,7 @@ The gap comes from **hidden-gem** programs — 11 of our 24 are flagged this way
 
 ```
    ┌───────────────┐                       ┌──────────────┐
-   │  Your browser │  ──── direct ─────▶  │ Anthropic API │
+   │  Your browser │  ──── direct ─────▶   │ Anthropic API│
    │  (your key)   │                       └──────────────┘
    └───────────────┘
         ▲  │
