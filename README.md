@@ -6,6 +6,8 @@
   <a href="https://pdx-benefits-navigator.vercel.app/"><strong>🚀 Try the live demo</strong></a>
   &nbsp;·&nbsp;
   <a href="https://pdx-benefits-navigator-hackathon.vercel.app/"><strong>🏁 Hackathon v1.0 snapshot</strong></a>
+  &nbsp;·&nbsp;
+  <a href="CASE_STUDY.md"><strong>📖 Engineering case study</strong></a>
 </p>
 
 <p align="center">
@@ -193,6 +195,8 @@ An AI eligibility tool is only as trustworthy as its data, so the repo gates its
 - **Script-maintained README numbers** — every dollar figure in this README's persona table is rewritten from the baked fixtures by [`npm run sync:readme`](scripts/sync-readme-numbers.ts), never hand-typed.
 - **CI on every push** — lint, typecheck, data validation, tests, and a production build ([workflow](.github/workflows/ci.yml)).
 - **Eligibility evals** — [`npm run eval`](scripts/eval/run-eval.ts) scores the live engine against 14 hand-derived ground-truth households (income cliffs, jurisdiction traps, trigger events) across program-set accuracy, dollar plausibility, confidence calibration, and LLM-judged reasoning quality. Latest scoreboard: [`evals/REPORT.md`](evals/REPORT.md).
+
+The reasoning behind these choices — and what the eval actually caught — is in the [engineering case study](CASE_STUDY.md).
 
 ---
 
