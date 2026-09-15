@@ -49,7 +49,10 @@ async function loadDotEnvLocal(): Promise<void> {
   }
 }
 
-async function runOne(slug: keyof typeof scenarios, apiKey: string): Promise<void> {
+async function runOne(
+  slug: keyof typeof scenarios,
+  apiKey: string,
+): Promise<void> {
   const intake = scenarios[slug];
   console.log(`\n→ ${slug}`);
 
@@ -57,7 +60,11 @@ async function runOne(slug: keyof typeof scenarios, apiKey: string): Promise<voi
   let output = null;
   let errorMessage: string | null = null;
 
-  for await (const event of analyzeEligibilityStream(apiKey, intake, ELIGIBILITY_MODEL)) {
+  for await (const event of analyzeEligibilityStream(
+    apiKey,
+    intake,
+    ELIGIBILITY_MODEL,
+  )) {
     if (event.type === 'progress') {
       progressCount++;
       process.stdout.write('.');
@@ -73,7 +80,7 @@ async function runOne(slug: keyof typeof scenarios, apiKey: string): Promise<voi
 
   const eligibleCount = output.matches.filter((m) => m.eligible).length;
   console.log(
-    `\n✓ ${slug}: $${output.total_estimated_annual_value.toLocaleString()} across ${eligibleCount} eligible programs (${progressCount} program IDs streamed)`
+    `\n✓ ${slug}: $${output.total_estimated_annual_value.toLocaleString()} across ${eligibleCount} eligible programs (${progressCount} program IDs streamed)`,
   );
 
   const path = join(OUT_DIR, `${slug}.json`);
@@ -96,7 +103,9 @@ async function main() {
     : allSlugs;
 
   if (targets.length === 0) {
-    console.error(`No scenario matches "${filter}". Available: ${allSlugs.join(', ')}`);
+    console.error(
+      `No scenario matches "${filter}". Available: ${allSlugs.join(', ')}`,
+    );
     process.exit(1);
   }
 
