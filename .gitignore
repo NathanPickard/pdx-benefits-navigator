@@ -47,3 +47,6 @@ next-env.d.ts
 # eval run artifacts (REPORT.md is the committed record)
 /evals/runs/
 
+# Playwright MCP session output (screenshots, console logs, page snapshots)
+.playwright-mcp/
+
