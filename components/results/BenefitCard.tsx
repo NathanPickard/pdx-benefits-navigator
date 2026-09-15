@@ -236,7 +236,11 @@ export function BenefitCard({
             )}
           </div>
         </div>
-        <div className="text-left sm:text-right" style={{ minWidth: 130 }}>
+        {/* On sm+ this column sits top-right, under the absolute collapse toggle — clear it */}
+        <div
+          className={`text-left sm:text-right${onToggleCollapse ? ' sm:mt-6' : ''}`}
+          style={{ minWidth: 130 }}
+        >
           <div
             className="font-display tabular"
             style={{
