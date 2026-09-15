@@ -31,11 +31,21 @@ const personas: Array<[string, string, Fixture]> = [
   ['Rose', 'Senior widow, Social Security only, owns home in Lents, Vietnamese-speaking', rose],
 ];
 
-const tableRows = personas
-  .map(([name, situation, f]) =>
-    `| **${name}** | ${situation} | ${usd(f.federal_only_value)}/yr | **${usd(f.total_estimated_annual_value)}/yr** across ${eligible(f)} programs |`,
-  )
-  .join('\n');
+// The markers wrap the WHOLE table (header included). An HTML comment between
+// the header separator and the body rows terminates the table in GitHub's
+// Markdown renderer, so the header must live inside the synced region.
+const TABLE_HEADER =
+  '| Family | Situation | Federal & state programs | PDX Benefits Navigator (full local layer) |\n' +
+  '|---|---|---|---|';
+
+const tableRows =
+  TABLE_HEADER +
+  '\n' +
+  personas
+    .map(([name, situation, f]) =>
+      `| **${name}** | ${situation} | ${usd(f.federal_only_value)}/yr | **${usd(f.total_estimated_annual_value)}/yr** across ${eligible(f)} programs |`,
+    )
+    .join('\n');
 
 const mDelta = maria.total_estimated_annual_value - maria.federal_only_value;
 const hook =
