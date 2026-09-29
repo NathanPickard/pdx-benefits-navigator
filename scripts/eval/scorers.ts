@@ -54,6 +54,37 @@ export function scoreProgramSet(
   };
 }
 
+export type ScheduleUnit = NonNullable<Program['benefit_schedule']>['unit'];
+
+/** Multiplier that turns one schedule row into an annual dollar amount. */
+const ANNUAL_MULTIPLIER: Partial<Record<ScheduleUnit, number>> = {
+  usd_monthly: 12,
+  usd_annual: 1,
+  usd_one_time: 1,
+};
+
+/**
+ * The dollar range an eligible estimate may fall in. The prompt tells the model a
+ * benefit_schedule is authoritative, so its annualized rows widen the coarse range.
+ * A schedule is trusted only when it is dollar-denominated AND overlaps the range:
+ * some schedules hold copays (erdc) or assessed-value exemptions
+ * (veterans-prop-tax-exempt) rather than benefit dollars.
+ */
+export function acceptedDollarRange(program: Program): [number, number] {
+  const { min, max } = program.estimated_annual_value;
+  const schedule = program.benefit_schedule;
+  const multiplier = schedule ? ANNUAL_MULTIPLIER[schedule.unit] : undefined;
+  if (!schedule || multiplier === undefined || schedule.amounts.length === 0) {
+    return [min, max];
+  }
+
+  const annual = schedule.amounts.map((row) => row.value * multiplier);
+  const low = Math.min(...annual);
+  const high = Math.max(...annual);
+  const overlapsRange = low <= max && high >= min;
+  return overlapsRange ? [Math.min(min, low), Math.max(max, high)] : [min, max];
+}
+
 export function scoreDollars(
   output: AnalysisOutput,
   allPrograms: Program[],
@@ -67,10 +98,7 @@ export function scoreDollars(
     if (!m.eligible) continue;
     const program = byId.get(m.program_id);
     if (!program) continue;
-    const [min, max] = valueOverrides?.[m.program_id] ?? [
-      program.estimated_annual_value.min,
-      program.estimated_annual_value.max,
-    ];
+    const [min, max] = valueOverrides?.[m.program_id] ?? acceptedDollarRange(program);
     checked++;
     if (m.estimated_annual_value < min || m.estimated_annual_value > max) {
       violations.push({ program_id: m.program_id, value: m.estimated_annual_value, min, max });
