@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 
 const HIDDEN_GEM_PROGRAMS = [
   { name: "Portland Renter Relocation", value: "$2,900 – $4,500", jurisdiction: "portland" as const },
-  { name: "PCEF Home Energy", value: "up to $15,000", jurisdiction: "portland" as const },
+  { name: "CEP Home Weatherization", value: "up to $15,000", jurisdiction: "portland" as const },
   { name: "SUN Service System", value: "$1,000 – $6,000", jurisdiction: "multnomah" as const },
   { name: "Multnomah Eviction Prevention", value: "up to $5,000", jurisdiction: "multnomah" as const },
   { name: "Water Bureau Discount", value: "80% off bill", jurisdiction: "portland" as const },
@@ -87,10 +87,10 @@ export default function AboutPage() {
             <div>
               <p style={{ color: "var(--ink-2)", lineHeight: 1.7, margin: "0 0 20px", fontSize: "1rem" }}>
                 Most national screening tools check federal programs — SNAP, Medicaid, WIC — and stop
-                there. That leaves a significant gap. Portland and Multnomah County have funded a layer
-                of locally-targeted programs that can add{" "}
-                <strong style={{ color: "var(--ink)" }}>$10,000 – $25,000 a year</strong> for an
-                average family, and most residents never hear about them.
+                there. Portland and Multnomah County fund a layer of local programs on top of
+                those. For our three example households, that layer adds{" "}
+                <strong style={{ color: "var(--ink)" }}>about $8,600 – $19,800 a year</strong>,
+                and most residents never hear about these programs.
               </p>
               <p style={{ color: "var(--ink-2)", lineHeight: 1.7, margin: "0 0 20px", fontSize: "1rem" }}>
                 We built this to close that gap. We check all{" "}

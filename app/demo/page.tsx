@@ -109,7 +109,7 @@ export default function DemoHubPage() {
           Live demo scenarios
         </p>
         <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">
-          Three real Portland situations.
+          Three example Portland households.
         </h1>
         <p className="max-w-2xl text-muted-foreground">
           Each scenario runs against all 24 federal, Oregon, Multnomah County, and Portland
