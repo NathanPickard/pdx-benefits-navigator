@@ -4,4 +4,4 @@
 This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` before writing any code. Heed deprecation notices.
 <!-- END:nextjs-agent-rules -->
 
-Before editing code, read `ARCHITECTURE.md` (codebase map: flows, state keys, invariants, where to edit). Project rules are in `CLAUDE.md`.
+Before editing code, read `ARCHITECTURE.md` (codebase map: flows, state keys, invariants, where to edit). Project rules are in `CLAUDE.md`. Domain vocabulary is in `CONTEXT.md`; recorded decisions are in `adr/`.

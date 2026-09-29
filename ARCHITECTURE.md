@@ -112,7 +112,8 @@ Program schema essentials (`types/program.ts`): `id`, `jurisdiction` (federal|or
 ```
 npm run eval [-- caseId ...] [-- --runs N]      scripts/eval/run-eval.ts
    cases/     14 ground-truth EvalCase (personas + income-cliff pairs + trap cases)
-   scorers.ts pure: program-set F1, dollar in-range vs programs.json, confidence agreement
+   scorers.ts pure: program-set F1, dollar in-range vs programs.json (range, widened by a
+              dollar benefit_schedule only when it overlaps the range), confidence agreement
    judge.ts   LLM judge (Haiku) grades reasoning per match
    report.ts  → evals/REPORT.md scoreboard (+ evals/runs/*.json, gitignored)
 ```
@@ -136,6 +137,8 @@ Run it after any prompt or model change. The scoreboard in `evals/REPORT.md` is 
 - Results page effect is guarded against React StrictMode double-invocation; `pdx_demo_simulate` is removed only after the fake stream finishes.
 - `translatePayload` returns a full re-parsed object; program ids and numbers must survive untouched. `LanguageToggle` keeps the English original and swaps views.
 - ES/VI chrome strings are AI-generated at runtime via the same key. `lib/i18n.ts` only ships English.
+- CSP in `next.config.ts` limits `connect-src` to `'self'` and `https://api.anthropic.com`. A new external host is silently blocked in the browser until it is added there.
+- Tests run on Node's built-in runner (`node:test` + `node:assert/strict` via `tsx`), not Jest or Vitest. Client components cannot be imported in these tests; `scripts/__tests__/fixtures.test.ts` asserts the `SLUG_MAP` invariant as a contract check instead.
 - `app/opengraph-image.tsx` runs under Satori: flexbox only, explicit `display:flex` on every wrapper, WOFF/TTF fonts from `app/_fonts/`.
 - `docs/`, `evals/runs/`, `.env.local` are gitignored. Plans and specs under `docs/superpowers/` are local-only.
 - `v1.0-hackathon` tag and the `-hackathon` Vercel alias are frozen. Ongoing work is `main`.
