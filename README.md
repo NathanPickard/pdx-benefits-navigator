@@ -1,6 +1,6 @@
 # 🌹 PDX Benefits Navigator
 
-> An AI navigator that helps Portland residents discover every federal, Oregon, Multnomah County, and City of Portland benefit program they qualify for — in about three minutes, with a downloadable application packet.
+> Screens a Portland household against 24 federal, Oregon, Multnomah County, and City of Portland benefit programs in about three minutes, then produces a printable application packet.
 
 <p align="center">
   <a href="https://pdx-benefits-navigator.vercel.app/"><strong>🚀 Live demo</strong></a>
@@ -23,230 +23,210 @@
 </p>
 
 <p align="center">
-  <em>Built for the 2026 AI Portland Build Challenge, then hardened with an eval harness and data-integrity gates. Solo project.</em>
+  <em>Built solo for the 2026 AI Portland Build Challenge, then hardened with an eval harness, data-integrity gates, and a domain glossary.</em>
 </p>
-
----
 
 ## For engineering reviewers
 
-If you have five minutes, this is what the repo is meant to show:
+Each claim below links to the code or report that backs it, so you can check it in about five minutes:
 
 | Claim | Evidence |
 |---|---|
-| **The AI is graded, not trusted.** 14 hand-derived ground-truth households (income cliffs, jurisdiction traps, trigger events) score the live engine on program-set F1, dollar plausibility, confidence calibration, and LLM-judged reasoning. | [`evals/REPORT.md`](evals/REPORT.md) — aggregate F1 0.95, precision 0.94, recall 0.98, 96% of dollar estimates inside official ranges. Failures are listed, not hidden. |
-| **Eligibility is derived, not declared.** The model must emit a per-requirement audit trail; code computes `eligible` from it and recomputes every dollar total. The model's own verdict is overridden. | [`lib/eligibility.ts`](lib/eligibility.ts) `deriveEligibility` / `recomputeTotals`, structured output via Zod in [`lib/claudeBrowser.ts`](lib/claudeBrowser.ts) |
-| **Privacy by architecture.** Bring-your-own-key, browser-to-Anthropic streaming. The server has one route, and it renders a PDF. No database, no logging, nothing to breach. | [BYOK trust model](#-the-byok-trust-model), [`app/api/packet/route.ts`](app/api/packet/route.ts) |
-| **Data integrity is a CI gate.** A Zod schema plus invariant checks guard both the curated seed and the merged runtime database, and assert the merge never altered eligibility policy. README dollar figures are script-generated from fixtures. | [`scripts/validate-data.ts`](scripts/validate-data.ts), [`scripts/sync-readme-numbers.ts`](scripts/sync-readme-numbers.ts), [CI workflow](.github/workflows/ci.yml) |
-| **Trade-offs are written down.** Why the whole database is the prompt, what the eval caught, and what I would do differently. | [`CASE_STUDY.md`](CASE_STUDY.md), [`ARCHITECTURE.md`](ARCHITECTURE.md) |
+| **The AI is graded, not trusted.** 14 hand-derived ground-truth households, including income cliffs and jurisdiction traps, score the live engine on which programs it finds, whether dollar estimates fall inside official ranges, confidence, and reasoning checked by a second model. | [`evals/REPORT.md`](evals/REPORT.md): F1 0.95 (precision 0.94, recall 0.98) and 96% of dollar estimates inside official ranges. Every failure is listed by name. |
+| **The grader gets graded too.** The eval has caught three bugs in its own scoring: a judge that lacked the income tables, two wrong answer-key calls, and a dollar check that marked official SNAP amounts as wrong. | [`CASE_STUDY.md` §3](CASE_STUDY.md#3-grading-the-ai-with-receipts), [`adr/0001`](adr/0001-widened-official-range.md) |
+| **Eligibility is derived, not declared.** The model fills in a checklist with one line per program requirement. Code computes eligibility from that checklist and recomputes every dollar total, overriding the model's own verdict. | [`lib/eligibility.ts`](lib/eligibility.ts) `deriveEligibility` and `recomputeTotals`, structured output via Zod in [`lib/claudeBrowser.ts`](lib/claudeBrowser.ts) |
+| **Privacy by architecture.** The browser calls Anthropic directly with the visitor's own API key. The app's one API route renders a PDF and stores nothing. There's no database, no analytics, and no logging of answers. | [How your data flows](#how-your-data-flows), [`app/api/packet/route.ts`](app/api/packet/route.ts) |
+| **Data integrity is a CI gate.** A Zod schema plus invariant checks guard both the curated program data and the merged runtime copy. CI fails if a scrape ever changes eligibility policy. | [`scripts/validate-data.ts`](scripts/validate-data.ts), [CI workflow](.github/workflows/ci.yml) |
+| **Built for AI-assisted development.** An agent starts from hard rules, a codebase map, a domain glossary, and recorded decisions, and the eval scoreboard decides whether a prompt or model change ships. | [How this repo works with AI agents](#how-this-repo-works-with-ai-agents) |
 
-Fastest way to see it working without a key: [María's demo](https://pdx-benefits-navigator.vercel.app/demo/maria).
+To see it working without a key, open [María's demo](https://pdx-benefits-navigator.vercel.app/demo/maria).
 
----
-
-## 📸 A quick look
+## Screenshots
 
 <table>
   <tr>
     <td width="50%" align="center" valign="top">
       <img src="public/screenshots/landing.png" alt="Landing page" />
       <br/>
-      <sub><b>Landing</b> — the $1.2B opening hook, a live preview showing what's possible for María's family, and a three-step explainer of how the navigator works.</sub>
+      <sub><b>Landing</b>: the pitch, a preview of María's results, and a three-step explainer.</sub>
     </td>
     <td width="50%" align="center" valign="top">
       <img src="public/screenshots/demo-hub.png" alt="Demo hub" />
       <br/>
-      <sub><b>Demo hub</b> — three pre-baked personas with their hero programs and expected annual benefits, all explorable without an API key.</sub>
+      <sub><b>Demo hub</b>: three pre-computed households you can open without an API key.</sub>
     </td>
   </tr>
   <tr>
     <td width="50%" align="center" valign="top">
       <img src="public/screenshots/results.png" alt="Results overview" />
       <br/>
-      <sub><b>Results overview</b> — total annual benefits found, side-by-side comparison vs. federal-only tools, time-sensitive urgency banners, priority briefs, and one-click PDF/calendar export.</sub>
+      <sub><b>Results overview</b>: María's estimated annual total with its likely range, a time-sensitive deadline, and the comparison with federal-and-state tools.</sub>
     </td>
     <td width="50%" align="center" valign="top">
-      <img src="public/screenshots/results2.png" alt="Results detail" />
+      <img src="public/screenshots/results2.png" alt="Program card detail" />
       <br/>
-      <sub><b>Results detail</b> — per-program cards with confidence labels, plain-language eligibility reasoning, numbered application steps, document checklist, and the relevant city/state code citation.</sub>
+      <sub><b>Program card</b>: plain-language reasoning, the requirement checklist, next steps, documents to bring, and the legal basis.</sub>
     </td>
   </tr>
 </table>
 
----
+## Why the local layer matters
 
-## 💸 The problem
-
-Oregon families leave roughly **$1.2 billion** in unclaimed benefits on the table every year.
-
-Most national benefit-screening tools only check **federal** programs (SNAP, Medicaid, WIC). They miss the layer of **state, county, and city** programs where Portland actually invests — programs like Renter Relocation Assistance, the Portland Clean Energy Fund, the SUN Service System, and the Water Bureau Discount.
-
-For a typical Portland family, that gap is **$10,000–$25,000 per year**.
+National benefit screeners check federal programs, and some add state programs. They skip the county and city programs where Portland invests its own money, such as Renter Relocation Assistance ($2,900–$4,500 after a rent increase of 10% or more) and the Water Bureau's bill discount. For the three demo households, those local programs add about $8,600 to $19,800 a year.
 
 <!-- README:HOOK:START -->
-> A federal-and-state screener gets María's family to **$33,039/yr**.
-> PDX Benefits Navigator adds the local layer — Multnomah County + City of Portland — and brings the total to **$52,811/yr**. That's **$19,772 more** her family is owed but most tools never surface.
+> Federal and Oregon programs alone come to **$33,039/yr** for María's family.
+> Adding Multnomah County and City of Portland programs brings the estimate to **$52,811/yr**: **$19,772 more** that federal-and-state screeners don't check.
 <!-- README:HOOK:END -->
 
----
+## What it does
 
-## ✨ What it does
+The app runs one screening per household and turns the result into something a family can act on:
 
-- 🤖 **Evaluates all 24 programs at once** — federal + state + county + city, in a single Claude call
-- 🌍 **Speaks 3 languages** — English, Spanish, and Vietnamese, with AI-generated translation of the full results page
-- 📋 **Conversational intake** — a 5-step, mobile-first wizard that takes about 3 minutes
-- 💰 **Per-program dollar estimates** — grounded in official program ranges, with plain-language reasoning
-- 📄 **Printable application packet** — server-rendered PDF you can take to a 211 office or a caseworker
-- 📅 **Renewal calendar** — `.ics` export so you never miss a re-enrollment deadline
-- 🔑 **Bring your own Anthropic key** — the app server never sees your data or your bill
+- **Screens all 24 programs in one Claude call**: federal, Oregon, Multnomah County, and City of Portland
+- **Conversational intake**: a 5-step, mobile-first form that takes about three minutes
+- **Per-program dollar estimates**: anchored to each program's official range, with plain-language reasoning
+- **Near misses**: programs the household almost qualifies for, with the requirement that failed
+- **Printable application packet**: a server-rendered PDF to bring to a 211 office or a caseworker
+- **Renewal calendar**: an `.ics` file of re-enrollment deadlines
+- **Spanish and Vietnamese results**: AI translation of the results page, using your API key
+- **Bring your own Anthropic key**: analyses run on your key, so the app costs nothing to host
 
----
+## Try it without installing anything
 
-## 🚀 Try it in 30 seconds
+The three demo households are pre-computed, so they load instantly with no API key:
 
-**No install required.** The three demo personas are pre-baked and load instantly — no API key needed:
+- **[Open the app](https://pdx-benefits-navigator.vercel.app/)** (latest) or the **[hackathon snapshot](https://pdx-benefits-navigator-hackathon.vercel.app/)** (frozen at v1.0)
+- [María](https://pdx-benefits-navigator.vercel.app/demo/maria): household of 4 with 2 kids, renter, 12% rent increase
+- [James](https://pdx-benefits-navigator.vercel.app/demo/james): disabled veteran, unemployed homeowner
+- [Rose](https://pdx-benefits-navigator.vercel.app/demo/rose): senior on Social Security, Vietnamese-speaking
 
-- 👉 **[Open the app](https://pdx-benefits-navigator.vercel.app/)** (latest) · **[Hackathon snapshot](https://pdx-benefits-navigator-hackathon.vercel.app/)** (frozen at v1.0)
-- 👉 [María — single parent, 2 kids, 12% rent increase](https://pdx-benefits-navigator.vercel.app/demo/maria)
-- 👉 [James — disabled veteran, unemployed homeowner](https://pdx-benefits-navigator.vercel.app/demo/james)
-- 👉 [Rose — senior on Social Security, Vietnamese-speaking](https://pdx-benefits-navigator.vercel.app/demo/rose)
+To screen your own household, click the **key icon** in the top right and paste an [Anthropic API key](https://console.anthropic.com/settings/keys). The key is stored only in your browser.
 
-To run the full intake with your own answers, click the **key icon** in the top right and paste an [Anthropic API key](https://console.anthropic.com/settings/keys). Your key is stored only in your browser.
+## The three demo households
 
----
-
-## 👨‍👩‍👧 The three demo families
+Each household was run through the same engine and model as production, and the results were saved as fixtures:
 
 <!-- README:TABLE:START -->
 | Family | Situation | Federal & state programs | PDX Benefits Navigator (full local layer) |
 |---|---|---|---|
-| **María & family** | Single parent, 2 kids, part-time at Fred Meyer, renter in Cully, Spanish-speaking, 12% rent increase | $33,039/yr | **$52,811/yr** across 18 programs |
+| **María & family** | Household of 4 with 2 kids, part-time at Fred Meyer, renter in Cully, Spanish-speaking, 12% rent increase | $33,039/yr | **$52,811/yr** across 18 programs |
 | **James** | Single, disabled veteran, unemployed, owns home in St. Johns | $13,867/yr | **$22,695/yr** across 14 programs |
 | **Rose** | Senior widow, Social Security only, owns home in Lents, Vietnamese-speaking | $12,887/yr | **$21,507/yr** across 13 programs |
 <!-- README:TABLE:END -->
 
-The gap comes from **hidden-gem** programs — 11 of our 24 are flagged this way, and no national tool surfaces them. Numbers are pulled directly from the [`data/scenarios/*.json`](data/scenarios/) fixtures by `npm run sync:readme`; the source of truth for ranges is [`data/programs.seed.json`](data/programs.seed.json).
+The difference comes from the 11 hidden-gem programs: locally funded programs that national screeners don't cover. `npm run sync:readme` writes these numbers from the fixtures in [`data/scenarios/`](data/scenarios/), so they're never typed by hand. Official program ranges come from [`data/programs.seed.json`](data/programs.seed.json).
 
----
+## How your data flows
 
-## 🔐 The BYOK trust model
+Personalized analysis runs in your browser, on your own Anthropic API key:
 
-```
-   ┌───────────────┐                       ┌──────────────┐
-   │  Your browser │  ──── direct ─────▶   │ Anthropic API│
-   │  (your key)   │                       └──────────────┘
-   └───────────────┘
-        ▲  │
-        │  │ stored in localStorage only
-        │  ▼
-   ┌───────────────┐
-   │ This app's    │  ⛔ never sees your key
-   │ server        │  ⛔ never sees your intake
-   └───────────────┘
+```text
+Your browser ── intake answers + your key ──▶ Anthropic API
+     │
+     │  key: localStorage      answers: sessionStorage
+     │
+     └── intake + results, only if you download the packet ──▶ /api/packet
+                                                    renders the PDF, stores nothing
 ```
 
-Personalized analyses run **client-side** with a key you provide. The browser-side Claude client uses `dangerouslyAllowBrowser: true` — which is safe here because the key belongs to the end user, not the app operator.
+- **Your API key**: stored in `localStorage` and sent only to Anthropic, never to this app's server
+- **Your intake answers**: kept in `sessionStorage` and sent to Anthropic for the analysis; if you download the packet, they're also sent to `/api/packet` to render the PDF
+- **The server**: one API route, which renders the PDF and keeps nothing; there's no database, no analytics, and no logging of answers
 
-- ✅ Your API key never leaves your browser (`localStorage`)
-- ✅ Your intake answers never leave your browser (`sessionStorage`)
-- ✅ No database, no logging of your responses
-- ✅ The only server route is `/api/packet`, which renders the PDF from data you POST back — it isn't stored
+The browser client sets `dangerouslyAllowBrowser: true`. That's safe here because the key belongs to the person using the app, not to the app's operator.
 
----
+## How it works
 
-## 🏗️ How it works
+The browser streams one structured analysis per household, and code checks the result before anything is shown:
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│  Browser                                                        │
-│                                                                 │
-│  /            ── landing                                        │
-│  /intake      ── 5-step wizard ──┐                              │
-│  /demo/[id]   ── load pre-baked fixture from data/scenarios/    │
-│                            │                                    │
-│                            ▼ sessionStorage                     │
-│  /results     ── streams analysis (via user's key) OR           │
-│                  loads pre-baked fixture                        │
-│                            │                       │            │
-│                            ▼                       │            │
-│                   Anthropic API                    │            │
-│                   (streamed directly               │            │
-│                    from browser)                   │            │
-│                                                    │            │
-└────────────────────────────────────────────────────┼────────────┘
-                                                     │
-                                                     ▼
-                                            ┌──────────────┐
-                                            │ /api/packet  │
-                                            │ (PDF render, │
-                                            │  no AI)      │
-                                            └──────────────┘
+```text
+/intake       5-step form ──▶ sessionStorage
+/demo/[id]    loads a pre-computed fixture ──▶ sessionStorage
+                      │
+                      ▼
+/results      streams the analysis from Anthropic (your key)
+              or shows the fixture (demos)
+                      │
+                      ▼
+              code derives eligibility, recomputes totals
+                      │
+                      ▼
+              results page ──▶ /api/packet (PDF, no AI)
 ```
 
 ### Eligibility engine
 
-[`lib/claudeBrowser.ts`](lib/claudeBrowser.ts) wraps the official Anthropic SDK and streams a structured analysis with a Zod output schema. The system prompt in [`lib/eligibility.ts`](lib/eligibility.ts) encodes:
+[`lib/claudeBrowser.ts`](lib/claudeBrowser.ts) wraps the official Anthropic SDK and streams a structured analysis validated by a Zod schema. The system prompt in [`lib/eligibility.ts`](lib/eligibility.ts) contains:
 
-- 2026 Federal Poverty Level, Oregon State Median Income, and HUD Area Median Income tables
-- Portland ZIP-code map (so Claude knows `97203` = St. Johns, not Gresham)
-- All 24 program rules — income limits, jurisdiction requirements, event triggers
-- Confidence-level guidance (`high` / `medium` / `low`)
+- 2026 Federal Poverty Level, Oregon State Median Income, and Portland-area HUD income tables
+- A Portland ZIP code map, so Claude knows `97203` is St. Johns, not Gresham
+- The rules for all 24 programs: income limits, residency, and triggering events such as a rent increase
+- Guidance for rating its own confidence as high, medium, or low
 
-After the stream completes, code takes over: `eligible` is derived from the per-requirement audit trail, dollar totals are recomputed from the matches, and a truncated or invalid response is retried once. Prompt caching is applied to the system prompt, so repeat requests on the same key are cheap.
+Once the stream finishes, code takes over. It derives each program's eligibility from the requirement checklist, recomputes every dollar total from the matches, and retries once if the response was truncated or invalid. The system prompt is cached, so a repeat analysis within about five minutes reads it at the cached price.
 
-### No vector DB. No workflow engine.
+### Why the whole database is the prompt
 
-The full programs database is embedded in the system prompt. Claude has the entire eligibility picture in context for every request — which means rules are iterated by editing JSON, not by re-plumbing pipelines. The case study explains [why this beat retrieval](CASE_STUDY.md#1-the-whole-database-is-the-prompt) for a 24-program corpus.
+There's no vector database and no retrieval step. All 24 programs fit in about 15,000 tokens, so Claude sees every program on every request. Retrieval's typical failure is silently skipping a relevant document, and for this app the worst mistake is skipping a program someone qualifies for. The [case study](CASE_STUDY.md#1-the-whole-database-is-the-prompt) covers the trade-off and where it stops scaling.
 
-### Pre-baked demo fixtures
+### Pre-computed demo fixtures
 
-[`data/scenarios/maria.json`](data/scenarios/maria.json), `james.json`, and `rose.json` contain pre-computed `AnalysisOutput` payloads generated by the same engine and model as production. The `/demo/[scenario]` route loads the matching fixture into `sessionStorage`, then redirects to `/results`, which skips the API call when it sees the fixture key. **Demos work for everyone, with no key required and no API spend.**
+[`data/scenarios/maria.json`](data/scenarios/maria.json), `james.json`, and `rose.json` hold analyses generated by the same engine and model as production. The `/demo/[scenario]` route loads a fixture into `sessionStorage` and redirects to `/results`, which skips the API call when a fixture is present. Demos cost nothing and work for everyone.
 
----
+## Keeping the numbers honest
 
-## ✅ Keeping the numbers honest
+An AI eligibility tool is only as trustworthy as its data, so the repo checks itself in five places:
 
-An AI eligibility tool is only as trustworthy as its data, so the repo gates itself:
+- **Eligibility evals**: [`npm run eval`](scripts/eval/run-eval.ts) scores the live engine against 14 hand-derived households on program accuracy, dollar estimates, confidence, and reasoning. The latest run is committed at [`evals/REPORT.md`](evals/REPORT.md), failures included.
+- **Schema and invariant gate**: [`npm run validate:data`](scripts/validate-data.ts) validates the curated seed and the merged runtime data with Zod, and fails if a merge changes eligibility policy such as income limits or residency rules.
+- **Fixture regression tests**: each demo household's totals must add up, every match must point at a real program, and signature programs (Renter Relocation for María) must stay eligible.
+- **Script-maintained README numbers**: [`npm run sync:readme`](scripts/sync-readme-numbers.ts) rewrites the household table and María's comparison from the fixtures.
+- **CI on every pull request and push to main**: lint, typecheck, data validation, tests, and a production build ([workflow](.github/workflows/ci.yml)).
 
-- **Eligibility evals** — [`npm run eval`](scripts/eval/run-eval.ts) scores the live engine against 14 hand-derived ground-truth households (income cliffs, jurisdiction traps, trigger events) across program-set accuracy, dollar plausibility, confidence calibration, and LLM-judged reasoning quality. The latest run is committed at [`evals/REPORT.md`](evals/REPORT.md), including every failure the scorers and judge flagged.
-- **Schema + invariant gate** — [`npm run validate:data`](scripts/validate-data.ts) validates both the curated seed and the merged runtime database with Zod, and asserts the merge step never altered curated eligibility policy (income bases, thresholds, flags). CI fails if it does.
-- **Fixture regression tests** — the test suite checks each demo persona's totals add up, that every match points at a real program, and that signature programs (like Renter Relocation for María) stay eligible after prompt or data changes.
-- **Script-maintained README numbers** — every dollar figure in this README's persona table is rewritten from the baked fixtures by [`npm run sync:readme`](scripts/sync-readme-numbers.ts), never hand-typed.
-- **CI on every push** — lint, typecheck, data validation, tests, and a production build ([workflow](.github/workflows/ci.yml)).
+What the eval caught, including bugs in the eval itself, is in the [engineering case study](CASE_STUDY.md#3-grading-the-ai-with-receipts).
 
-What the eval actually caught, and what changed because of it, is in the [engineering case study](CASE_STUDY.md#3-grading-the-ai-with-receipts).
+## How this repo works with AI agents
 
----
+I build this project with [Claude Code](https://claude.com/claude-code). The repo gives an agent the same context a new teammate would need:
 
-## 🛠️ Tech stack
+- **[`CLAUDE.md`](CLAUDE.md) and [`AGENTS.md`](AGENTS.md)**: product context and six hard rules, such as keeping AI calls off the server and taking every dollar figure from official program data
+- **[`ARCHITECTURE.md`](ARCHITECTURE.md)**: the request flow, every browser-state key, the invariants, and which files to touch for common changes
+- **[`CONTEXT.md`](CONTEXT.md)**: a domain glossary (match, estimate, unestimated match, official range) so code, comments, and UI copy use one vocabulary
+- **[`adr/`](adr/)**: decisions that would surprise a reader, with the alternatives that were rejected
+- **[`evals/REPORT.md`](evals/REPORT.md)**: the scoreboard that decides whether a prompt or model change ships
+
+The agent proposes changes. Tests, CI, the eval, and my own review of every diff decide what merges.
+
+## Tech stack
 
 - **[Next.js 16](https://nextjs.org/)** App Router on **[Vercel](https://vercel.com/)**
-- **[React 19](https://react.dev/)** + **TypeScript**
-- **[Anthropic Claude](https://www.anthropic.com/api)** — `claude-sonnet-4-6` for eligibility analysis (configurable in [`lib/eligibility.ts`](lib/eligibility.ts)), structured output via the SDK's Zod helper
-- **[Tailwind CSS v4](https://tailwindcss.com/)** + custom **Rose City** design tokens (OKLCH palette, Lora + Plus Jakarta Sans pairing)
-- **[shadcn/ui](https://ui.shadcn.com/)** + **[Base UI](https://base-ui.com/)** primitives
-- **[react-hook-form](https://react-hook-form.com/)** + **[Zod](https://zod.dev/)** for the intake wizard
-- **[framer-motion](https://www.framer.com/motion/)** for the money counter + bar animations
-- **[@react-pdf/renderer](https://react-pdf.org/)** for the printable application packet
-- **[Firecrawl](https://www.firecrawl.dev/)** for the optional program-data scrape pipeline
-- **Node test runner** (no test framework dependency) for unit and fixture tests
+- **[React 19](https://react.dev/)** and **TypeScript**
+- **[Anthropic Claude](https://www.anthropic.com/api)**: `claude-sonnet-4-6` for eligibility analysis (set in [`lib/eligibility.ts`](lib/eligibility.ts)), structured output through the SDK's Zod helper
+- **[Tailwind CSS v4](https://tailwindcss.com/)** with custom Rose City design tokens (OKLCH palette, Lora and Plus Jakarta Sans)
+- **[shadcn/ui](https://ui.shadcn.com/)** and **[Base UI](https://base-ui.com/)** primitives
+- **[react-hook-form](https://react-hook-form.com/)** and **[Zod](https://zod.dev/)** for the intake form
+- **[framer-motion](https://www.framer.com/motion/)** for the money counter and comparison bars
+- **[@react-pdf/renderer](https://react-pdf.org/)** for the application packet
+- **[Firecrawl](https://www.firecrawl.dev/)** for the optional program-data scrape
+- **Node's built-in test runner** for unit and fixture tests, with no test framework dependency
 
----
+## The 24 programs
 
-## 📋 The 24 programs
+The screener covers four levels of government:
 
 | Jurisdiction | Programs |
 |---|---|
-| **Federal** | SNAP · OHP/Medicaid · WIC · School Meals · ACP Internet |
-| **Oregon** | ERDC childcare · Oregon EITC + Kids' Credit · PGE Income Discount · NW Natural GAP · LIHEAP + Energy Trust · Senior/Disabled Property Tax Deferral · Veterans Property Tax Exemption · Oregon TANF · 💎 Double Up Food Bucks |
-| **Multnomah County** | Eviction Prevention Funds · SUN Service System · ADVSD case management · 💎 Multnomah Preschool for All · 💎 TriMet Low-Income Fare |
-| **City of Portland** | 💎 Renter Relocation Assistance · 💎 Water Bureau Discount · 💎 PCEF Home Energy · 💎 Transportation Wallet · 💎 Inclusionary Housing |
+| **Federal** | WIC · School Meals · Lifeline (phone and internet) |
+| **Oregon** | SNAP · Oregon Health Plan (Medicaid) · ERDC childcare · Oregon EITC + Kids' Credit · PGE Income-Qualified Bill Discount · NW Natural Bill Discount · LIHEAP + Energy Trust · Senior/Disabled Property Tax Deferral · Veterans Property Tax Exemption · TANF · 💎 Double Up Food Bucks |
+| **Multnomah County** | 💎 Eviction Prevention · 💎 SUN Service System · 💎 Aging and Disability helpline (ADVSD) · 💎 Preschool for All · 💎 TriMet Low-Income Fare |
+| **City of Portland** | 💎 Renter Relocation Assistance · 💎 Water Bureau Financial Assistance · 💎 CEP Home Weatherization (PCEF-funded) · 💎 Transportation Wallet · 💎 Inclusionary Housing |
 
-💎 = **hidden gem** — 11 of the 24 programs are flagged this way. They're the ones no national tool surfaces, and they drive most of the dollar gap.
+💎 marks a **hidden gem**: one of the 11 locally funded programs that national screeners don't cover. SNAP and the Oregon Health Plan are federally funded but run by Oregon, so the app counts them as Oregon programs.
 
----
+## Local development
 
-## 💻 Local development
+You need Node.js and npm:
 
 ```bash
 git clone https://github.com/NathanPickard/pdx-benefits-navigator.git
@@ -255,7 +235,7 @@ npm install
 npm run dev
 ```
 
-Then open [http://localhost:3000](http://localhost:3000). Click the **key icon** in the top right to paste your Anthropic API key, or jump straight to a `/demo/*` route (no key required).
+Then open [http://localhost:3000](http://localhost:3000). Click the **key icon** in the top right to paste your Anthropic API key, or go straight to a `/demo/*` route, which needs no key.
 
 The full verification chain, identical to CI:
 
@@ -265,15 +245,15 @@ npm run lint && npm run typecheck && npm run validate:data && npm test && npm ru
 
 ### Environment variables
 
-| Variable | Required? | Used by |
-|---|---|---|
-| `ANTHROPIC_API_KEY` | Only for re-baking demo fixtures and running evals (`.env.local`) | [`scripts/precompute-scenarios.ts`](scripts/precompute-scenarios.ts), [`scripts/eval/run-eval.ts`](scripts/eval/run-eval.ts) |
-| `FIRECRAWL_API_KEY` | Only for re-scraping program data | [`scripts/scrape-programs.ts`](scripts/scrape-programs.ts) |
+Normal use needs no environment variables. Two scripts use them from `.env.local`:
 
-No server-side `ANTHROPIC_API_KEY` is needed for normal operation. The personalized analysis path uses a key the user provides in their browser.
+| Variable | Needed for | Used by |
+|---|---|---|
+| `ANTHROPIC_API_KEY` | Re-computing demo fixtures and running evals | [`scripts/precompute-scenarios.ts`](scripts/precompute-scenarios.ts), [`scripts/eval/run-eval.ts`](scripts/eval/run-eval.ts) |
+| `FIRECRAWL_API_KEY` | Re-scraping program data | [`scripts/scrape-programs.ts`](scripts/scrape-programs.ts) |
 
 <details>
-<summary><strong>Advanced: re-baking the demo fixtures</strong></summary>
+<summary><strong>Re-computing the demo fixtures</strong></summary>
 
 If you change the system prompt, the model, or the program data, regenerate `data/scenarios/*.json` so the demos match live results:
 
@@ -282,111 +262,105 @@ npm run bake
 npm run sync:readme
 ```
 
-The bake script ([`scripts/precompute-scenarios.ts`](scripts/precompute-scenarios.ts)) calls `analyzeEligibilityStream()` from [`lib/claudeBrowser.ts`](lib/claudeBrowser.ts) directly in Node, using `ANTHROPIC_API_KEY` from `.env.local` and the same `ELIGIBILITY_MODEL` as the runtime. The sync script then rewrites the persona dollar figures in this README from the fresh fixtures.
+The bake script ([`scripts/precompute-scenarios.ts`](scripts/precompute-scenarios.ts)) calls `analyzeEligibilityStream()` from [`lib/claudeBrowser.ts`](lib/claudeBrowser.ts) directly in Node, with `ANTHROPIC_API_KEY` from `.env.local` and the same `ELIGIBILITY_MODEL` as production. The sync script then rewrites the household numbers in this README.
 
-The seed file [`data/programs.seed.json`](data/programs.seed.json) is the source of truth for program rules — `data/programs.json` is the live build artifact.
+[`data/programs.seed.json`](data/programs.seed.json) is the source of truth for program rules. [`data/programs.json`](data/programs.json) is generated from it.
 </details>
 
----
+## Deploy your own
 
-## 🚢 Deploy your own
-
-The app is built for Vercel with zero configuration. Because AI calls happen client-side with user-provided keys, you can deploy publicly without any AI-related env vars — your account never pays for visitor analyses.
+The app deploys to Vercel with zero configuration. Because analyses run in the browser on each visitor's own key, you can deploy it publicly without any AI environment variables, and your account never pays for visitors' analyses.
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FNathanPickard%2Fpdx-benefits-navigator)
 
-The only server route is `/api/packet` (PDF generation), which has no AI cost. Demo scenarios are served from static JSON bundled with the build.
+The only API route is `/api/packet`, which renders the PDF and has no AI cost. The demo fixtures are static JSON bundled with the build.
 
----
+## Project structure
 
-## 📂 Project structure
-
+```text
+app/              Routes: landing, intake, results, demo, /api/packet
+components/       brand/ intake/ landing/ results/ ui/ (shadcn)
+lib/              Engine: prompt, browser client, Zod schema, cache, PDF, .ics
+types/program.ts  Shared types: Program, IntakeData, AnalysisOutput
+data/             programs.seed.json → programs.json; scenarios/ fixtures
+scripts/          Data pipeline (scrape, merge, validate), bake, eval harness
+evals/            Committed eval scoreboard
+adr/              Architecture decision records
+CONTEXT.md        Domain glossary
+CASE_STUDY.md     Engineering decisions and what they cost
 ```
-app/                          # Routes: landing, intake, results, demo, /api/packet
-components/                   # brand/ intake/ landing/ results/ ui/ (shadcn)
-lib/                          # Engine: prompt, browser client, Zod schema, cache, PDF, .ics
-types/program.ts              # Shared vocabulary: Program, IntakeData, AnalysisOutput
-data/                         # programs.seed.json → programs.json; scenarios/ fixtures
-scripts/                      # Data pipeline (scrape/merge/validate), bake, eval harness
-evals/                        # Committed eval scoreboard
-```
 
-[`ARCHITECTURE.md`](ARCHITECTURE.md) has the full map: request flows, every browser-state key, the data pipeline, invariants, and a where-to-edit table for common changes.
+[`ARCHITECTURE.md`](ARCHITECTURE.md) has the full map: request flows, every browser-state key, the data pipeline, the invariants, and where to edit for common changes.
 
----
-
-## ❓ FAQ
+## FAQ
 
 <details>
 <summary><strong>Is this an official Portland or Multnomah County tool?</strong></summary>
 
-No. This is an independent project built for the AI Portland Build Challenge. It's a discovery aid — always verify eligibility through the official program or a caseworker before applying.
+No. It's an independent project built for the AI Portland Build Challenge. Treat it as a discovery aid, and confirm eligibility with the program or a caseworker before applying.
 </details>
 
 <details>
 <summary><strong>Is it free to use?</strong></summary>
 
-The hosted app is free. Personalized analyses use an Anthropic API key you provide, and a single analysis costs well under a dollar. The three demo scenarios are pre-baked and cost nothing.
+The hosted app is free. A personalized analysis uses the Anthropic API key you provide. Based on the prompt and typical output size, one analysis costs roughly $0.15 to $0.25 at Sonnet 4.6 prices. The three demo households cost nothing.
 </details>
 
 <details>
 <summary><strong>Is my information private?</strong></summary>
 
-Yes. Your intake answers live in your browser's `sessionStorage` only — they never reach our server, and there's no database. Your Anthropic API key is stored in `localStorage` and used to call Anthropic directly from your browser.
+Your intake answers stay in your browser's `sessionStorage`. They're sent to Anthropic for the analysis and, only if you download the packet, to this app's server to render the PDF. Nothing is stored or logged. Your API key stays in `localStorage` and goes only to Anthropic.
 </details>
 
 <details>
 <summary><strong>How accurate are the dollar estimates?</strong></summary>
 
-Every estimate is checked against the official benefit range published by the administering agency, and the eval harness reports how often the model stays inside it. Actual amounts depend on caseworker review and current funding cycles. Treat the results as a starting point, not a guarantee.
+The prompt anchors each estimate to the program's official range, and the eval harness measures how often estimates stay inside it: 96% in the latest run, with every exception listed in [`evals/REPORT.md`](evals/REPORT.md). Actual amounts depend on caseworker review and current funding. Treat the results as a starting point, not a guarantee.
 </details>
 
 <details>
 <summary><strong>Can I add a program?</strong></summary>
 
-Yes — please! Open a PR against [`data/programs.seed.json`](data/programs.seed.json). The schema is in [`types/program.ts`](types/program.ts). New programs should include a citation to the official program page.
+Yes, please. Open a pull request against [`data/programs.seed.json`](data/programs.seed.json). The schema is in [`types/program.ts`](types/program.ts), and each new program needs a citation to its official program page.
 </details>
 
 <details>
-<summary><strong>Why "bring your own key"?</strong></summary>
+<summary><strong>Why bring your own key?</strong></summary>
 
-Three reasons: (1) it keeps the project free for me to host, (2) visitor data never touches my server, and (3) it scales — any number of people can use the tool concurrently without rate-limit collisions. The trade-off is a real adoption barrier for the people who need this most, which the Limitations section owns.
+It keeps the project free to host, it keeps visitor answers off my server's storage, and it scales without shared rate limits. The trade-off is a real barrier for the people who need this most, which the limitations below cover.
 </details>
 
----
+## Limitations
 
-## ⚠️ Limitations
+These are the known gaps, most important first:
 
-- **Estimates only — not legal advice.** Verify with the program before applying.
-- **Programs database is a snapshot.** Federal Poverty Levels update annually; local programs change funding cycles. Refresh `data/programs.seed.json` when rules change.
-- **Eligibility logic is in the prompt.** A deliberate trade-off — makes the engine fast to iterate on, but rules are encoded in natural language rather than a deterministic engine. The eval harness is the guardrail.
-- **AI-generated translations.** Spanish and Vietnamese bundles are produced live by Claude. Good, but not professionally certified.
-- **BYOK is a barrier.** Pasting an API key is fine for reviewers and caseworkers, not for a family in crisis. A sponsored server-side key is the obvious next step and would need the privacy story reworked.
+- **Estimates only, not legal advice**: confirm with the program before applying
+- **Rules live in the prompt**: eligibility logic is written in natural language, not a deterministic rules engine, so the eval harness is the guardrail
+- **Some estimates miss**: 4% of dollar estimates in the latest eval fell outside official ranges, and a few eligible programs come back at $0; both are listed in the report
+- **Program data is a snapshot**: poverty guidelines change every year and local programs change funding cycles, so `data/programs.seed.json` needs periodic updates
+- **Translation needs a key**: only the results page is translated, and translation uses your API key, so the keyless demos are English only
+- **AI-generated translations**: Spanish and Vietnamese results are produced by Claude, not certified translators
+- **Bring your own key is a barrier**: pasting an API key works for reviewers and caseworkers, not for a family in crisis; a sponsored server-side key is the likely next step and would need the privacy design reworked
 
----
+## Contributing
 
-## 🤝 Contributing
+Pull requests are welcome, especially:
 
-PRs welcome, especially:
-
-- New programs to add to the database
-- Corrections to program rules or income thresholds
-- Additional curated (non-AI) language translations
+- New programs for the database
+- Corrections to program rules or income limits
+- Human-reviewed translations
 - Accessibility improvements
 
----
+## Credits and data sources
 
-## 🙏 Credits & data sources
-
-- **2026 Federal Poverty Level** tables (HHS)
-- **Oregon Revised Statutes** for state-program rules
-- **Portland City Code** + **Multnomah County** ordinances for local programs
+- **2026 Federal Poverty Level** guidelines (HHS)
+- **Oregon State Median Income** and **Portland-area HUD income limits**
+- **Oregon Revised Statutes** for state program rules
+- **Portland City Code** and **Multnomah County** ordinances for local programs
 - **211info**, **Multnomah County DCHS**, and **Oregon Food Bank** for community context
 
-Built in Portland with **[Claude Code](https://claude.com/claude-code)** as a pair-programmer, a lot of coffee, and gratitude for the people who actually run these programs day to day.
+Built in Portland with **[Claude Code](https://claude.com/claude-code)** as a pair programmer, and with gratitude for the people who run these programs every day.
 
----
-
-## 📄 License
+## License
 
 [MIT](LICENSE) © 2026 Nathan Pickard

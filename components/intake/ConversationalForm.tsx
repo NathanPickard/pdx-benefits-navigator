@@ -226,7 +226,7 @@ export function ConversationalForm() {
           textAlign: 'center',
         }}
       >
-        Nothing is stored. Your answers stay in this browser session.
+        Your answers stay in this browser session and go to Anthropic only for your analysis. Nothing is saved on our server.
       </p>
     </main>
   );
@@ -897,7 +897,7 @@ function Review({ values }: { values: FormValues }) {
     <>
       <StepHeading
         title="Ready to find what you're owed."
-        sub="We'll check all 20 federal, state, county, and Portland programs in about 5 seconds."
+        sub="We'll check all 24 federal, state, county, and Portland programs. The analysis can take a few minutes."
       />
       <div className="rc-card-flat" style={{ padding: '8px 0' }}>
         <dl style={{ margin: 0 }}>

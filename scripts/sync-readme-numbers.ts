@@ -26,7 +26,7 @@ const james = load('james');
 const rose = load('rose');
 
 const personas: Array<[string, string, Fixture]> = [
-  ['María & family', 'Single parent, 2 kids, part-time at Fred Meyer, renter in Cully, Spanish-speaking, 12% rent increase', maria],
+  ['María & family', 'Household of 4 with 2 kids, part-time at Fred Meyer, renter in Cully, Spanish-speaking, 12% rent increase', maria],
   ['James', 'Single, disabled veteran, unemployed, owns home in St. Johns', james],
   ['Rose', 'Senior widow, Social Security only, owns home in Lents, Vietnamese-speaking', rose],
 ];
@@ -49,8 +49,8 @@ const tableRows =
 
 const mDelta = maria.total_estimated_annual_value - maria.federal_only_value;
 const hook =
-  `> A federal-and-state screener gets María's family to **${usd(maria.federal_only_value)}/yr**.\n` +
-  `> PDX Benefits Navigator adds the local layer — Multnomah County + City of Portland — and brings the total to **${usd(maria.total_estimated_annual_value)}/yr**. That's **${usd(mDelta)} more** her family is owed but most tools never surface.`;
+  `> Federal and Oregon programs alone come to **${usd(maria.federal_only_value)}/yr** for María's family.\n` +
+  `> Adding Multnomah County and City of Portland programs brings the estimate to **${usd(maria.total_estimated_annual_value)}/yr**: **${usd(mDelta)} more** that federal-and-state screeners don't check.`;
 
 function replaceRegion(text: string, name: string, body: string): string {
   const re = new RegExp(`(<!-- README:${name}:START -->\\n)[\\s\\S]*?(\\n<!-- README:${name}:END -->)`);

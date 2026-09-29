@@ -18,6 +18,7 @@ import programs from "@/data/programs.json";
 const HIDDEN_GEM_COUNT = (programs as { hidden_gem: boolean }[]).filter(
   (p) => p.hidden_gem,
 ).length;
+const PROGRAM_COUNT = programs.length;
 
 const eligibleCount = (f: { matches: { eligible: boolean }[] }) =>
   f.matches.filter((m) => m.eligible).length;
@@ -36,12 +37,12 @@ const HIDDEN_GEMS = [
       "When your rent goes up more than 10% in a year, your landlord owes you a lump sum.",
   },
   {
-    id: "pcef",
-    name: "PCEF Home Energy",
+    id: "cep",
+    name: "CEP Home Weatherization",
     value: "up to $15,000",
     jurisdiction: "portland" as const,
     blurb:
-      "Free heat pumps, weatherization, and AC — funded by Portland's tax on large retailers.",
+      "Free weatherization, heat pumps, and home repairs, funded by Portland's clean energy tax on large retailers.",
   },
   {
     id: "sun",
@@ -83,7 +84,7 @@ const SCENARIO_SUMMARIES = [
     short: "María",
     zip: "97218 · Cully",
     blurb:
-      "Single parent · 2 kids · part-time at Fred Meyer · rent went up 12%.",
+      "Family of 4 · 2 kids · part-time at Fred Meyer · rent went up 12%.",
     total: MARIA_TOTAL,
     eligibleCount: MARIA_ELIGIBLE,
     accent: "rose" as const,
@@ -112,7 +113,7 @@ const SCENARIO_SUMMARIES = [
 
 const MARQUEE_ITEMS = [
   ["Portland Renter Relocation", "$4,500"],
-  ["PCEF Home Energy", "up to $15,000"],
+  ["CEP Home Weatherization", "up to $15,000"],
   ["SUN Service System", "$3,000"],
   ["Multnomah Eviction Prevention", "$2,000"],
   ["Water Bureau Discount", "80% off"],
@@ -159,17 +160,16 @@ export default function HomePage() {
                     fontWeight: 500,
                   }}
                 >
-                  Portland has set aside{" "}
+                  Most screeners skip{" "}
                   <span style={{ color: "var(--rose)" }}>
                     <StatReveal
-                      target={1.2}
-                      decimals={1}
-                      prefix="$"
+                      target={HIDDEN_GEM_COUNT}
+                      decimals={0}
                       duration={2.4}
                     />{" "}
-                    billion
+                    benefits
                   </span>{" "}
-                  for families who never claim it.
+                  Portland families can get.
                 </h1>
 
                 <p
@@ -182,7 +182,7 @@ export default function HomePage() {
                   }}
                 >
                   Most national tools only check federal benefits. We check{" "}
-                  <strong style={{ color: "var(--ink)" }}>all twenty</strong> —
+                  <strong style={{ color: "var(--ink)" }}>all {PROGRAM_COUNT}</strong> —
                   federal, Oregon, Multnomah County, and the City of Portland —
                   and put together a kind, useful packet for you in about three
                   minutes.
@@ -259,7 +259,7 @@ export default function HomePage() {
                       margin: "0 0 18px",
                     }}
                   >
-                    Single parent · 2 kids · part-time at Fred Meyer · rent
+                    Family of 4 · 2 kids · part-time at Fred Meyer · rent
                     went up 12%.
                   </p>
 
@@ -397,7 +397,7 @@ export default function HomePage() {
               n="1"
               tone="rose"
               title="Tell us about your household"
-              body="Twelve gentle questions: size, income, ZIP, what's going on. Your answers stay in this browser."
+              body="Five short steps: household, income, ZIP, and what's going on. Nothing is saved on our server."
             />
             <Step
               n="2"
