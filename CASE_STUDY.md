@@ -67,19 +67,23 @@ The current scoreboard ([`evals/REPORT.md`](evals/REPORT.md)):
 
 | case | F1 | precision | recall | $ in-range |
 | --- | --- | --- | --- | --- |
-| zip-gresham (jurisdiction trap) | 1.00 | 1.00 | 1.00 | 79% |
-| veteran-renter (false-positive trap) | 1.00 | 1.00 | 1.00 | 92% |
-| cliff-snap-over ($484 over the cutoff) | 0.87 | 0.77 | 1.00 | 88% |
-| **Aggregate (14 cases)** | **0.97** | **0.96** | **0.99** | **93%** |
+| zip-gresham (jurisdiction trap) | 1.00 | 1.00 | 1.00 | 86% |
+| veteran-renter (false-positive trap) | 0.96 | 0.92 | 1.00 | 93% |
+| cliff-snap-over ($484 over the cutoff) | 0.91 | 0.83 | 1.00 | 100% |
+| **Aggregate (14 cases)** | **0.95** | **0.94** | **0.98** | **96%** |
+
+The veteran-renter trap held: the property-tax exemption was correctly denied.
+Its one false positive is county eviction prevention, marked eligible at $0.
 
 The eval earns its keep by what it caught. The model let SNAP through for a
-household $484 *over* the 130% FPL cutoff — with an arithmetic error the judge
-flagged. It repeatedly overrides the database's Oregon EITC income cap with its
+household $484 *over* the 130% FPL cutoff in two separate runs: first with an
+arithmetic error the judge flagged, then by citing a SNAP categorical-eligibility
+rule my database doesn't encode. It repeatedly overrides the database's Oregon EITC income cap with its
 own world knowledge. And it sometimes invents dollar figures outside official
 ranges (a $16,000 OHP estimate against a $3,000–$6,000 published range) —
 directly violating a project hard rule, now visible instead of anecdotal.
 
-Two of my own mistakes are part of the record. First, the judge originally
+Three of my own mistakes are part of the record. First, the judge originally
 graded reasoning without the FPL/SMI/AMI tables the engine sees, so it called
 *correct* table citations "fabricated" — a 45% pass rate that was noise. Grading
 the grader is part of eval engineering. Second, the first run proved my answer
@@ -88,7 +92,14 @@ Lifeline's "enrolled in a qualifying program" path (enrolled ≠ eligible), and
 I'd marked a senior household SNAP-ineligible when the model correctly applied
 the federal elderly-household income-test waiver my database doesn't encode.
 Both moved to the eval's `uncertain` bucket, which exists precisely so ambiguous
-calls never inflate or deflate the score.
+calls never inflate or deflate the score. Third, the dollar scorer checked only
+each program's coarse range, while the prompt tells the model to prefer the
+official benefit table. Correct amounts were scored as violations: SNAP at
+$785 × 12, the exact allotment for a household of three, sat above the $9,000
+range cap. The fix trusts a table only when it holds benefit dollars and
+overlaps the range, because two tables in my data hold copays and assessed
+property values instead. Re-scoring the earlier run cut dollar violations from
+16 to 11.
 
 ## 4. Keeping the numbers honest
 
