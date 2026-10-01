@@ -49,7 +49,7 @@ async function runStreamAttempt(
 ): Promise<{ parsed: AnalysisOutput; stopReason: string | null }> {
   const stream = anthropic.messages.stream({
     model,
-    // The full 20-program per-requirement analysis runs ~8-12K output tokens;
+    // The full 24-program per-requirement analysis runs ~8-12K output tokens;
     // 64K is safe streaming headroom (timeouts aren't a concern when streaming).
     // NOTE: adaptive thinking was tried and removed — on this 20-program task it
     // pushed a streamed analysis past several minutes with no accuracy gain over
