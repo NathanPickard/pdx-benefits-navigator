@@ -4,6 +4,7 @@
  */
 
 import type { MatchResult, Program } from '@/types/program';
+import { formatEstimate, hasEstimate } from './estimate';
 
 export interface CalendarEntry {
   match: MatchResult;
@@ -67,7 +68,8 @@ export function buildIcsCalendar(entries: CalendarEntry[]): string {
     start.setUTCMonth(start.getUTCMonth() + months);
 
     const descParts: string[] = [];
-    descParts.push(`Estimated value: $${match.estimated_annual_value.toLocaleString()}/year`);
+    const value = match.estimated_annual_value;
+    descParts.push(`Estimated value: ${formatEstimate(value)}${hasEstimate(value) ? '/year' : ''}`);
     if (program.renewal_cycle) descParts.push(`Renewal cycle: ${program.renewal_cycle}`);
     if (program.contact_org) descParts.push(`Contact: ${program.contact_org}`);
     if (program.contact_phone) descParts.push(`Phone: ${program.contact_phone}`);

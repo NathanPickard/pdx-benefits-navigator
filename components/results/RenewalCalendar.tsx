@@ -3,6 +3,7 @@
 import { Calendar, Download } from 'lucide-react';
 
 import { buildIcsCalendar, downloadIcsFile, renewalIntervalMonths } from '@/lib/calendar';
+import { formatEstimate } from '@/lib/estimate';
 import type { Chrome, LanguageCode } from '@/lib/i18n';
 import type { MatchResult, Program } from '@/types/program';
 
@@ -138,11 +139,17 @@ export function RenewalCalendar({
           label={chrome.renewalUpcoming}
           entries={upcoming}
           locale={locale}
+          askLabel={chrome.askTheProgram}
           highlight
         />
       )}
       {later.length > 0 && (
-        <CalendarBucket label={chrome.renewalLater} entries={later} locale={locale} />
+        <CalendarBucket
+          label={chrome.renewalLater}
+          entries={later}
+          locale={locale}
+          askLabel={chrome.askTheProgram}
+        />
       )}
     </section>
   );
@@ -152,11 +159,13 @@ function CalendarBucket({
   label,
   entries,
   locale,
+  askLabel,
   highlight,
 }: {
   label: string;
   entries: RenderableEntry[];
   locale: string;
+  askLabel: string;
   highlight?: boolean;
 }) {
   const groups = new Map<string, { date: Date; items: RenderableEntry[] }>();
@@ -229,7 +238,7 @@ function CalendarBucket({
                     className="tabular"
                     style={{ color: 'var(--moss-2)', fontWeight: 600 }}
                   >
-                    ${match.estimated_annual_value.toLocaleString()}
+                    {formatEstimate(match.estimated_annual_value, askLabel)}
                   </div>
                 </li>
               ))}

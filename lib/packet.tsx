@@ -1,5 +1,6 @@
 import { Document, Image, Page, StyleSheet, Text, View } from '@react-pdf/renderer';
 import type { AnalysisOutput, IntakeData, MatchResult, Program } from '@/types/program';
+import { formatEstimate, hasEstimate } from './estimate';
 
 const C = {
   fg: '#18181b',
@@ -295,8 +296,10 @@ function ProgramPage({
           </View>
         </View>
         <View>
-          <Text style={styles.progValue}>${match.estimated_annual_value.toLocaleString()}</Text>
-          <Text style={styles.progValueLabel}>estimated / year</Text>
+          <Text style={styles.progValue}>{formatEstimate(match.estimated_annual_value)}</Text>
+          {hasEstimate(match.estimated_annual_value) && (
+            <Text style={styles.progValueLabel}>estimated / year</Text>
+          )}
         </View>
       </View>
 

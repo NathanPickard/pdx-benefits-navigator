@@ -136,3 +136,18 @@ test('buildIcsCalendar: URL property included when program has application_url',
   const ics = buildIcsCalendar([makeEntry()]);
   assert.match(ics, /URL:https:\/\/www\.oregon\.gov/);
 });
+
+// Undo RFC 5545 line folding so assertions don't depend on where lines wrap.
+const unfold = (ics: string) => ics.replace(/\r\n /g, '');
+
+test('buildIcsCalendar: DESCRIPTION shows the estimate for an estimated match', () => {
+  const ics = unfold(buildIcsCalendar([makeEntry()]));
+  // RFC 5545 escapes commas in TEXT values.
+  assert.ok(ics.includes('Estimated value: $1\\,800/year'));
+});
+
+test('buildIcsCalendar: DESCRIPTION says "Ask the program" for an unestimated match, never $0', () => {
+  const ics = unfold(buildIcsCalendar([makeEntry({ estimated_annual_value: 0 })]));
+  assert.ok(ics.includes('Estimated value: Ask the program'));
+  assert.ok(!ics.includes('$0'));
+});

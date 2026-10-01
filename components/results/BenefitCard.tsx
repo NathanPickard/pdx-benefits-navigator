@@ -13,6 +13,7 @@ import {
 
 import { JurisdictionPill } from '@/components/brand/JurisdictionPill';
 import type { AppStatus } from '@/lib/applicationStatus';
+import { formatEstimate, hasEstimate } from '@/lib/estimate';
 import type { Chrome } from '@/lib/i18n';
 import type { MatchResult, Program } from '@/types/program';
 
@@ -251,9 +252,11 @@ export function BenefitCard({
               letterSpacing: '-0.02em',
             }}
           >
-            ${match.estimated_annual_value.toLocaleString()}
+            {formatEstimate(match.estimated_annual_value, chrome.askTheProgram)}
           </div>
-          <div className="tag mt-1">{chrome.estimatedYear}</div>
+          {hasEstimate(match.estimated_annual_value) && (
+            <div className="tag mt-1">{chrome.estimatedYear}</div>
+          )}
           <div
             className="flex items-center justify-start sm:justify-end gap-1.5 mt-3"
             style={{ fontSize: '0.78rem', color: 'var(--ink-3)' }}

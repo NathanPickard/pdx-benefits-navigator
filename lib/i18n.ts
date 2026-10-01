@@ -22,6 +22,7 @@ export interface Chrome {
   confidenceMedium: string;
   confidenceLow: string;
   estimatedYear: string;
+  askTheProgram: string; // shown in place of a dollar figure for an unestimated match
   whyYouQualify: string;
   nextSteps: string;
   whatToBring: string;
@@ -102,6 +103,7 @@ export const CHROME_EN: Chrome = {
   confidenceMedium: 'Worth checking',
   confidenceLow: 'Edge case',
   estimatedYear: 'estimated / year',
+  askTheProgram: 'Ask the program',
   whyYouQualify: 'Why you qualify',
   nextSteps: 'Next steps',
   whatToBring: 'What to bring',

@@ -18,6 +18,7 @@ import { ProgressBar } from '@/components/results/ProgressBar';
 import { UrgencyBanner } from '@/components/results/UrgencyBanner';
 import { RenewalCalendar } from '@/components/results/RenewalCalendar';
 import { useApplicationStatus } from '@/lib/applicationStatus';
+import { formatEstimate, hasEstimate } from '@/lib/estimate';
 import { CHROME_EN, LANGUAGES, type Chrome, type LanguageCode } from '@/lib/i18n';
 import { useApiKey } from '@/lib/userKey';
 import { cacheAnalysis, readCachedAnalysis } from '@/lib/resultsCache';
@@ -201,9 +202,11 @@ export default function ResultsPage() {
         if (!translated?.output || !translated?.chrome) {
           throw new Error('Translation response missing fields');
         }
+        // The model may drop a Chrome key; fall back to English rather than render blank.
+        const bundle = translated as TranslatedBundle;
         setTranslations((prev) => ({
           ...prev,
-          [next]: translated as TranslatedBundle,
+          [next]: { ...bundle, chrome: { ...CHROME_EN, ...bundle.chrome } },
         }));
         setLang(next);
       } catch (e) {
@@ -631,9 +634,10 @@ function Dashboard({
       '',
     ];
     for (const { match, program } of allEligible) {
-      const value = match.estimated_annual_value.toLocaleString();
+      const value = match.estimated_annual_value;
+      const amount = hasEstimate(value) ? `~${formatEstimate(value)}/yr` : formatEstimate(value);
       const step = match.next_steps?.[0] ?? program.short_name;
-      lines.push(`• ${program.name} — ~$${value}/yr — ${step}`);
+      lines.push(`• ${program.name} — ${amount} — ${step}`);
     }
     const text = lines.join('\n');
     try {
