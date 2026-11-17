@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useForm, Controller, type UseFormReturn } from 'react-hook-form';
@@ -59,6 +59,8 @@ const stepFields: Record<number, (keyof FormValues)[]> = {
   4: [],
 };
 
+const AUTOSAVE_DEBOUNCE_MS = 500;
+
 const DEFAULT_VALUES: FormValues = {
   household_size: 1,
   num_children: 0,
@@ -110,7 +112,6 @@ export function ConversationalForm() {
   const router = useRouter();
   const [step, setStep] = useState(0);
   const [submitting, setSubmitting] = useState(false);
-  const autosaveTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(schema),
@@ -124,13 +125,17 @@ export function ConversationalForm() {
   }, [form]);
 
   useEffect(() => {
-    const sub = form.watch((values) => {
-      if (autosaveTimer.current) clearTimeout(autosaveTimer.current);
-      autosaveTimer.current = setTimeout(() => {
-        try { sessionStorage.setItem('pdx_intake', JSON.stringify(values)); } catch { /* non-fatal */ }
-      }, 500);
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const unsubscribe = form.subscribe({
+      formState: { values: true },
+      callback: ({ values }) => {
+        clearTimeout(timer);
+        timer = setTimeout(() => {
+          try { sessionStorage.setItem('pdx_intake', JSON.stringify(values)); } catch { /* non-fatal */ }
+        }, AUTOSAVE_DEBOUNCE_MS);
+      },
     });
-    return () => { sub.unsubscribe(); if (autosaveTimer.current) clearTimeout(autosaveTimer.current); };
+    return () => { unsubscribe(); clearTimeout(timer); };
   }, [form]);
 
   const next = async () => {
@@ -512,7 +517,6 @@ function NumStepper({
 function Household({ form }: { form: Form }) {
   const num_children = form.watch('num_children');
   const children_ages = form.watch('children_ages') ?? [];
-  const household_size = form.watch('household_size');
 
   return (
     <>
@@ -527,7 +531,7 @@ function Household({ form }: { form: Form }) {
             name="household_size"
             render={({ field }) => (
               <NumStepper
-                value={household_size}
+                value={field.value}
                 onChange={field.onChange}
                 min={1}
                 max={12}
@@ -541,7 +545,7 @@ function Household({ form }: { form: Form }) {
             name="num_children"
             render={({ field }) => (
               <NumStepper
-                value={num_children}
+                value={field.value}
                 onChange={(n) => {
                   field.onChange(n);
                   const ages = Array.from({ length: n }, (_, i) => children_ages[i] ?? 0);
