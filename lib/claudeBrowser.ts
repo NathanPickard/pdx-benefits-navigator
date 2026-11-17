@@ -34,19 +34,23 @@ export type AnalyzeStreamEvent =
   | { type: 'complete'; output: AnalysisOutput }
   | { type: 'error'; message: string };
 
+interface StreamAttemptResult {
+  parsed: AnalysisOutput;
+  stopReason: string | null;
+}
+
 /**
- * Run one stream attempt. Returns { parsed, stopReason }. Yields progress
- * events into the provided callback so the generator can forward them.
- * On the retry attempt, `onProgress` is still called (uses the same seenIds
- * set so no duplicate program_id events are emitted across attempts).
+ * Run one stream attempt. Yields a progress event as soon as each new
+ * program_id appears in the streamed text, then returns { parsed, stopReason }.
+ * The retry attempt shares the same seenIds set, so no program_id is emitted
+ * twice across attempts.
  */
-async function runStreamAttempt(
+async function* runStreamAttempt(
   anthropic: Anthropic,
   intake: IntakeData,
   model: string,
-  seenIds: Set<string>,
-  onProgress: (programId: string) => void
-): Promise<{ parsed: AnalysisOutput; stopReason: string | null }> {
+  seenIds: Set<string>
+): AsyncGenerator<AnalyzeStreamEvent, StreamAttemptResult> {
   const stream = anthropic.messages.stream({
     model,
     // The full 24-program per-requirement analysis runs ~8-12K output tokens;
@@ -83,7 +87,7 @@ async function runStreamAttempt(
         const id = match[1];
         if (!seenIds.has(id)) {
           seenIds.add(id);
-          onProgress(id);
+          yield { type: 'progress', programId: id };
         }
       }
     }
@@ -113,26 +117,12 @@ export async function* analyzeEligibilityStream(
   const anthropic = makeClient(apiKey);
   const seenIds = new Set<string>();
 
-  // Collected progress events from the first attempt to yield them in order.
-  const pendingProgress: string[] = [];
-
   try {
     let firstAttemptError: unknown = null;
 
     // ── Attempt 1 ──────────────────────────────────────────────────────────
     try {
-      const result = await runStreamAttempt(
-        anthropic,
-        intake,
-        model,
-        seenIds,
-        (id) => pendingProgress.push(id)
-      );
-
-      // Flush progress events from the first attempt.
-      for (const id of pendingProgress) {
-        yield { type: 'progress', programId: id };
-      }
+      const result = yield* runStreamAttempt(anthropic, intake, model, seenIds);
 
       if (result.stopReason === 'max_tokens') {
         // Truncated — treat as retryable.
@@ -145,27 +135,14 @@ export async function* analyzeEligibilityStream(
         return;
       }
     } catch (err) {
-      // Flush whatever progress we collected before the error.
-      for (const id of pendingProgress) {
-        yield { type: 'progress', programId: id };
-      }
       firstAttemptError = err;
     }
 
     // ── Attempt 2 (retry once on truncation or validation failure) ──────────
-    // Collect attempt-2 progress ids so we can yield them after the call
-    // resolves (can't yield from inside a plain callback).
-    const retryProgress: string[] = [];
-
-    let attempt2Result: { parsed: AnalysisOutput; stopReason: string | null };
+    let attempt2Result: StreamAttemptResult;
     try {
-      attempt2Result = await runStreamAttempt(
-        anthropic,
-        intake,
-        model,
-        seenIds, // shared — won't re-emit already-seen program ids
-        (id) => retryProgress.push(id)
-      );
+      // seenIds is shared, so already-seen program ids aren't re-emitted.
+      attempt2Result = yield* runStreamAttempt(anthropic, intake, model, seenIds);
     } catch (err) {
       // Re-throw typed API errors so the outer handler produces the correct
       // user-facing message (auth failure, rate limit, etc.). Only absorb
@@ -182,11 +159,6 @@ export async function* analyzeEligibilityStream(
         message: 'The analysis response was cut off — please try again.',
       };
       return;
-    }
-
-    // Flush attempt-2 progress events (mirroring attempt-1 flush above).
-    for (const id of retryProgress) {
-      yield { type: 'progress', programId: id };
     }
 
     if (attempt2Result.stopReason === 'max_tokens') {
