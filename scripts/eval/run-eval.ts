@@ -21,11 +21,11 @@ import { scoreProgramSet, scoreDollars, scoreConfidence } from './scorers';
 import { judgeMatch, JUDGE_MODEL } from './judge';
 import { renderReport } from './report';
 import type { AttemptResult, CaseResult, ReasoningScore, RunData } from './report';
-import { analyzeEligibilityStream } from '../../lib/claudeBrowser';
 import { ELIGIBILITY_MODEL } from '../../lib/eligibility';
 import type { AnalysisOutput, Program } from '../../types/program';
 import type { EvalCase } from './types';
 import { loadDotEnvLocal } from '../lib/env';
+import { collectAnalysis } from '../lib/collectAnalysis';
 
 const ROOT = process.cwd();
 
@@ -126,21 +126,13 @@ async function runAttempt(
   allPrograms: Program[],
   programById: Map<string, Program>,
 ): Promise<AttemptResult> {
-  let output: AnalysisOutput | null = null;
-  let errorMessage: string | null = null;
-
-  for await (const event of analyzeEligibilityStream(apiKey, kase.intake, ELIGIBILITY_MODEL)) {
-    if (event.type === 'progress') {
-      process.stdout.write('.');
-    } else if (event.type === 'complete') {
-      output = event.output;
-    } else if (event.type === 'error') {
-      errorMessage = event.message;
-    }
+  let output: AnalysisOutput;
+  try {
+    output = await collectAnalysis(apiKey, kase.intake, () => process.stdout.write('.'));
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : String(error);
+    throw new Error(`${kase.id}: ${message}`);
   }
-
-  if (errorMessage) throw new Error(errorMessage);
-  if (!output) throw new Error(`${kase.id}: no complete event received`);
 
   const programSet = scoreProgramSet(output, kase.expected, allPrograms);
   const dollars = scoreDollars(output, allPrograms, kase.expected.valueOverrides);

@@ -1,8 +1,8 @@
 /**
  * Re-bakes the pre-computed demo scenario fixtures at data/scenarios/*.json.
  *
- * Calls analyzeEligibilityStream from lib/claudeBrowser.ts directly in a Node
- * context, using ANTHROPIC_API_KEY from .env.local. The runtime app still uses
+ * Calls analyzeEligibilityStream from lib/claudeBrowser.ts (via
+ * scripts/lib/collectAnalysis.ts) directly in a Node context, using ANTHROPIC_API_KEY from .env.local. The runtime app still uses
  * the same function from the browser with the user's BYOK — this script is the
  * build-time path for refreshing demo fixtures after the seed or eligibility
  * prompt changes. The server never sees an API key in production.
@@ -17,9 +17,9 @@
 import { writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { scenarios } from '../lib/scenarios';
-import { analyzeEligibilityStream } from '../lib/claudeBrowser';
-import { ELIGIBILITY_MODEL } from '../lib/eligibility';
 import { formatUsd } from '../lib/estimate';
+import type { AnalysisOutput } from '../types/program';
+import { collectAnalysis } from './lib/collectAnalysis';
 import { loadDotEnvLocal } from './lib/env';
 
 const ROOT = process.cwd();
@@ -36,26 +36,16 @@ async function runOne(
   console.log(`\n→ ${slug}`);
 
   let progressCount = 0;
-  let output = null;
-  let errorMessage: string | null = null;
-
-  for await (const event of analyzeEligibilityStream(
-    apiKey,
-    intake,
-    ELIGIBILITY_MODEL,
-  )) {
-    if (event.type === 'progress') {
+  let output: AnalysisOutput;
+  try {
+    output = await collectAnalysis(apiKey, intake, () => {
       progressCount++;
       process.stdout.write('.');
-    } else if (event.type === 'complete') {
-      output = event.output;
-    } else if (event.type === 'error') {
-      errorMessage = event.message;
-    }
+    });
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : String(error);
+    throw new Error(`${slug}: ${message}`);
   }
-
-  if (errorMessage) throw new Error(`${slug}: ${errorMessage}`);
-  if (!output) throw new Error(`${slug}: no complete event received`);
 
   const eligibleCount = output.matches.filter((m) => m.eligible).length;
   console.log(
