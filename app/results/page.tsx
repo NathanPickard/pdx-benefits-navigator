@@ -43,6 +43,19 @@ type State =
   | { kind: 'error'; message: string }
   | { kind: 'needs-key' };
 
+// Demo replay pacing: one program ticks off every DEMO_TICK_MS, then the
+// results appear DEMO_FINISH_DELAY_MS after the last one.
+const DEMO_TICK_MS = 438;
+const DEMO_FINISH_DELAY_MS = 250;
+
+// State updater that records one more evaluated program while loading.
+function appendEvaluated(id: string): (s: State) => State {
+  return (s) =>
+    s.kind === 'loading'
+      ? { ...s, progress: { evaluated: [...s.progress.evaluated, id] } }
+      : s;
+}
+
 export default function ResultsPage() {
   const router = useRouter();
   const { apiKey, hydrated } = useApiKey();
@@ -105,16 +118,11 @@ export default function ResultsPage() {
           finishTimeout = setTimeout(() => {
             sessionStorage.removeItem('pdx_demo_simulate');
             setState({ kind: 'ok', data: output });
-          }, 250);
+          }, DEMO_FINISH_DELAY_MS);
           return;
         }
-        const id = programIds[i++];
-        setState((s) =>
-          s.kind === 'loading'
-            ? { ...s, progress: { evaluated: [...s.progress.evaluated, id] } }
-            : s
-        );
-      }, 438);
+        setState(appendEvaluated(programIds[i++]));
+      }, DEMO_TICK_MS);
 
       return () => {
         clearInterval(interval);
@@ -147,11 +155,7 @@ export default function ResultsPage() {
       for await (const event of analyzeEligibilityStream(apiKey, parsed)) {
         if (cancelled) return;
         if (event.type === 'progress') {
-          setState((s) =>
-            s.kind === 'loading'
-              ? { ...s, progress: { evaluated: [...s.progress.evaluated, event.programId] } }
-              : s
-          );
+          setState(appendEvaluated(event.programId));
         } else if (event.type === 'complete') {
           cacheAnalysis(parsed, event.output);
           setState({ kind: 'ok', data: event.output });
@@ -183,7 +187,8 @@ export default function ResultsPage() {
         return;
       }
       if (!originalData) return;
-      if (next !== 'es' && next !== 'vi') return;
+      // 'en' returned above, so TypeScript narrows next to a translation target.
+      const target: Exclude<LanguageCode, 'en'> = next;
       if (!apiKey) {
         setTranslateError(
           'Translation requires an Anthropic API key. Click the key indicator above to add one.'
@@ -191,13 +196,13 @@ export default function ResultsPage() {
         return;
       }
 
-      setPendingLang(next);
+      setPendingLang(target);
       try {
         const { translatePayload } = await import('@/lib/claudeBrowser');
         const translated = await translatePayload(
           apiKey,
           { output: originalData, chrome: CHROME_EN },
-          next
+          target
         );
         if (!translated?.output || !translated?.chrome) {
           throw new Error('Translation response missing fields');
@@ -209,8 +214,8 @@ export default function ResultsPage() {
           output: mergeTranslatedStrings(originalData, translated.output),
           chrome: { ...CHROME_EN, ...translated.chrome },
         };
-        setTranslations((prev) => ({ ...prev, [next]: bundle }));
-        setLang(next);
+        setTranslations((prev) => ({ ...prev, [target]: bundle }));
+        setLang(target);
       } catch (e) {
         setTranslateError(e instanceof Error ? e.message : 'Translation failed');
       } finally {
@@ -265,13 +270,10 @@ export default function ResultsPage() {
     );
   }
 
-  const bundle: TranslatedBundle =
-    lang === 'en'
-      ? { output: state.data, chrome: CHROME_EN }
-      : translations[lang as Exclude<LanguageCode, 'en'>] ?? {
-          output: state.data,
-          chrome: CHROME_EN,
-        };
+  const bundle: TranslatedBundle = (lang !== 'en' ? translations[lang] : undefined) ?? {
+    output: state.data,
+    chrome: CHROME_EN,
+  };
 
   return (
     <>
