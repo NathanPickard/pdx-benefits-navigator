@@ -1,8 +1,6 @@
 import { z } from 'zod';
 import type { IntakeData } from '@/types/program';
 
-export const INTAKE_STORAGE_KEY = 'pdx_intake';
-
 export const IntakeSchema = z.object({
   household_size: z.number().int().min(1).max(12),
   num_children: z.number().int().min(0).max(10),

@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 
 import { scenarios } from '@/lib/scenarios';
+import { SESSION_KEYS } from '@/lib/sessionState';
 import mariaFixture from '@/data/scenarios/maria.json';
 import jamesFixture from '@/data/scenarios/james.json';
 import roseFixture from '@/data/scenarios/rose.json';
@@ -29,11 +30,11 @@ export default function DemoPage() {
       return;
     }
     sessionStorage.setItem(
-      'pdx_intake',
+      SESSION_KEYS.intake,
       JSON.stringify(scenarios[entry.intakeKey])
     );
-    sessionStorage.setItem('pdx_prebaked', JSON.stringify(entry.output));
-    sessionStorage.setItem('pdx_demo_simulate', '1');
+    sessionStorage.setItem(SESSION_KEYS.prebaked, JSON.stringify(entry.output));
+    sessionStorage.setItem(SESSION_KEYS.demoSimulate, '1');
     router.replace('/results');
   }, [params.scenario, router]);
 

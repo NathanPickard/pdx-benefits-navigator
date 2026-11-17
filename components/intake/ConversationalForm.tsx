@@ -12,7 +12,8 @@ import { useApiKey } from '@/lib/userKey';
 import { fplFor } from '@/lib/fpl';
 import { formatUsd } from '@/lib/estimate';
 import { PROGRAM_COUNT } from '@/lib/programs';
-import { INTAKE_STORAGE_KEY, IntakeSchema, parseStoredIntakeFields } from '@/lib/intakeSchema';
+import { IntakeSchema, parseStoredIntakeFields } from '@/lib/intakeSchema';
+import { SESSION_KEYS } from '@/lib/sessionState';
 
 type FormValues = z.infer<typeof IntakeSchema>;
 type Form = UseFormReturn<FormValues>;
@@ -58,7 +59,7 @@ const DEFAULT_VALUES: FormValues = {
 // render, so server and client render the same initial markup.
 function seedFromStorage(): FormValues | null {
   try {
-    const raw = sessionStorage.getItem(INTAKE_STORAGE_KEY);
+    const raw = sessionStorage.getItem(SESSION_KEYS.intake);
     if (!raw) return null;
     return parseStoredIntakeFields(JSON.parse(raw), DEFAULT_VALUES);
   } catch {
@@ -89,7 +90,7 @@ export function ConversationalForm() {
       callback: ({ values }) => {
         clearTimeout(timer);
         timer = setTimeout(() => {
-          try { sessionStorage.setItem(INTAKE_STORAGE_KEY, JSON.stringify(values)); } catch { /* non-fatal */ }
+          try { sessionStorage.setItem(SESSION_KEYS.intake, JSON.stringify(values)); } catch { /* non-fatal */ }
         }, AUTOSAVE_DEBOUNCE_MS);
       },
     });
@@ -110,10 +111,10 @@ export function ConversationalForm() {
     const submitted: FormValues = values.housing_status === 'rent'
       ? values
       : { ...values, recent_rent_increase_pct: undefined, received_eviction_notice: false };
-    sessionStorage.setItem(INTAKE_STORAGE_KEY, JSON.stringify(submitted));
+    sessionStorage.setItem(SESSION_KEYS.intake, JSON.stringify(submitted));
     // Clear any leftover demo state so a prior demo run doesn't hijack this scan.
-    sessionStorage.removeItem('pdx_prebaked');
-    sessionStorage.removeItem('pdx_demo_simulate');
+    sessionStorage.removeItem(SESSION_KEYS.prebaked);
+    sessionStorage.removeItem(SESSION_KEYS.demoSimulate);
     router.push('/results');
   };
 
