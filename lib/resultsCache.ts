@@ -1,3 +1,4 @@
+import { AnalysisOutputSchema } from './eligibilitySchema';
 import type { AnalysisOutput, IntakeData } from '@/types/program';
 
 const KEY = 'pdx_analysis';
@@ -25,8 +26,11 @@ export function readCachedAnalysis(intake: IntakeData): AnalysisOutput | null {
   try {
     const raw = sessionStorage.getItem(KEY);
     if (!raw) return null;
-    const parsed = JSON.parse(raw) as { hash: string; output: AnalysisOutput };
-    return parsed.hash === hashIntake(intake) ? parsed.output : null;
+    const parsed = JSON.parse(raw) as { hash?: unknown; output?: unknown };
+    if (parsed?.hash !== hashIntake(intake)) return null;
+    // A malformed cached analysis counts as a cache miss.
+    const output = AnalysisOutputSchema.safeParse(parsed.output);
+    return output.success ? output.data : null;
   } catch {
     return null;
   }

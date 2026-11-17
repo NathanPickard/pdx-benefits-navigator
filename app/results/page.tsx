@@ -25,7 +25,7 @@ import { mergeTranslatedStrings } from '@/lib/results/translation';
 import { CHROME_EN, LANGUAGES, type Chrome, type LanguageCode } from '@/lib/i18n';
 import { useApiKey } from '@/lib/userKey';
 import { cacheAnalysis, readCachedAnalysis } from '@/lib/resultsCache';
-import { SESSION_KEYS } from '@/lib/sessionState';
+import { SESSION_KEYS, readPrebaked, readStoredIntake } from '@/lib/sessionState';
 import { PROGRAMS, PROGRAM_BY_ID, compareGemThenValue } from '@/lib/programs';
 import type { AnalysisOutput, IntakeData, Program } from '@/types/program';
 
@@ -89,17 +89,13 @@ export default function ResultsPage() {
 
     // Demo routes stash a pre-baked AnalysisOutput here so the dashboard can
     // skip the API call entirely.
-    const prebaked = sessionStorage.getItem(SESSION_KEYS.prebaked);
-    if (prebaked) {
-      let output: AnalysisOutput;
-      try {
-        output = JSON.parse(prebaked) as AnalysisOutput;
-      } catch {
+    if (sessionStorage.getItem(SESSION_KEYS.prebaked)) {
+      const output = readPrebaked();
+      if (!output) {
         setState({ kind: 'error', message: 'Could not load demo data.' });
         return;
       }
-      const rawIntake = sessionStorage.getItem(SESSION_KEYS.intake);
-      if (rawIntake) setIntake(JSON.parse(rawIntake) as IntakeData);
+      setIntake(readStoredIntake());
 
       const simulate = sessionStorage.getItem(SESSION_KEYS.demoSimulate) === '1';
       if (!simulate) {
@@ -131,12 +127,12 @@ export default function ResultsPage() {
       };
     }
 
-    const rawIntake = sessionStorage.getItem(SESSION_KEYS.intake);
-    if (!rawIntake) {
+    // A missing, partial or corrupt intake sends the user back to the form.
+    const parsed = readStoredIntake();
+    if (!parsed) {
       router.replace('/intake');
       return;
     }
-    const parsed = JSON.parse(rawIntake) as IntakeData;
     setIntake(parsed);
 
     if (!apiKey) {
@@ -531,13 +527,10 @@ function Dashboard({
   const { statusFor, setStatus, clearAll, hasAny } = useApplicationStatus();
 
   const handleDownloadPacket = useCallback(async () => {
-    if (packetState === 'loading') return;
+    if (packetState === 'loading' || !intake) return;
     setPacketState('loading');
     setPacketError(null);
     try {
-      const raw = sessionStorage.getItem(SESSION_KEYS.intake);
-      if (!raw) throw new Error('Missing intake data');
-      const intake = JSON.parse(raw) as IntakeData;
       const res = await fetch('/api/packet', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -554,7 +547,7 @@ function Dashboard({
       setPacketError(e instanceof Error ? e.message : 'Download failed');
       setPacketState('error');
     }
-  }, [packetState, originalData]);
+  }, [packetState, originalData, intake]);
 
   const [sortMode, setSortMode] = useState<'gems' | 'amount'>('gems');
   const [filterCategory, setFilterCategory] = useState<Program['category'] | null>(null);
@@ -666,7 +659,7 @@ function Dashboard({
           <button
             type="button"
             onClick={handleDownloadPacket}
-            disabled={packetState === 'loading'}
+            disabled={packetState === 'loading' || !intake}
             className="rc-btn rc-btn-outline rc-btn-sm"
           >
             {packetState === 'loading' ? (
