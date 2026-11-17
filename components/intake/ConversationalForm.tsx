@@ -10,6 +10,7 @@ import { ArrowLeft, ArrowRight, Check, KeyRound, Sparkles } from 'lucide-react';
 
 import { useApiKey } from '@/lib/userKey';
 import { fplFor } from '@/lib/fpl';
+import { formatUsd } from '@/lib/estimate';
 import type { IntakeData } from '@/types/program';
 
 const schema = z.object({
@@ -883,7 +884,7 @@ const CITIZENSHIP_LABEL: Record<FormValues['citizenship'], string> = {
 function Review({ values }: { values: FormValues }) {
   const lines: [string, string][] = [
     ['Household', `${values.household_size} people · ${values.num_children} children`],
-    ['Annual income', `$${(values.annual_income || 0).toLocaleString()}`],
+    ['Annual income', formatUsd(values.annual_income || 0)],
     ['Employment', EMPLOYMENT_LABEL[values.employment_status]],
     ['Location', `${values.zip_code || '—'} · ${HOUSING_LABEL[values.housing_status]}`],
     ['Language', LANG_LABEL[values.primary_language]],

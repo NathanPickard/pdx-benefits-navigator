@@ -1,6 +1,7 @@
 import { ImageResponse } from 'next/og';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
+import { formatUsd } from '@/lib/estimate';
 
 import mariaFixture from '@/data/scenarios/maria.json';
 
@@ -152,7 +153,7 @@ export default async function Image() {
           >
             <div style={{ display: 'flex' }}>
               <span style={{ color: MOSS_DEEP }}>
-                ${MARIA_PDX_DELTA.toLocaleString()}/yr
+                {formatUsd(MARIA_PDX_DELTA)}/yr
               </span>
               <span>&nbsp;more</span>
             </div>

@@ -19,6 +19,7 @@ import { join } from 'node:path';
 import { scenarios } from '../lib/scenarios';
 import { analyzeEligibilityStream } from '../lib/claudeBrowser';
 import { ELIGIBILITY_MODEL } from '../lib/eligibility';
+import { formatUsd } from '../lib/estimate';
 
 const ROOT = process.cwd();
 const OUT_DIR = join(ROOT, 'data', 'scenarios');
@@ -80,7 +81,7 @@ async function runOne(
 
   const eligibleCount = output.matches.filter((m) => m.eligible).length;
   console.log(
-    `\n✓ ${slug}: $${output.total_estimated_annual_value.toLocaleString()} across ${eligibleCount} eligible programs (${progressCount} program IDs streamed)`,
+    `\n✓ ${slug}: ${formatUsd(output.total_estimated_annual_value)} across ${eligibleCount} eligible programs (${progressCount} program IDs streamed)`,
   );
 
   const path = join(OUT_DIR, `${slug}.json`);

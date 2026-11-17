@@ -10,6 +10,7 @@ import {
 } from "@/components/brand/RoseStamp";
 import { JurisdictionPill } from "@/components/brand/JurisdictionPill";
 import { StatReveal } from "@/components/landing/StatReveal";
+import { formatUsd } from "@/lib/estimate";
 import mariaFixture from "@/data/scenarios/maria.json";
 import jamesFixture from "@/data/scenarios/james.json";
 import roseFixture from "@/data/scenarios/rose.json";
@@ -284,7 +285,7 @@ export default function HomePage() {
                         fontWeight: 500,
                       }}
                     >
-                      ${MARIA_TOTAL.toLocaleString()}
+                      {formatUsd(MARIA_TOTAL)}
                     </div>
                     <div
                       className="flex items-center gap-2 mt-3"
@@ -582,7 +583,7 @@ export default function HomePage() {
                           marginTop: 2,
                         }}
                       >
-                        ${s.total.toLocaleString()}
+                        {formatUsd(s.total)}
                       </div>
                     </div>
                     <div style={{ textAlign: "right" }}>
@@ -651,13 +652,13 @@ export default function HomePage() {
                 >
                   Federal &amp; state tools find{" "}
                   <span style={{ color: "var(--ink-3)" }}>
-                    ${MARIA_FEDERAL.toLocaleString()}
+                    {formatUsd(MARIA_FEDERAL)}
                   </span>
                   .
                   <br />
                   We find{" "}
                   <span style={{ color: "var(--rose)" }}>
-                    ${MARIA_TOTAL.toLocaleString()}
+                    {formatUsd(MARIA_TOTAL)}
                   </span>
                   .
                 </h3>

@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 import { animate, motion, useMotionValue, useReducedMotion, useTransform } from 'framer-motion';
+import { formatNumber } from '@/lib/estimate';
 
 export function StatReveal({
   target,
@@ -21,7 +22,7 @@ export function StatReveal({
   const shouldReduceMotion = useReducedMotion();
   const count = useMotionValue(0);
   const formatted = useTransform(count, (v) => {
-    const num = decimals === 0 ? Math.round(v).toLocaleString() : v.toFixed(decimals);
+    const num = decimals === 0 ? formatNumber(Math.round(v)) : v.toFixed(decimals);
     return `${prefix}${num}${suffix ? ` ${suffix}` : ''}`;
   });
 

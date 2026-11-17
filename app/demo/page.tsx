@@ -3,6 +3,7 @@ import { ArrowRight, Briefcase, Heart, ShieldCheck } from 'lucide-react';
 
 import { buttonVariants } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { formatUsd } from '@/lib/estimate';
 import mariaFixture from '@/data/scenarios/maria.json';
 import jamesFixture from '@/data/scenarios/james.json';
 import roseFixture from '@/data/scenarios/rose.json';
@@ -36,7 +37,7 @@ const heroPrograms = (f: Fixture, n = 4): string[] => {
 };
 
 const expectedFromFixture = (f: Fixture) =>
-  `~$${f.total_estimated_annual_value.toLocaleString()}/year`;
+  `~${formatUsd(f.total_estimated_annual_value)}/year`;
 
 interface ScenarioCard {
   slug: string;

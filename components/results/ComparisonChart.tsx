@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useReducedMotion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
+import { formatUsd } from '@/lib/estimate';
 
 export function ComparisonChart({
   federal,
@@ -69,7 +70,7 @@ export function ComparisonChart({
         <div className="pill pill-rose" style={{ fontSize: '0.86rem', padding: '8px 14px' }}>
           <ArrowRight size={13} />
           <span className="tabular" style={{ fontWeight: 700 }}>
-            +${delta.toLocaleString()}
+            +{formatUsd(delta)}
           </span>
           <span>{missLabel}</span>
         </div>
@@ -98,10 +99,10 @@ export function ComparisonChart({
       </div>
 
       <div className="rc-mini-row">
-        <Mini label="Federal-only finds" value={`$${federal.toLocaleString()}`} sub="the national tools" />
+        <Mini label="Federal-only finds" value={formatUsd(federal)} sub="the national tools" />
         <Mini
           label="Hyperlocal delta"
-          value={`+$${delta.toLocaleString()}`}
+          value={`+${formatUsd(delta)}`}
           sub="what we add on top"
           tone="rose"
         />
@@ -154,7 +155,7 @@ function BarRow({
           className="font-display tabular"
           style={{ fontSize: '1.45rem', color, fontWeight: 500 }}
         >
-          ${value.toLocaleString()}
+          {formatUsd(value)}
         </span>
       </div>
       <div

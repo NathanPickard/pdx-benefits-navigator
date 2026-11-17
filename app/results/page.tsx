@@ -18,7 +18,7 @@ import { ProgressBar } from '@/components/results/ProgressBar';
 import { UrgencyBanner } from '@/components/results/UrgencyBanner';
 import { RenewalCalendar } from '@/components/results/RenewalCalendar';
 import { useApplicationStatus } from '@/lib/applicationStatus';
-import { formatEstimate, hasEstimate } from '@/lib/estimate';
+import { formatEstimate, formatNumber, formatUsd, hasEstimate } from '@/lib/estimate';
 import { likelyRange } from '@/lib/results/derive';
 import { mergeTranslatedStrings } from '@/lib/results/translation';
 import { CHROME_EN, LANGUAGES, type Chrome, type LanguageCode } from '@/lib/i18n';
@@ -620,7 +620,7 @@ function Dashboard({
   );
 
   const handleCopySummary = useCallback(async () => {
-    const total = data.total_estimated_annual_value.toLocaleString();
+    const total = formatNumber(data.total_estimated_annual_value);
     const count = allEligible.length;
     const lines: string[] = [
       `PDX Benefits Navigator — estimated $${total}/year across ${count} program${count !== 1 ? 's' : ''}`,
@@ -806,7 +806,7 @@ function Dashboard({
                 <KV k="Children" v={String(intake.num_children)} />
                 <KV
                   k="Income"
-                  v={`$${(intake.annual_income || 0).toLocaleString()}`}
+                  v={formatUsd(intake.annual_income || 0)}
                 />
                 <KV k="Housing" v={HOUSING_LABEL[intake.housing_status]} />
                 <KV k="Language" v={LANG_LABEL[intake.primary_language]} />
