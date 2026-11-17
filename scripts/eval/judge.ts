@@ -1,6 +1,7 @@
 import Anthropic from '@anthropic-ai/sdk';
 import { ELIGIBILITY_SYSTEM_PROMPT } from '../../lib/eligibility';
 import type { IntakeData, MatchResult, Program } from '../../types/program';
+import type { JudgeResult, JudgeVerdict } from './types';
 
 export const JUDGE_MODEL = 'claude-haiku-4-5-20251001';
 
@@ -63,7 +64,7 @@ export function buildJudgePrompt(
 
 export function parseJudgeResponse(
   text: string,
-): { verdict: 'pass' | 'fail'; issue?: string } | null {
+): (JudgeVerdict & { verdict: 'pass' | 'fail' }) | null {
   const jsonMatch = text.match(/\{[\s\S]*\}/);
   if (!jsonMatch) return null;
   try {
@@ -83,7 +84,7 @@ export async function judgeMatch(
   intake: IntakeData,
   program: Program,
   match: MatchResult,
-): Promise<{ verdict: 'pass' | 'fail' | 'unjudged'; issue?: string; prompt: string; raw: string }> {
+): Promise<JudgeResult> {
   const prompt = buildJudgePrompt(intake, program, match);
   try {
     const client = new Anthropic({ apiKey });

@@ -53,3 +53,20 @@ export interface ConfidenceScore {
   checked: number;
   disagreements: ConfidenceDisagreement[];
 }
+
+/** Outcome of one LLM-judge call. `unjudged` means the call failed or the reply was unparseable. */
+export interface JudgeVerdict {
+  verdict: 'pass' | 'fail' | 'unjudged';
+  issue?: string;
+}
+
+/** A judge call with the exact prompt sent and the raw reply, kept for auditing. */
+export interface JudgeResult extends JudgeVerdict {
+  prompt: string;
+  raw: string;
+}
+
+/** A judge result tagged with the program it audited, as stored in the eval report. */
+export interface JudgeTranscript extends JudgeResult {
+  program_id: string;
+}

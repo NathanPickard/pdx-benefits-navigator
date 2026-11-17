@@ -8,6 +8,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { z } from 'zod';
+import type { Program as ProgramType } from '../types/program';
 
 const ROOT = process.cwd();
 const SEED_PATH = path.join(ROOT, 'data', 'programs.seed.json');
@@ -76,7 +77,13 @@ const ProgramSchema = z.object({
   contact_org: z.string().optional(),
 });
 
-type Program = z.infer<typeof ProgramSchema>;
+type ValidatedProgram = z.infer<typeof ProgramSchema>;
+
+/** Compile-time drift guard: the schema must describe exactly the Program interface. */
+type Equals<A, B> =
+  (<T>() => T extends A ? 1 : 2) extends (<T>() => T extends B ? 1 : 2) ? true : false;
+const schemaMatchesProgram: Equals<ValidatedProgram, ProgramType> = true;
+void schemaMatchesProgram;
 
 /** Stable JSON (recursively sorted keys) for deep-equality comparison. */
 function canonical(value: unknown): string {
@@ -95,8 +102,8 @@ function load(file: string): unknown[] {
   return JSON.parse(fs.readFileSync(file, 'utf8')) as unknown[];
 }
 
-function validateList(label: string, list: unknown[]): Program[] {
-  const parsed: Program[] = [];
+function validateList(label: string, list: unknown[]): ValidatedProgram[] {
+  const parsed: ValidatedProgram[] = [];
   list.forEach((raw, i) => {
     const r = ProgramSchema.safeParse(raw);
     if (!r.success) {
@@ -109,7 +116,7 @@ function validateList(label: string, list: unknown[]): Program[] {
   return parsed;
 }
 
-function checkInvariants(label: string, programs: Program[]): void {
+function checkInvariants(label: string, programs: ValidatedProgram[]): void {
   for (const p of programs) {
     const e = p.eligibility;
     // Income-basis state machine.

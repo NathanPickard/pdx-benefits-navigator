@@ -5,8 +5,10 @@
  *   - Provide a value AND a verbatim quote from the scraped page (`quote`), OR
  *   - Set the value to null AND provide a reason (`reason`).
  *
- * Locked fields (id, jurisdiction, category, hidden_gem, urgency, application_url)
- * are owned by human curation in programs.seed.json and never overwritten.
+ * Locked fields are owned by human curation in programs.seed.json. The source of
+ * truth for which fields are locked is LOCKED_FIELDS in scripts/merge-scraped.ts;
+ * the merge never copies them from the scrape. Scraped `eligibility` and
+ * `application_method` values are audit evidence only and never reach programs.json.
  *
  * Output: data/programs.scraped.json — each program carries its standard fields
  * plus a `_provenance` map: { "field.path": { quote } | { reason } }.
@@ -34,10 +36,27 @@ const OUT_PATH = path.join(ROOT, 'data', 'programs.scraped.json');
 const REPORT_PATH = path.join(ROOT, 'data', 'programs.report.md');
 const MODEL = 'claude-haiku-4-5-20251001';
 
+/** Per-page Firecrawl timeout. */
+const SCRAPE_TIMEOUT_MS = 30_000;
+/** Pages shorter than this are treated as empty or blocked. */
+const MIN_MARKDOWN_CHARS = 200;
 /**
- * Fields whose seed values are authoritative are echoed directly in scrapeOne()
- * below (id, jurisdiction, category, hidden_gem, urgency, application_url).
- * The prompt also omits them from the extraction schema so the model can't drift.
+ * Per-source cap. Government landing pages can carry 15-20k of nav chrome before
+ * the actual content; ~40k per URL is still ample within Haiku 4.5's 200K window.
+ */
+const MAX_SOURCE_CHARS = 40_000;
+/** Output budget for one program's extraction (values plus provenance). */
+const EXTRACT_MAX_TOKENS = 8000;
+/** Pause between programs to stay polite to source sites and APIs. */
+const INTER_PROGRAM_DELAY_MS = 500;
+
+/**
+ * A subset of the locked fields (id, jurisdiction, category, hidden_gem, urgency,
+ * application_url) is echoed from the seed in scrapeOne() below, and the prompt
+ * omits them from the extraction schema so the model can't drift. The full locked
+ * list lives in LOCKED_FIELDS in scripts/merge-scraped.ts. `eligibility` and
+ * `application_method` are still extracted, but only as audit evidence: the merge
+ * keeps the seed values.
  */
 
 /**
@@ -220,13 +239,10 @@ async function fetchSource(
     const doc = await firecrawl.scrape(url, {
       formats: ['markdown'],
       onlyMainContent: true,
-      timeout: 30000,
+      timeout: SCRAPE_TIMEOUT_MS,
     });
-    if (!doc.markdown || doc.markdown.length < 200) return null;
-    // Government landing pages can carry 15-20k of nav chrome before the actual
-    // content. With multiple URLs we share an 80k budget so each gets ~40k —
-    // still ample for typical program pages within Haiku 4.5's 200K window.
-    return { url, markdown: doc.markdown.slice(0, 40000) };
+    if (!doc.markdown || doc.markdown.length < MIN_MARKDOWN_CHARS) return null;
+    return { url, markdown: doc.markdown.slice(0, MAX_SOURCE_CHARS) };
   } catch {
     return null;
   }
@@ -251,13 +267,13 @@ async function scrapeOne(
 
   const response = await anthropic.messages.create({
     model: MODEL,
-    max_tokens: 8000,
+    max_tokens: EXTRACT_MAX_TOKENS,
     messages: [{ role: 'user', content: buildPrompt(program, sources) }],
   });
 
   const text = response.content
-    .filter((b) => b.type === 'text')
-    .map((b) => (b as { type: 'text'; text: string }).text)
+    .filter((b): b is Anthropic.TextBlock => b.type === 'text')
+    .map((b) => b.text)
     .join('');
 
   const parsed = extractJson(text);
@@ -274,7 +290,8 @@ async function scrapeOne(
   }
 
   const result: ScrapedProgram = {
-    // Locked fields echoed straight from the seed.
+    // Locked fields echoed straight from the seed (a subset of merge-scraped's
+    // LOCKED_FIELDS, which is the source of truth).
     id: program.id,
     jurisdiction: program.jurisdiction,
     category: program.category,
@@ -504,7 +521,7 @@ async function main() {
       });
       console.log(`FAIL  ${message.slice(0, 80)}`);
     }
-    await new Promise((r) => setTimeout(r, 500));
+    await new Promise((r) => setTimeout(r, INTER_PROGRAM_DELAY_MS));
   }
 
   await fs.writeFile(OUT_PATH, JSON.stringify(scraped, null, 2) + '\n');
