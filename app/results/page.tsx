@@ -757,12 +757,12 @@ function Dashboard({
               }}
             >
               across{' '}
-              <strong style={{ color: 'var(--ink)' }}>{allEligible.length} programs</strong>
+              <strong style={{ color: 'var(--ink)' }}>{allEligible.length} program{allEligible.length !== 1 ? 's' : ''}</strong>
               {gemCount > 0 && (
                 <>
                   , including{' '}
                   <strong style={{ color: 'var(--rose)' }}>
-                    {gemCount} hyperlocal Portland gem{gemCount > 1 ? 's' : ''}
+                    {gemCount} hyperlocal Portland gem{gemCount !== 1 ? 's' : ''}
                   </strong>{' '}
                   that national tools would miss
                 </>
@@ -963,7 +963,7 @@ function Dashboard({
             <header className="flex items-end justify-between gap-6 flex-wrap mb-8">
               <div>
                 <div className="eyebrow mb-2">
-                  {allEligible.length} programs ·{' '}
+                  {allEligible.length} program{allEligible.length !== 1 ? 's' : ''} ·{' '}
                   {sortMode === 'gems' ? 'hidden gems first' : 'largest amount first'}
                 </div>
                 <h2
