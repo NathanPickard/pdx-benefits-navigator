@@ -4,9 +4,7 @@ import { ArrowRight, Briefcase, Heart, ShieldCheck } from 'lucide-react';
 import { buttonVariants } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { formatUsd } from '@/lib/estimate';
-import mariaFixture from '@/data/scenarios/maria.json';
-import jamesFixture from '@/data/scenarios/james.json';
-import roseFixture from '@/data/scenarios/rose.json';
+import { DEMO_FIXTURES } from '@/lib/demoFixtures';
 import { PROGRAM_BY_ID, PROGRAM_COUNT, compareGemThenValue } from '@/lib/programs';
 
 type Fixture = {
@@ -61,8 +59,8 @@ const SCENARIOS: ScenarioCard[] = [
       { label: 'Where', value: 'Cully (97218) · renting' },
       { label: 'Language', value: 'Spanish · LPR status' },
     ],
-    hero: heroPrograms(mariaFixture),
-    expected: expectedFromFixture(mariaFixture),
+    hero: heroPrograms(DEMO_FIXTURES.maria),
+    expected: expectedFromFixture(DEMO_FIXTURES.maria),
     icon: <Heart className="h-5 w-5" />,
     accentClass: 'border-emerald-200 bg-emerald-50/40 hover:border-emerald-300',
   },
@@ -76,8 +74,8 @@ const SCENARIOS: ScenarioCard[] = [
       { label: 'Where', value: 'St. Johns (97203) · homeowner' },
       { label: 'Status', value: 'Veteran · service-connected disability' },
     ],
-    hero: heroPrograms(jamesFixture),
-    expected: expectedFromFixture(jamesFixture),
+    hero: heroPrograms(DEMO_FIXTURES.james),
+    expected: expectedFromFixture(DEMO_FIXTURES.james),
     icon: <ShieldCheck className="h-5 w-5" />,
     accentClass: 'border-blue-200 bg-blue-50/40 hover:border-blue-300',
   },
@@ -91,8 +89,8 @@ const SCENARIOS: ScenarioCard[] = [
       { label: 'Where', value: 'Lents (97266) · homeowner' },
       { label: 'Language', value: 'Vietnamese' },
     ],
-    hero: heroPrograms(roseFixture),
-    expected: expectedFromFixture(roseFixture),
+    hero: heroPrograms(DEMO_FIXTURES.rose),
+    expected: expectedFromFixture(DEMO_FIXTURES.rose),
     icon: <Briefcase className="h-5 w-5" />,
     accentClass: 'border-amber-200 bg-amber-50/40 hover:border-amber-300',
   },
