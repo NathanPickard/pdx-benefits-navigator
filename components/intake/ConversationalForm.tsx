@@ -12,34 +12,9 @@ import { useApiKey } from '@/lib/userKey';
 import { fplFor } from '@/lib/fpl';
 import { formatUsd } from '@/lib/estimate';
 import { PROGRAM_COUNT } from '@/lib/programs';
-import type { IntakeData } from '@/types/program';
+import { INTAKE_STORAGE_KEY, IntakeSchema, parseStoredIntakeFields } from '@/lib/intakeSchema';
 
-const schema = z.object({
-  household_size: z.number().int().min(1).max(12),
-  num_children: z.number().int().min(0).max(10),
-  children_ages: z.array(z.number().int().min(0).max(17)),
-  annual_income: z.number().min(0).max(500000),
-  zip_code: z.string().regex(/^\d{5}$/, '5-digit ZIP'),
-  housing_status: z.enum(['rent', 'own', 'unhoused', 'staying_with_others']),
-  recent_rent_increase_pct: z.number().min(0).max(100).optional(),
-  received_eviction_notice: z.boolean().optional(),
-  has_disability: z.boolean(),
-  is_veteran: z.boolean(),
-  is_pregnant: z.boolean(),
-  has_senior_in_household: z.boolean(),
-  primary_language: z.enum(['en', 'es', 'vi', 'ru', 'zh', 'so', 'ar']),
-  employment_status: z.enum([
-    'employed_ft',
-    'employed_pt',
-    'self_employed',
-    'unemployed',
-    'retired',
-    'disabled',
-  ]),
-  citizenship: z.enum(['citizen', 'lpr', 'other', 'prefer_not_say']),
-});
-
-type FormValues = z.infer<typeof schema>;
+type FormValues = z.infer<typeof IntakeSchema>;
 type Form = UseFormReturn<FormValues>;
 
 const STEPS = ['Household', 'Income', 'Housing', 'About you', 'Review'] as const;
@@ -83,26 +58,9 @@ const DEFAULT_VALUES: FormValues = {
 // render, so server and client render the same initial markup.
 function seedFromStorage(): FormValues | null {
   try {
-    const raw = sessionStorage.getItem('pdx_intake');
+    const raw = sessionStorage.getItem(INTAKE_STORAGE_KEY);
     if (!raw) return null;
-    const stored = JSON.parse(raw) as Partial<FormValues>;
-    return {
-      household_size: typeof stored.household_size === 'number' ? stored.household_size : DEFAULT_VALUES.household_size,
-      num_children: typeof stored.num_children === 'number' ? stored.num_children : DEFAULT_VALUES.num_children,
-      children_ages: Array.isArray(stored.children_ages) ? stored.children_ages : DEFAULT_VALUES.children_ages,
-      annual_income: typeof stored.annual_income === 'number' ? stored.annual_income : DEFAULT_VALUES.annual_income,
-      zip_code: typeof stored.zip_code === 'string' ? stored.zip_code : DEFAULT_VALUES.zip_code,
-      housing_status: ['rent', 'own', 'unhoused', 'staying_with_others'].includes(stored.housing_status as string) ? (stored.housing_status as FormValues['housing_status']) : DEFAULT_VALUES.housing_status,
-      recent_rent_increase_pct: typeof stored.recent_rent_increase_pct === 'number' ? stored.recent_rent_increase_pct : DEFAULT_VALUES.recent_rent_increase_pct,
-      received_eviction_notice: typeof stored.received_eviction_notice === 'boolean' ? stored.received_eviction_notice : DEFAULT_VALUES.received_eviction_notice,
-      has_disability: typeof stored.has_disability === 'boolean' ? stored.has_disability : DEFAULT_VALUES.has_disability,
-      is_veteran: typeof stored.is_veteran === 'boolean' ? stored.is_veteran : DEFAULT_VALUES.is_veteran,
-      is_pregnant: typeof stored.is_pregnant === 'boolean' ? stored.is_pregnant : DEFAULT_VALUES.is_pregnant,
-      has_senior_in_household: typeof stored.has_senior_in_household === 'boolean' ? stored.has_senior_in_household : DEFAULT_VALUES.has_senior_in_household,
-      primary_language: ['en', 'es', 'vi', 'ru', 'zh', 'so', 'ar'].includes(stored.primary_language as string) ? (stored.primary_language as FormValues['primary_language']) : DEFAULT_VALUES.primary_language,
-      employment_status: ['employed_ft', 'employed_pt', 'self_employed', 'unemployed', 'retired', 'disabled'].includes(stored.employment_status as string) ? (stored.employment_status as FormValues['employment_status']) : DEFAULT_VALUES.employment_status,
-      citizenship: ['citizen', 'lpr', 'other', 'prefer_not_say'].includes(stored.citizenship as string) ? (stored.citizenship as FormValues['citizenship']) : DEFAULT_VALUES.citizenship,
-    };
+    return parseStoredIntakeFields(JSON.parse(raw), DEFAULT_VALUES);
   } catch {
     return null;
   }
@@ -114,7 +72,7 @@ export function ConversationalForm() {
   const [submitting, setSubmitting] = useState(false);
 
   const form = useForm<FormValues>({
-    resolver: zodResolver(schema),
+    resolver: zodResolver(IntakeSchema),
     mode: 'onChange',
     defaultValues: DEFAULT_VALUES,
   });
@@ -131,7 +89,7 @@ export function ConversationalForm() {
       callback: ({ values }) => {
         clearTimeout(timer);
         timer = setTimeout(() => {
-          try { sessionStorage.setItem('pdx_intake', JSON.stringify(values)); } catch { /* non-fatal */ }
+          try { sessionStorage.setItem(INTAKE_STORAGE_KEY, JSON.stringify(values)); } catch { /* non-fatal */ }
         }, AUTOSAVE_DEBOUNCE_MS);
       },
     });
@@ -152,7 +110,7 @@ export function ConversationalForm() {
     const submitted: FormValues = values.housing_status === 'rent'
       ? values
       : { ...values, recent_rent_increase_pct: undefined, received_eviction_notice: false };
-    sessionStorage.setItem('pdx_intake', JSON.stringify(submitted as IntakeData));
+    sessionStorage.setItem(INTAKE_STORAGE_KEY, JSON.stringify(submitted));
     // Clear any leftover demo state so a prior demo run doesn't hijack this scan.
     sessionStorage.removeItem('pdx_prebaked');
     sessionStorage.removeItem('pdx_demo_simulate');
