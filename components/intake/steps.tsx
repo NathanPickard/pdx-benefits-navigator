@@ -4,7 +4,6 @@ import { Sparkles } from 'lucide-react';
 
 import { fplFor } from '@/lib/fpl';
 import { formatUsd } from '@/lib/estimate';
-import { PROGRAM_COUNT } from '@/lib/programs';
 import type { IntakeSchema } from '@/lib/intakeSchema';
 
 import { Choices, Field, NumStepper, StepHeading, YesNo } from './fields';
@@ -386,7 +385,12 @@ const CITIZENSHIP_LABEL: Record<FormValues['citizenship'], string> = {
   prefer_not_say: 'Prefer not to say',
 };
 
-export function Review({ values }: { values: FormValues }) {
+interface ReviewProps {
+  values: FormValues;
+  programCount: number;
+}
+
+export function Review({ values, programCount }: ReviewProps) {
   const lines: [string, string][] = [
     ['Household', `${values.household_size} people · ${values.num_children} children`],
     ['Annual income', formatUsd(values.annual_income || 0)],
@@ -412,7 +416,7 @@ export function Review({ values }: { values: FormValues }) {
     <>
       <StepHeading
         title="Ready to find what you're owed."
-        sub={`We'll check all ${PROGRAM_COUNT} federal, state, county, and Portland programs. The analysis can take a few minutes.`}
+        sub={`We'll check all ${programCount} federal, state, county, and Portland programs. The analysis can take a few minutes.`}
       />
       <div className="rc-card-flat" style={{ padding: '8px 0' }}>
         <dl style={{ margin: 0 }}>

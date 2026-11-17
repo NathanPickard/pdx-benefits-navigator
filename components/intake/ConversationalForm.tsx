@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useForm } from 'react-hook-form';
@@ -64,7 +64,12 @@ function seedFromStorage(): FormValues | null {
   }
 }
 
-export function ConversationalForm() {
+interface ConversationalFormProps {
+  /** Passed from the server page so the programs database stays out of the client bundle. */
+  programCount: number;
+}
+
+export function ConversationalForm({ programCount }: ConversationalFormProps) {
   const router = useRouter();
   const [step, setStep] = useState(0);
   const [submitting, setSubmitting] = useState(false);
@@ -80,18 +85,21 @@ export function ConversationalForm() {
     if (seeded) form.reset(seeded);
   }, [form]);
 
+  // Held in a ref so onSubmit can cancel a pending autosave; otherwise a save
+  // queued just before submit would write the draft back after it is cleared.
+  const autosaveTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+
   useEffect(() => {
-    let timer: ReturnType<typeof setTimeout> | undefined;
     const unsubscribe = form.subscribe({
       formState: { values: true },
       callback: ({ values }) => {
-        clearTimeout(timer);
-        timer = setTimeout(() => {
+        clearTimeout(autosaveTimer.current);
+        autosaveTimer.current = setTimeout(() => {
           try { sessionStorage.setItem(SESSION_KEYS.intakeDraft, JSON.stringify(values)); } catch { /* non-fatal */ }
         }, AUTOSAVE_DEBOUNCE_MS);
       },
     });
-    return () => { unsubscribe(); clearTimeout(timer); };
+    return () => { unsubscribe(); clearTimeout(autosaveTimer.current); };
   }, [form]);
 
   const next = async () => {
@@ -103,6 +111,7 @@ export function ConversationalForm() {
 
   const onSubmit = (values: FormValues) => {
     setSubmitting(true);
+    clearTimeout(autosaveTimer.current);
     // Rent fields stay in form state if the user switches away from Rent;
     // drop them from the submitted copy so they don't reach the analysis.
     const submitted: FormValues = values.housing_status === 'rent'
@@ -151,14 +160,14 @@ export function ConversationalForm() {
         <StepNumerals current={step} />
       </header>
 
-      <form onSubmit={form.handleSubmit(onSubmit)}>
+      <form onSubmit={(e) => form.handleSubmit(onSubmit)(e)}>
         <div className="rc-card rc-card-pad-lg">
           <div className="rc-enter" key={step}>
             {step === 0 && <Household form={form} />}
             {step === 1 && <Income form={form} />}
             {step === 2 && <Housing form={form} />}
             {step === 3 && <AboutYou form={form} />}
-            {step === 4 && <Review values={form.getValues()} />}
+            {step === 4 && <Review values={form.getValues()} programCount={programCount} />}
           </div>
 
           <div
