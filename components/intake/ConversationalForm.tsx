@@ -133,7 +133,12 @@ export function ConversationalForm() {
 
   const onSubmit = (values: FormValues) => {
     setSubmitting(true);
-    sessionStorage.setItem('pdx_intake', JSON.stringify(values as IntakeData));
+    // Rent fields stay in form state if the user switches away from Rent;
+    // drop them from the submitted copy so they don't reach the analysis.
+    const submitted: FormValues = values.housing_status === 'rent'
+      ? values
+      : { ...values, recent_rent_increase_pct: undefined, received_eviction_notice: false };
+    sessionStorage.setItem('pdx_intake', JSON.stringify(submitted as IntakeData));
     // Clear any leftover demo state so a prior demo run doesn't hijack this scan.
     sessionStorage.removeItem('pdx_prebaked');
     sessionStorage.removeItem('pdx_demo_simulate');
