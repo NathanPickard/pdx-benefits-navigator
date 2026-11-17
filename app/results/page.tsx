@@ -20,6 +20,7 @@ import { RenewalCalendar } from '@/components/results/RenewalCalendar';
 import { useApplicationStatus } from '@/lib/applicationStatus';
 import { formatEstimate, hasEstimate } from '@/lib/estimate';
 import { likelyRange } from '@/lib/results/derive';
+import { mergeTranslatedStrings } from '@/lib/results/translation';
 import { CHROME_EN, LANGUAGES, type Chrome, type LanguageCode } from '@/lib/i18n';
 import { useApiKey } from '@/lib/userKey';
 import { cacheAnalysis, readCachedAnalysis } from '@/lib/resultsCache';
@@ -203,12 +204,14 @@ export default function ResultsPage() {
         if (!translated?.output || !translated?.chrome) {
           throw new Error('Translation response missing fields');
         }
-        // The model may drop a Chrome key; fall back to English rather than render blank.
-        const bundle = translated as TranslatedBundle;
-        setTranslations((prev) => ({
-          ...prev,
-          [next]: { ...bundle, chrome: { ...CHROME_EN, ...bundle.chrome } },
-        }));
+        // Keep numbers, eligibility and ids from the English analysis; take
+        // only translated strings. The model may drop a Chrome key; fall back
+        // to English rather than render blank.
+        const bundle: TranslatedBundle = {
+          output: mergeTranslatedStrings(originalData, translated.output),
+          chrome: { ...CHROME_EN, ...translated.chrome },
+        };
+        setTranslations((prev) => ({ ...prev, [next]: bundle }));
         setLang(next);
       } catch (e) {
         setTranslateError(e instanceof Error ? e.message : 'Translation failed');
