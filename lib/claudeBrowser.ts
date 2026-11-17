@@ -34,6 +34,30 @@ export type AnalyzeStreamEvent =
   | { type: 'complete'; output: AnalysisOutput }
   | { type: 'error'; message: string };
 
+/** One initial attempt plus one retry on truncation, parse or server failure. */
+const MAX_ATTEMPTS = 2;
+
+/**
+ * Shown when every attempt was truncated or produced an unusable result. A
+ * parse or pipeline failure on the final attempt also lands here.
+ */
+const TRUNCATED_MESSAGE = 'The analysis response was cut off — please try again.';
+
+/**
+ * Client errors (status < 500: bad key, rate limit, bad request) fail the same
+ * way on a retry. Server errors and mid-stream errors (no status) may not.
+ */
+function isNonRetryableApiError(err: unknown): boolean {
+  return err instanceof Anthropic.APIError && typeof err.status === 'number' && err.status < 500;
+}
+
+/** Derive eligibility, check consistency and recompute dollar totals. */
+function finalize(parsed: AnalysisOutput): AnalysisOutput {
+  const derived = deriveEligibility(parsed);
+  assertConsistency(derived);
+  return recomputeTotals(derived);
+}
+
 interface StreamAttemptResult {
   parsed: AnalysisOutput;
   stopReason: string | null;
@@ -115,66 +139,31 @@ export async function* analyzeEligibilityStream(
   model: string = ELIGIBILITY_MODEL
 ): AsyncGenerator<AnalyzeStreamEvent> {
   const anthropic = makeClient(apiKey);
+  // Shared across attempts, so already-seen program ids aren't re-emitted.
   const seenIds = new Set<string>();
 
   try {
-    let firstAttemptError: unknown = null;
-
-    // ── Attempt 1 ──────────────────────────────────────────────────────────
-    try {
-      const result = yield* runStreamAttempt(anthropic, intake, model, seenIds);
-
-      if (result.stopReason === 'max_tokens') {
-        // Truncated — treat as retryable.
-        firstAttemptError = new Error('max_tokens');
-      } else {
-        // Apply derive → assert → recompute and yield complete.
-        const derived = deriveEligibility(result.parsed);
-        assertConsistency(derived);
-        yield { type: 'complete', output: recomputeTotals(derived) };
+    for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+      const isFinalAttempt = attempt === MAX_ATTEMPTS;
+      let output: AnalysisOutput | null = null;
+      try {
+        const { parsed, stopReason } = yield* runStreamAttempt(anthropic, intake, model, seenIds);
+        // A truncated response leaves output null, so the loop retries.
+        if (stopReason !== 'max_tokens') output = finalize(parsed);
+      } catch (err) {
+        // Client errors (bad key, rate limit, bad request) won't change on a
+        // retry. API errors on the final attempt go to the outer handler for
+        // a specific message. Anything else (parse or pipeline failure) retries,
+        // and on the final attempt falls through to TRUNCATED_MESSAGE.
+        if (isNonRetryableApiError(err)) throw err;
+        if (isFinalAttempt && err instanceof Anthropic.APIError) throw err;
+      }
+      if (output) {
+        yield { type: 'complete', output };
         return;
       }
-    } catch (err) {
-      firstAttemptError = err;
     }
-
-    // ── Attempt 2 (retry once on truncation or validation failure) ──────────
-    let attempt2Result: StreamAttemptResult;
-    try {
-      // seenIds is shared, so already-seen program ids aren't re-emitted.
-      attempt2Result = yield* runStreamAttempt(anthropic, intake, model, seenIds);
-    } catch (err) {
-      // Re-throw typed API errors so the outer handler produces the correct
-      // user-facing message (auth failure, rate limit, etc.). Only absorb
-      // truncation/parse failures here.
-      if (
-        err instanceof Anthropic.AuthenticationError ||
-        err instanceof Anthropic.RateLimitError ||
-        err instanceof Anthropic.APIError
-      ) {
-        throw err;
-      }
-      yield {
-        type: 'error',
-        message: 'The analysis response was cut off — please try again.',
-      };
-      return;
-    }
-
-    if (attempt2Result.stopReason === 'max_tokens') {
-      yield {
-        type: 'error',
-        message: 'The analysis response was cut off — please try again.',
-      };
-      return;
-    }
-
-    // Both attempts succeeded enough to reach here; apply pipeline.
-    void firstAttemptError; // acknowledged, not rethrown
-    const parsed = attempt2Result.parsed;
-    const derived = deriveEligibility(parsed);
-    assertConsistency(derived);
-    yield { type: 'complete', output: recomputeTotals(derived) };
+    yield { type: 'error', message: TRUNCATED_MESSAGE };
   } catch (e) {
     if (e instanceof Anthropic.AuthenticationError) {
       yield {
