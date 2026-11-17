@@ -1,13 +1,10 @@
 import Link from "next/link";
 import { RoseStamp } from "./RoseStamp";
 
-type Props = { size?: "md" | "lg"; href?: string };
-
-export function Wordmark({ size = "md", href = "/" }: Props) {
-  const isLg = size === "lg";
+export function Wordmark() {
   return (
     <Link
-      href={href}
+      href="/"
       style={{
         display: "inline-flex",
         alignItems: "center",
@@ -18,7 +15,7 @@ export function Wordmark({ size = "md", href = "/" }: Props) {
         color: "var(--ink)",
       }}
     >
-      <RoseStamp size={isLg ? 44 : 36} />
+      <RoseStamp size={36} />
       <span
         style={{
           display: "inline-flex",
@@ -31,7 +28,7 @@ export function Wordmark({ size = "md", href = "/" }: Props) {
         <span
           className="font-display"
           style={{
-            fontSize: isLg ? "1.55rem" : "1.2rem",
+            fontSize: "1.2rem",
             lineHeight: 1,
             letterSpacing: "-0.015em",
             fontWeight: 500,

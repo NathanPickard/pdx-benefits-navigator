@@ -11,8 +11,9 @@ import { looksLikeAnthropicKey, useApiKey } from '@/lib/userKey';
  * shows "Key set" (green) or "No key" (gray). Clicking it opens the modal.
  */
 export function ApiKeyControl() {
-  const { apiKey, hydrated, setKey, clearKey } = useApiKey();
+  const { apiKey, setKey, clearKey } = useApiKey();
   const [open, setOpen] = useState(false);
+  const hasKey = Boolean(apiKey);
 
   return (
     <>
@@ -33,20 +34,20 @@ export function ApiKeyControl() {
           whiteSpace: 'nowrap',
         }}
         aria-label="API key settings"
-        title={apiKey ? 'API key is set' : 'No API key set'}
+        title={hasKey ? 'API key is set' : 'No API key set'}
       >
         <span
           style={{
             width: 8,
             height: 8,
             borderRadius: 999,
-            background: hydrated && apiKey ? 'var(--moss)' : 'var(--ink-4)',
+            background: hasKey ? 'var(--moss)' : 'var(--ink-4)',
             flexShrink: 0,
           }}
         />
         <KeyRound size={12} />
         <span className="rc-hide-sm">
-          {hydrated && apiKey ? 'Key set' : 'No key'}
+          {hasKey ? 'Key set' : 'No key'}
         </span>
       </button>
 
