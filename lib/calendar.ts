@@ -4,6 +4,7 @@
  */
 
 import type { MatchResult, Program } from '@/types/program';
+import { downloadBlob } from './download';
 import { formatEstimate, hasEstimate } from './estimate';
 
 export interface CalendarEntry {
@@ -114,12 +115,5 @@ export function buildIcsCalendar(entries: CalendarEntry[]): string {
 
 export function downloadIcsFile(ics: string, filename = 'pdx-benefits-renewals.ics'): void {
   const blob = new Blob([ics], { type: 'text/calendar;charset=utf-8' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = filename;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
+  downloadBlob(blob, filename);
 }

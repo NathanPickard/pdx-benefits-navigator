@@ -18,6 +18,7 @@ import { ProgressBar } from '@/components/results/ProgressBar';
 import { UrgencyBanner } from '@/components/results/UrgencyBanner';
 import { RenewalCalendar } from '@/components/results/RenewalCalendar';
 import { useApplicationStatus } from '@/lib/applicationStatus';
+import { downloadBlob } from '@/lib/download';
 import { formatEstimate, formatNumber, formatUsd, hasEstimate } from '@/lib/estimate';
 import { likelyRange } from '@/lib/results/derive';
 import { mergeTranslatedStrings } from '@/lib/results/translation';
@@ -544,14 +545,7 @@ function Dashboard({
         throw new Error(errBody.error ?? `HTTP ${res.status}`);
       }
       const blob = await res.blob();
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'pdx-benefits-packet.pdf';
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
+      downloadBlob(blob, 'pdx-benefits-packet.pdf');
       setPacketState('idle');
     } catch (e) {
       setPacketError(e instanceof Error ? e.message : 'Download failed');
