@@ -30,8 +30,9 @@ Dependency direction: `app → components → lib → types/data`. `scripts` imp
 ## 2. Request flow (live path)
 
 ```
-/intake  ConversationalForm ──writes──▶ sessionStorage.pdx_intake (IntakeData)
-                                       clears pdx_prebaked, pdx_demo_simulate
+/intake  ConversationalForm ──autosaves──▶ sessionStorage.pdx_intake_draft (partial answers)
+                           ──on submit──▶ sessionStorage.pdx_intake (IntakeData)
+                                         clears pdx_intake_draft, pdx_prebaked, pdx_demo_simulate
    │ router.push
    ▼
 /results  app/results/page.tsx   decision order in the mount effect:
@@ -82,7 +83,8 @@ Fixtures go stale whenever the prompt, model, or programs change. Re-bake: `npm 
 | key | store | shape | writer | reader |
 |---|---|---|---|---|
 | `pdx_anthropic_key` | localStorage | string | lib/userKey.tsx | `useApiKey()` everywhere |
-| `pdx_intake` | sessionStorage | IntakeData | ConversationalForm, demo route | results page, packet download |
+| `pdx_intake` | sessionStorage | IntakeData | ConversationalForm (on submit), demo route | results page, packet download, ConversationalForm (seed fallback) |
+| `pdx_intake_draft` | sessionStorage | in-progress form values | ConversationalForm (debounced autosave; cleared on submit) | ConversationalForm (seeds the form first) |
 | `pdx_analysis` | sessionStorage | `{hash, output}` | lib/resultsCache.ts | results page |
 | `pdx_prebaked` | sessionStorage | AnalysisOutput | demo route | results page |
 | `pdx_demo_simulate` | sessionStorage | `'1'` | demo route | results page (clears after simulation) |

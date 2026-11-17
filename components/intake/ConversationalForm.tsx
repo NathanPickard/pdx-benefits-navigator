@@ -54,12 +54,14 @@ const DEFAULT_VALUES: FormValues = {
   citizenship: 'citizen',
 };
 
-// Reads a saved intake from sessionStorage. Returns null when there is none,
-// so the form keeps DEFAULT_VALUES. Called only after mount, never during
-// render, so server and client render the same initial markup.
+// Reads a saved intake from sessionStorage: the autosaved draft first, then
+// the last submitted intake. Returns null when there is neither, so the form
+// keeps DEFAULT_VALUES. Called only after mount, never during render, so
+// server and client render the same initial markup.
 function seedFromStorage(): FormValues | null {
   try {
-    const raw = sessionStorage.getItem(SESSION_KEYS.intake);
+    const raw = sessionStorage.getItem(SESSION_KEYS.intakeDraft)
+      ?? sessionStorage.getItem(SESSION_KEYS.intake);
     if (!raw) return null;
     return parseStoredIntakeFields(JSON.parse(raw), DEFAULT_VALUES);
   } catch {
@@ -90,7 +92,7 @@ export function ConversationalForm() {
       callback: ({ values }) => {
         clearTimeout(timer);
         timer = setTimeout(() => {
-          try { sessionStorage.setItem(SESSION_KEYS.intake, JSON.stringify(values)); } catch { /* non-fatal */ }
+          try { sessionStorage.setItem(SESSION_KEYS.intakeDraft, JSON.stringify(values)); } catch { /* non-fatal */ }
         }, AUTOSAVE_DEBOUNCE_MS);
       },
     });
@@ -112,6 +114,7 @@ export function ConversationalForm() {
       ? values
       : { ...values, recent_rent_increase_pct: undefined, received_eviction_notice: false };
     sessionStorage.setItem(SESSION_KEYS.intake, JSON.stringify(submitted));
+    sessionStorage.removeItem(SESSION_KEYS.intakeDraft);
     // Clear any leftover demo state so a prior demo run doesn't hijack this scan.
     sessionStorage.removeItem(SESSION_KEYS.prebaked);
     sessionStorage.removeItem(SESSION_KEYS.demoSimulate);

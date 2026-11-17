@@ -8,8 +8,13 @@ import type { AnalysisOutput, IntakeData } from '@/types/program';
  * results page. Keep every key here so readers and writers can't drift apart.
  */
 export const SESSION_KEYS = {
-  /** The submitted (or autosaved) intake answers, as JSON. */
+  /** The submitted intake answers, as JSON. Written only on submit. */
   intake: 'pdx_intake',
+  /**
+   * In-progress intake answers autosaved by the form, as JSON. Kept apart from
+   * `intake` so a half-finished draft never triggers an analysis.
+   */
+  intakeDraft: 'pdx_intake_draft',
   /** A pre-baked demo analysis, as JSON. Set by /demo/[scenario]. */
   prebaked: 'pdx_prebaked',
   /** '1' when the results page should replay the pre-baked analysis as a stream. */
