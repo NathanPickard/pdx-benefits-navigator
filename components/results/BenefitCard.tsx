@@ -15,6 +15,7 @@ import { JurisdictionPill } from '@/components/brand/JurisdictionPill';
 import type { AppStatus } from '@/lib/applicationStatus';
 import { formatEstimate, hasEstimate } from '@/lib/estimate';
 import type { Chrome } from '@/lib/i18n';
+import { CATEGORY_LABEL } from '@/lib/programLabels';
 import type { MatchResult, Program } from '@/types/program';
 
 function statusOptions(c: Chrome): { value: AppStatus; label: string }[] {
@@ -41,19 +42,6 @@ function confidenceLabel(level: MatchResult['confidence'], c: Chrome): string {
       return c.confidenceLow;
   }
 }
-
-const CATEGORY_LABEL: Record<Program['category'], string> = {
-  food: 'Food',
-  healthcare: 'Healthcare',
-  housing: 'Housing',
-  utility: 'Utility',
-  childcare: 'Childcare',
-  education: 'Education',
-  tax: 'Tax',
-  transportation: 'Transportation',
-  cash: 'Cash',
-  connectivity: 'Connectivity',
-};
 
 export function BenefitCard({
   match,

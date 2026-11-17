@@ -1,18 +1,6 @@
 import type { Chrome } from '@/lib/i18n';
+import { CATEGORY_LABEL } from '@/lib/programLabels';
 import type { Program } from '@/types/program';
-
-const CATEGORY_LABEL: Record<Program['category'], string> = {
-  food: 'Food',
-  healthcare: 'Healthcare',
-  housing: 'Housing',
-  utility: 'Utility',
-  childcare: 'Childcare',
-  education: 'Education',
-  tax: 'Tax',
-  transportation: 'Transportation',
-  cash: 'Cash',
-  connectivity: 'Connectivity',
-};
 
 const JURISDICTION_LABEL: Record<Program['jurisdiction'], string> = {
   federal: 'Federal',
