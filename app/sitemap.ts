@@ -1,8 +1,17 @@
 import type { MetadataRoute } from "next";
-
-const SITE_URL = "https://pdx-benefits-navigator.vercel.app";
+import { scenarios } from "@/lib/scenarios";
+import { SITE_URL } from "@/lib/site";
 
 export default function sitemap(): MetadataRoute.Sitemap {
+  const demoEntries: MetadataRoute.Sitemap = Object.keys(scenarios).map(
+    (slug) => ({
+      url: `${SITE_URL}/demo/${slug}`,
+      lastModified: new Date(),
+      changeFrequency: "monthly",
+      priority: 0.7,
+    }),
+  );
+
   return [
     {
       url: `${SITE_URL}/`,
@@ -22,24 +31,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly",
       priority: 0.8,
     },
-    {
-      url: `${SITE_URL}/demo/maria`,
-      lastModified: new Date(),
-      changeFrequency: "monthly",
-      priority: 0.7,
-    },
-    {
-      url: `${SITE_URL}/demo/james`,
-      lastModified: new Date(),
-      changeFrequency: "monthly",
-      priority: 0.7,
-    },
-    {
-      url: `${SITE_URL}/demo/rose`,
-      lastModified: new Date(),
-      changeFrequency: "monthly",
-      priority: 0.7,
-    },
+    ...demoEntries,
     {
       url: `${SITE_URL}/about`,
       lastModified: new Date(),

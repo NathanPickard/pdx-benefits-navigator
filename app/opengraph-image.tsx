@@ -2,6 +2,7 @@ import { ImageResponse } from 'next/og';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { formatUsd } from '@/lib/estimate';
+import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from '@/lib/site';
 
 import mariaFixture from '@/data/scenarios/maria.json';
 
@@ -12,6 +13,8 @@ export const contentType = 'image/png';
 
 const MARIA_PDX_DELTA =
   mariaFixture.total_estimated_annual_value - mariaFixture.federal_only_value;
+
+const SITE_HOST = new URL(SITE_URL).host;
 
 const PAPER = '#fbf4e7';
 const INK = '#2c3a4a';
@@ -115,7 +118,7 @@ export default async function Image() {
                 fontWeight: 700,
               }}
             >
-              PDX Benefits Navigator
+              {SITE_NAME}
             </div>
             <div
               style={{
@@ -171,9 +174,7 @@ export default async function Image() {
               maxWidth: 940,
             }}
           >
-            A friendly Portland-built navigator for federal, Oregon, Multnomah
-            County, and City of Portland benefits. Three minutes, no login,
-            nothing stored.
+            {SITE_DESCRIPTION}
           </div>
         </div>
 
@@ -201,7 +202,7 @@ export default async function Image() {
               24 programs · 3 minutes · Bring your own AI key
             </span>
             <span style={{ color: MOSS_DEEP, fontWeight: 700 }}>
-              pdx-benefits-navigator.vercel.app
+              {SITE_HOST}
             </span>
           </div>
         </div>
