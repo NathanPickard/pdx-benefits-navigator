@@ -19,14 +19,20 @@ import { UrgencyBanner } from '@/components/results/UrgencyBanner';
 import { RenewalCalendar } from '@/components/results/RenewalCalendar';
 import { useApplicationStatus } from '@/lib/applicationStatus';
 import { downloadBlob } from '@/lib/download';
-import { formatEstimate, formatNumber, formatUsd, hasEstimate } from '@/lib/estimate';
-import { likelyRange } from '@/lib/results/derive';
+import { formatUsd } from '@/lib/estimate';
+import {
+  buildPlainTextSummary,
+  filterRows,
+  joinPrograms,
+  likelyRange,
+  sortRows,
+} from '@/lib/results/derive';
 import { mergeTranslatedStrings } from '@/lib/results/translation';
 import { CHROME_EN, LANGUAGES, type Chrome, type LanguageCode } from '@/lib/i18n';
 import { useApiKey } from '@/lib/userKey';
 import { cacheAnalysis, readCachedAnalysis } from '@/lib/resultsCache';
 import { SESSION_KEYS, readPrebaked, readStoredIntake } from '@/lib/sessionState';
-import { PROGRAMS, PROGRAM_BY_ID, compareGemThenValue } from '@/lib/programs';
+import { PROGRAMS, PROGRAM_BY_ID } from '@/lib/programs';
 import type { AnalysisOutput, IntakeData, Program } from '@/types/program';
 
 // Languages supported by the results translation path (en/es/vi).
@@ -565,27 +571,20 @@ function Dashboard({
   }, []);
 
   // All eligible rows (unfiltered) — used for ProgressBar denominator + hero totals
-  const allEligible = useMemo(() => {
-    const rows = data.matches
-      .filter((m) => m.eligible)
-      .map((m) => ({ match: m, program: PROGRAM_BY_ID.get(m.program_id) }))
-      .filter((row): row is { match: typeof row.match; program: Program } => !!row.program);
-    return rows;
-  }, [data]);
+  const allEligible = useMemo(
+    () => joinPrograms(data.matches.filter((m) => m.eligible), PROGRAM_BY_ID),
+    [data]
+  );
 
   // Filtered + sorted eligible rows shown in the card grid
-  const eligible = useMemo(() => {
-    let rows = allEligible;
-    if (filterCategory) rows = rows.filter((r) => r.program.category === filterCategory);
-    if (filterJurisdiction) rows = rows.filter((r) => r.program.jurisdiction === filterJurisdiction);
-
-    if (sortMode === 'amount') {
-      return [...rows].sort(
-        (a, b) => b.match.estimated_annual_value - a.match.estimated_annual_value
-      );
-    }
-    return [...rows].sort(compareGemThenValue);
-  }, [allEligible, sortMode, filterCategory, filterJurisdiction]);
+  const eligible = useMemo(
+    () =>
+      sortRows(
+        filterRows(allEligible, { category: filterCategory, jurisdiction: filterJurisdiction }),
+        sortMode
+      ),
+    [allEligible, sortMode, filterCategory, filterJurisdiction]
+  );
 
   // Likely range: official ranges summed over all eligible rows with an
   // estimate (unfiltered, so it brackets the hero total).
@@ -598,25 +597,13 @@ function Dashboard({
   // surfaced below the eligible card grid — or front-and-center in the
   // zero-eligible empty state. Pre-rebake fixtures have no requirements[]
   // arrays; NearMissSection falls back to match.reasoning for the reason.
-  const nearMisses = useMemo(
-    () => data.matches.filter((m) => !m.eligible),
+  const nearMissRows = useMemo(
+    () => joinPrograms(data.matches.filter((m) => !m.eligible), PROGRAM_BY_ID),
     [data]
   );
 
   const handleCopySummary = useCallback(async () => {
-    const total = formatNumber(data.total_estimated_annual_value);
-    const count = allEligible.length;
-    const lines: string[] = [
-      `PDX Benefits Navigator — estimated $${total}/year across ${count} program${count !== 1 ? 's' : ''}`,
-      '',
-    ];
-    for (const { match, program } of allEligible) {
-      const value = match.estimated_annual_value;
-      const amount = hasEstimate(value) ? `~${formatEstimate(value)}/yr` : formatEstimate(value);
-      const step = match.next_steps?.[0] ?? program.short_name;
-      lines.push(`• ${program.name} — ${amount} — ${step}`);
-    }
-    const text = lines.join('\n');
+    const text = buildPlainTextSummary(data.total_estimated_annual_value, allEligible);
     try {
       if (!navigator.clipboard) throw new Error('unavailable');
       await navigator.clipboard.writeText(text);
@@ -935,12 +922,8 @@ function Dashboard({
             </div>
           </div>
 
-          {nearMisses.length > 0 && (
-            <NearMissSection
-              matches={nearMisses}
-              programById={PROGRAM_BY_ID}
-              chrome={chrome}
-            />
+          {nearMissRows.length > 0 && (
+            <NearMissSection rows={nearMissRows} chrome={chrome} />
           )}
         </section>
       ) : (
@@ -1083,12 +1066,8 @@ function Dashboard({
 
           <RenewalCalendar entries={allEligible} chrome={chrome} lang={lang} />
 
-          {nearMisses.length > 0 && (
-            <NearMissSection
-              matches={nearMisses}
-              programById={PROGRAM_BY_ID}
-              chrome={chrome}
-            />
+          {nearMissRows.length > 0 && (
+            <NearMissSection rows={nearMissRows} chrome={chrome} />
           )}
         </>
       )}
