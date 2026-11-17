@@ -15,6 +15,7 @@ import mariaFixture from "@/data/scenarios/maria.json";
 import jamesFixture from "@/data/scenarios/james.json";
 import roseFixture from "@/data/scenarios/rose.json";
 import { HIDDEN_GEM_COUNT, PROGRAM_COUNT } from "@/lib/programs";
+import { HIDDEN_GEM_HIGHLIGHTS, MARQUEE_ITEMS } from "@/lib/hiddenGemHighlights";
 
 const eligibleCount = (f: { matches: { eligible: boolean }[] }) =>
   f.matches.filter((m) => m.eligible).length;
@@ -22,56 +23,6 @@ const eligibleCount = (f: { matches: { eligible: boolean }[] }) =>
 const MARIA_TOTAL = mariaFixture.total_estimated_annual_value;
 const MARIA_FEDERAL = mariaFixture.federal_only_value;
 const MARIA_ELIGIBLE = eligibleCount(mariaFixture);
-
-const HIDDEN_GEMS = [
-  {
-    id: "renter",
-    name: "Portland Renter Relocation",
-    value: "$2,900 – $4,500",
-    jurisdiction: "portland" as const,
-    blurb:
-      "When your rent goes up more than 10% in a year, your landlord owes you a lump sum.",
-  },
-  {
-    id: "cep",
-    name: "CEP Home Weatherization",
-    value: "up to $15,000",
-    jurisdiction: "portland" as const,
-    blurb:
-      "Free weatherization, heat pumps, and home repairs, funded by Portland's clean energy tax on large retailers.",
-  },
-  {
-    id: "sun",
-    name: "SUN Service System",
-    value: "$1,000 – $6,000",
-    jurisdiction: "multnomah" as const,
-    blurb:
-      "After-school, family meals, mental health, and basic-needs case management.",
-  },
-  {
-    id: "evict",
-    name: "Multnomah Eviction Prevention",
-    value: "up to $5,000",
-    jurisdiction: "multnomah" as const,
-    blurb: "Emergency rent paid directly to landlords — within days.",
-  },
-  {
-    id: "water",
-    name: "Water Bureau Discount",
-    value: "80% off bill",
-    jurisdiction: "portland" as const,
-    blurb:
-      "Up to 80% off water + sewer for households under 60% State Median Income.",
-  },
-  {
-    id: "wallet",
-    name: "Transportation Wallet",
-    value: "$100 – $308 / yr",
-    jurisdiction: "portland" as const,
-    blurb:
-      "TriMet, BIKETOWN, and parking credits for income-qualified residents.",
-  },
-];
 
 const SCENARIO_SUMMARIES = [
   {
@@ -105,16 +56,6 @@ const SCENARIO_SUMMARIES = [
     eligibleCount: eligibleCount(roseFixture),
     accent: "sun" as const,
   },
-];
-
-const MARQUEE_ITEMS = [
-  ["Portland Renter Relocation", "$4,500"],
-  ["CEP Home Weatherization", "up to $15,000"],
-  ["SUN Service System", "$3,000"],
-  ["Multnomah Eviction Prevention", "$2,000"],
-  ["Water Bureau Discount", "80% off"],
-  ["Transportation Wallet", "$308 / yr"],
-  ["Inclusionary Housing", "$9,000 / yr"],
 ];
 
 const STEP_TONES = {
@@ -331,7 +272,7 @@ export default function HomePage() {
                   className="flex items-center gap-12"
                   style={{ flexShrink: 0 }}
                 >
-                  {MARQUEE_ITEMS.map(([n, v]) => (
+                  {MARQUEE_ITEMS.map(({ name: n, value: v }) => (
                     <span
                       key={n}
                       className="flex items-center gap-3"
@@ -433,8 +374,8 @@ export default function HomePage() {
           </SectionHeading>
 
           <div className="rc-cols-3">
-            {HIDDEN_GEMS.map((g) => (
-              <article key={g.id} className="rc-card" style={{ padding: 24 }}>
+            {HIDDEN_GEM_HIGHLIGHTS.map((g) => (
+              <article key={g.programId} className="rc-card" style={{ padding: 24 }}>
                 <div
                   className="flex items-center justify-between mb-3 flex-wrap"
                   style={{ gap: 6 }}

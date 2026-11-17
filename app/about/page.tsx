@@ -8,6 +8,7 @@ import { SoftBlobs } from "@/components/brand/RoseStamp";
 import { JurisdictionPill } from "@/components/brand/JurisdictionPill";
 import { formatUsd } from "@/lib/estimate";
 import { HIDDEN_GEM_COUNT, PROGRAM_COUNT } from "@/lib/programs";
+import { HIDDEN_GEM_HIGHLIGHTS } from "@/lib/hiddenGemHighlights";
 import mariaFixture from "@/data/scenarios/maria.json";
 import jamesFixture from "@/data/scenarios/james.json";
 import roseFixture from "@/data/scenarios/rose.json";
@@ -30,15 +31,6 @@ const LOCAL_LAYER_VALUES = [mariaFixture, jamesFixture, roseFixture].map(
 );
 const LOCAL_LAYER_MIN = roundForProse(Math.min(...LOCAL_LAYER_VALUES));
 const LOCAL_LAYER_MAX = roundForProse(Math.max(...LOCAL_LAYER_VALUES));
-
-const HIDDEN_GEM_PROGRAMS = [
-  { name: "Portland Renter Relocation", value: "$2,900 – $4,500", jurisdiction: "portland" as const },
-  { name: "CEP Home Weatherization", value: "up to $15,000", jurisdiction: "portland" as const },
-  { name: "SUN Service System", value: "$1,000 – $6,000", jurisdiction: "multnomah" as const },
-  { name: "Multnomah Eviction Prevention", value: "up to $5,000", jurisdiction: "multnomah" as const },
-  { name: "Water Bureau Discount", value: "80% off bill", jurisdiction: "portland" as const },
-  { name: "Transportation Wallet", value: "$100 – $308 / yr", jurisdiction: "portland" as const },
-];
 
 export default function AboutPage() {
   return (
@@ -132,10 +124,10 @@ export default function AboutPage() {
               aria-label="Examples of hidden-gem programs"
             >
               <div className="eyebrow mb-4" style={{ color: "var(--rose)" }}>
-                6 of 11 hidden gems
+                {HIDDEN_GEM_HIGHLIGHTS.length} of {HIDDEN_GEM_COUNT} hidden gems
               </div>
               <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-                {HIDDEN_GEM_PROGRAMS.map((p) => (
+                {HIDDEN_GEM_HIGHLIGHTS.map((p) => (
                   <div
                     key={p.name}
                     className="flex items-center justify-between gap-3 flex-wrap"
