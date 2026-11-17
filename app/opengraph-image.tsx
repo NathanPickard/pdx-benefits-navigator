@@ -2,6 +2,7 @@ import { ImageResponse } from 'next/og';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { formatUsd } from '@/lib/estimate';
+import { PROGRAM_COUNT } from '@/lib/programs';
 import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from '@/lib/site';
 
 import mariaFixture from '@/data/scenarios/maria.json';
@@ -199,7 +200,7 @@ export default async function Image() {
             }}
           >
             <span style={{ opacity: 0.7, fontWeight: 400 }}>
-              24 programs · 3 minutes · Bring your own AI key
+              {`${PROGRAM_COUNT} programs · 3 minutes · Bring your own AI key`}
             </span>
             <span style={{ color: MOSS_DEEP, fontWeight: 700 }}>
               {SITE_HOST}

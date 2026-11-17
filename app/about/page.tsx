@@ -6,12 +6,30 @@ import { AppBar } from "@/components/brand/AppBar";
 import { Wordmark } from "@/components/brand/Wordmark";
 import { SoftBlobs } from "@/components/brand/RoseStamp";
 import { JurisdictionPill } from "@/components/brand/JurisdictionPill";
+import { formatUsd } from "@/lib/estimate";
+import { HIDDEN_GEM_COUNT, PROGRAM_COUNT } from "@/lib/programs";
+import mariaFixture from "@/data/scenarios/maria.json";
+import jamesFixture from "@/data/scenarios/james.json";
+import roseFixture from "@/data/scenarios/rose.json";
 
 export const metadata: Metadata = {
   title: "About — PDX Benefits Navigator",
   description:
     "The story behind PDX Benefits Navigator — why Portland built it, how it protects your privacy, and how the AI analysis works. Built for the 2026 AI Portland Build Challenge.",
 };
+
+const LOCAL_LAYER_ROUNDING = 100;
+
+/** Round to the nearest LOCAL_LAYER_ROUNDING dollars for prose ("about $8,600"). */
+function roundForProse(n: number): number {
+  return Math.round(n / LOCAL_LAYER_ROUNDING) * LOCAL_LAYER_ROUNDING;
+}
+
+const LOCAL_LAYER_VALUES = [mariaFixture, jamesFixture, roseFixture].map(
+  (f) => f.pdx_specific_value
+);
+const LOCAL_LAYER_MIN = roundForProse(Math.min(...LOCAL_LAYER_VALUES));
+const LOCAL_LAYER_MAX = roundForProse(Math.max(...LOCAL_LAYER_VALUES));
 
 const HIDDEN_GEM_PROGRAMS = [
   { name: "Portland Renter Relocation", value: "$2,900 – $4,500", jurisdiction: "portland" as const },
@@ -89,13 +107,13 @@ export default function AboutPage() {
                 Most national screening tools check federal programs — SNAP, Medicaid, WIC — and stop
                 there. Portland and Multnomah County fund a layer of local programs on top of
                 those. For our three example households, that layer adds{" "}
-                <strong style={{ color: "var(--ink)" }}>about $8,600 – $19,800 a year</strong>,
+                <strong style={{ color: "var(--ink)" }}>about {formatUsd(LOCAL_LAYER_MIN)} – {formatUsd(LOCAL_LAYER_MAX)} a year</strong>,
                 and most residents never hear about these programs.
               </p>
               <p style={{ color: "var(--ink-2)", lineHeight: 1.7, margin: "0 0 20px", fontSize: "1rem" }}>
                 We built this to close that gap. We check all{" "}
-                <strong style={{ color: "var(--ink)" }}>24 programs</strong> — federal, state, county,
-                and city — in a single session. Eleven of those 24 are flagged as{" "}
+                <strong style={{ color: "var(--ink)" }}>{PROGRAM_COUNT} programs</strong> — federal, state, county,
+                and city — in a single session. {HIDDEN_GEM_COUNT} of those {PROGRAM_COUNT} are flagged as{" "}
                 <span className="pill pill-sun" style={{ fontSize: "0.78rem", verticalAlign: "middle" }}>
                   <Sparkles size={11} /> Hidden gems
                 </span>{" "}

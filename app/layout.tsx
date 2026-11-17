@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Lora, Plus_Jakarta_Sans } from "next/font/google";
 import { ApiKeyProvider } from "@/lib/userKey";
 import { Toaster } from "@/components/ui/sonner";
+import { HIDDEN_GEM_COUNT, PROGRAM_COUNT } from "@/lib/programs";
 import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/site";
 import "./globals.css";
 
@@ -55,8 +56,8 @@ const LD = {
   },
   inLanguage: ["en", "es", "vi"],
   featureList: [
-    "Screens all 24 federal, Oregon, Multnomah County, and City of Portland benefit programs",
-    "Highlights 11 locally-funded hidden-gem programs most national tools miss",
+    `Screens all ${PROGRAM_COUNT} federal, Oregon, Multnomah County, and City of Portland benefit programs`,
+    `Highlights ${HIDDEN_GEM_COUNT} locally-funded hidden-gem programs most national tools miss`,
     "No login required — answers stay in your browser session",
     "AI-powered eligibility analysis in plain language",
     "Printable PDF packet with program links, deadlines, and document checklists",

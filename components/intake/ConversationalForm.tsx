@@ -11,6 +11,7 @@ import { ArrowLeft, ArrowRight, Check, KeyRound, Sparkles } from 'lucide-react';
 import { useApiKey } from '@/lib/userKey';
 import { fplFor } from '@/lib/fpl';
 import { formatUsd } from '@/lib/estimate';
+import { PROGRAM_COUNT } from '@/lib/programs';
 import type { IntakeData } from '@/types/program';
 
 const schema = z.object({
@@ -907,7 +908,7 @@ function Review({ values }: { values: FormValues }) {
     <>
       <StepHeading
         title="Ready to find what you're owed."
-        sub="We'll check all 24 federal, state, county, and Portland programs. The analysis can take a few minutes."
+        sub={`We'll check all ${PROGRAM_COUNT} federal, state, county, and Portland programs. The analysis can take a few minutes.`}
       />
       <div className="rc-card-flat" style={{ padding: '8px 0' }}>
         <dl style={{ margin: 0 }}>

@@ -7,7 +7,7 @@ import { formatUsd } from '@/lib/estimate';
 import mariaFixture from '@/data/scenarios/maria.json';
 import jamesFixture from '@/data/scenarios/james.json';
 import roseFixture from '@/data/scenarios/rose.json';
-import { PROGRAM_BY_ID, compareGemThenValue } from '@/lib/programs';
+import { PROGRAM_BY_ID, PROGRAM_COUNT, compareGemThenValue } from '@/lib/programs';
 
 type Fixture = {
   total_estimated_annual_value: number;
@@ -113,7 +113,7 @@ export default function DemoHubPage() {
           Three example Portland households.
         </h1>
         <p className="max-w-2xl text-muted-foreground">
-          Each scenario runs against all 24 federal, Oregon, Multnomah County, and Portland
+          Each scenario runs against all {PROGRAM_COUNT} federal, Oregon, Multnomah County, and Portland
           programs in a single pass. Pick one — we&rsquo;ll show exactly what they qualify
           for and how to apply.
         </p>
