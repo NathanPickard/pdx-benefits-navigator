@@ -74,11 +74,13 @@ const DEFAULT_VALUES: FormValues = {
   citizenship: 'citizen',
 };
 
-function seedFromStorage(): FormValues {
-  if (typeof window === 'undefined') return DEFAULT_VALUES;
+// Reads a saved intake from sessionStorage. Returns null when there is none,
+// so the form keeps DEFAULT_VALUES. Called only after mount, never during
+// render, so server and client render the same initial markup.
+function seedFromStorage(): FormValues | null {
   try {
     const raw = sessionStorage.getItem('pdx_intake');
-    if (!raw) return DEFAULT_VALUES;
+    if (!raw) return null;
     const stored = JSON.parse(raw) as Partial<FormValues>;
     return {
       household_size: typeof stored.household_size === 'number' ? stored.household_size : DEFAULT_VALUES.household_size,
@@ -98,7 +100,7 @@ function seedFromStorage(): FormValues {
       citizenship: ['citizen', 'lpr', 'other', 'prefer_not_say'].includes(stored.citizenship as string) ? (stored.citizenship as FormValues['citizenship']) : DEFAULT_VALUES.citizenship,
     };
   } catch {
-    return DEFAULT_VALUES;
+    return null;
   }
 }
 
@@ -111,8 +113,13 @@ export function ConversationalForm() {
   const form = useForm<FormValues>({
     resolver: zodResolver(schema),
     mode: 'onChange',
-    defaultValues: seedFromStorage(),
+    defaultValues: DEFAULT_VALUES,
   });
+
+  useEffect(() => {
+    const seeded = seedFromStorage();
+    if (seeded) form.reset(seeded);
+  }, [form]);
 
   useEffect(() => {
     const sub = form.watch((values) => {
