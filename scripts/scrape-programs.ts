@@ -26,6 +26,7 @@ import Firecrawl from '@mendable/firecrawl-js';
 import Anthropic from '@anthropic-ai/sdk';
 
 import type { Program } from '../types/program';
+import { loadDotEnvLocal } from './lib/env';
 
 const ROOT = process.cwd();
 const SEED_PATH = path.join(ROOT, 'data', 'programs.seed.json');
@@ -51,29 +52,6 @@ type ProvenanceEntry =
 type Provenance = Record<string, ProvenanceEntry>;
 
 type ScrapedProgram = Program & { _provenance: Provenance };
-
-async function loadDotEnvLocal(): Promise<void> {
-  try {
-    const text = await fs.readFile(path.join(ROOT, '.env.local'), 'utf8');
-    for (const raw of text.split('\n')) {
-      const line = raw.trim();
-      if (!line || line.startsWith('#')) continue;
-      const eq = line.indexOf('=');
-      if (eq === -1) continue;
-      const key = line.slice(0, eq).trim();
-      let val = line.slice(eq + 1).trim();
-      if (
-        (val.startsWith('"') && val.endsWith('"')) ||
-        (val.startsWith("'") && val.endsWith("'"))
-      ) {
-        val = val.slice(1, -1);
-      }
-      if (!process.env[key]) process.env[key] = val;
-    }
-  } catch {
-    // Fall back to shell env.
-  }
-}
 
 async function loadSeed(): Promise<Program[]> {
   const text = await fs.readFile(SEED_PATH, 'utf8');
@@ -464,7 +442,7 @@ function writeReport(outcomes: ProgramOutcome[], programs: ScrapedProgram[]): st
 }
 
 async function main() {
-  await loadDotEnvLocal();
+  await loadDotEnvLocal(ROOT);
 
   if (!process.env.FIRECRAWL_API_KEY) {
     console.error('Missing FIRECRAWL_API_KEY in .env.local');

@@ -25,32 +25,9 @@ import { analyzeEligibilityStream } from '../../lib/claudeBrowser';
 import { ELIGIBILITY_MODEL } from '../../lib/eligibility';
 import type { AnalysisOutput, Program } from '../../types/program';
 import type { EvalCase } from './types';
+import { loadDotEnvLocal } from '../lib/env';
 
 const ROOT = process.cwd();
-
-// ── loadDotEnvLocal — copied verbatim from scripts/precompute-scenarios.ts ──
-async function loadDotEnvLocal(): Promise<void> {
-  try {
-    const text = await readFile(join(ROOT, '.env.local'), 'utf8');
-    for (const raw of text.split('\n')) {
-      const line = raw.trim();
-      if (!line || line.startsWith('#')) continue;
-      const eq = line.indexOf('=');
-      if (eq === -1) continue;
-      const key = line.slice(0, eq).trim();
-      let val = line.slice(eq + 1).trim();
-      if (
-        (val.startsWith('"') && val.endsWith('"')) ||
-        (val.startsWith("'") && val.endsWith("'"))
-      ) {
-        val = val.slice(1, -1);
-      }
-      if (!process.env[key]) process.env[key] = val;
-    }
-  } catch {
-    // Fall back to shell env.
-  }
-}
 
 /** Parses a `--runs` value; only a plain positive integer like `3` is accepted. */
 function parseRunsValue(value: string | undefined): number {
@@ -276,7 +253,7 @@ async function main(): Promise<void> {
   // A throw here is printed and exits 1 via the main().catch handler below.
   const { caseIds, runs } = parseEvalArgs(process.argv.slice(2));
 
-  await loadDotEnvLocal();
+  await loadDotEnvLocal(ROOT);
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) {
     console.error('Missing ANTHROPIC_API_KEY in .env.local');

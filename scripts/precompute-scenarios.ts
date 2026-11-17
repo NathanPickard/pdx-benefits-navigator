@@ -14,41 +14,19 @@
  * Env (.env.local): ANTHROPIC_API_KEY
  */
 
-import { readFile, writeFile } from 'node:fs/promises';
+import { writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { scenarios } from '../lib/scenarios';
 import { analyzeEligibilityStream } from '../lib/claudeBrowser';
 import { ELIGIBILITY_MODEL } from '../lib/eligibility';
 import { formatUsd } from '../lib/estimate';
+import { loadDotEnvLocal } from './lib/env';
 
 const ROOT = process.cwd();
 const OUT_DIR = join(ROOT, 'data', 'scenarios');
 
 // Precompute and runtime now share ELIGIBILITY_MODEL (Sonnet 4.6), so the
 // baked demo fixtures match what live BYOK users get.
-
-async function loadDotEnvLocal(): Promise<void> {
-  try {
-    const text = await readFile(join(ROOT, '.env.local'), 'utf8');
-    for (const raw of text.split('\n')) {
-      const line = raw.trim();
-      if (!line || line.startsWith('#')) continue;
-      const eq = line.indexOf('=');
-      if (eq === -1) continue;
-      const key = line.slice(0, eq).trim();
-      let val = line.slice(eq + 1).trim();
-      if (
-        (val.startsWith('"') && val.endsWith('"')) ||
-        (val.startsWith("'") && val.endsWith("'"))
-      ) {
-        val = val.slice(1, -1);
-      }
-      if (!process.env[key]) process.env[key] = val;
-    }
-  } catch {
-    // Fall back to shell env.
-  }
-}
 
 async function runOne(
   slug: keyof typeof scenarios,
@@ -90,7 +68,7 @@ async function runOne(
 }
 
 async function main() {
-  await loadDotEnvLocal();
+  await loadDotEnvLocal(ROOT);
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) {
     console.error('Missing ANTHROPIC_API_KEY in .env.local');
