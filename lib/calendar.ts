@@ -59,14 +59,19 @@ export function renewalIntervalMonths(cycle: string | undefined): number {
   return 12;
 }
 
+/** The next renewal date for a program, one renewal interval after `from`. */
+export function nextRenewalDate(program: Pick<Program, 'renewal_cycle'>, from: Date): Date {
+  const next = new Date(from);
+  next.setUTCMonth(next.getUTCMonth() + renewalIntervalMonths(program.renewal_cycle));
+  return next;
+}
+
 export function buildIcsCalendar(entries: CalendarEntry[]): string {
   const now = new Date();
   const stamp = formatDateTime(now);
 
   const events = entries.map(({ match, program }) => {
-    const months = renewalIntervalMonths(program.renewal_cycle);
-    const start = new Date(now);
-    start.setUTCMonth(start.getUTCMonth() + months);
+    const start = nextRenewalDate(program, now);
 
     const descParts: string[] = [];
     const value = match.estimated_annual_value;
