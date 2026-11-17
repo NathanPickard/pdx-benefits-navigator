@@ -1,7 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useCallback, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { ArrowLeft, Clipboard, Download, KeyRound, Loader2, Printer } from 'lucide-react';
 import { toast } from 'sonner';
@@ -27,226 +26,19 @@ import {
   likelyRange,
   sortRows,
 } from '@/lib/results/derive';
-import { mergeTranslatedStrings } from '@/lib/results/translation';
-import { CHROME_EN, LANGUAGES, type Chrome, type LanguageCode } from '@/lib/i18n';
+import { CHROME_EN, type Chrome, type LanguageCode } from '@/lib/i18n';
 import { useApiKey } from '@/lib/userKey';
-import { cacheAnalysis, readCachedAnalysis } from '@/lib/resultsCache';
-import { SESSION_KEYS, readPrebaked, readStoredIntake } from '@/lib/sessionState';
 import { PROGRAMS, PROGRAM_BY_ID } from '@/lib/programs';
 import type { AnalysisOutput, IntakeData, Program } from '@/types/program';
-
-// Languages supported by the results translation path (en/es/vi).
-// Used to guard the intake-language auto-select so unsupported languages
-// (ru/zh/so/ar) fall back to English rather than causing a runtime error.
-const SUPPORTED_RESULT_LANGS = new Set(LANGUAGES.map((l) => l.code));
-
-type TranslatedBundle = { output: AnalysisOutput; chrome: Chrome };
-
-type LoadingProgress = { evaluated: string[] };
-
-type State =
-  | { kind: 'loading'; progress: LoadingProgress }
-  | { kind: 'ok'; data: AnalysisOutput }
-  | { kind: 'error'; message: string }
-  | { kind: 'needs-key' };
-
-// Demo replay pacing: one program ticks off every DEMO_TICK_MS, then the
-// results appear DEMO_FINISH_DELAY_MS after the last one.
-const DEMO_TICK_MS = 438;
-const DEMO_FINISH_DELAY_MS = 250;
-
-// State updater that records one more evaluated program while loading.
-function appendEvaluated(id: string): (s: State) => State {
-  return (s) =>
-    s.kind === 'loading'
-      ? { ...s, progress: { evaluated: [...s.progress.evaluated, id] } }
-      : s;
-}
+import { useAnalysisLoader, type LoadingProgress } from './useAnalysisLoader';
+import { useResultsTranslation, type TranslatedBundle } from './useResultsTranslation';
 
 export default function ResultsPage() {
-  const router = useRouter();
   const { apiKey, hydrated } = useApiKey();
-  const [state, setState] = useState<State>({
-    kind: 'loading',
-    progress: { evaluated: [] },
-  });
-  const [intake, setIntake] = useState<IntakeData | null>(null);
-  const [lang, setLang] = useState<LanguageCode>('en');
-  const [translations, setTranslations] = useState<
-    Partial<Record<Exclude<LanguageCode, 'en'>, TranslatedBundle>>
-  >({});
-  const [pendingLang, setPendingLang] = useState<LanguageCode | null>(null);
-  const [translateError, setTranslateError] = useState<string | null>(null);
-  // Sync <html lang> with the active results language so screen readers and
-  // the browser's speech engine use the correct language for translated content.
-  // Arabic is not a supported results language yet so no dir="rtl" is needed
-  // here — add that when ar/fa support is added to the translation pipeline.
-  useEffect(() => {
-    document.documentElement.lang = lang;
-  }, [lang]);
-
-  // This effect reads browser-only sessionStorage and orchestrates the on-mount
-  // data load (demo replay or live streaming analysis), so the synchronous
-  // setState calls are intentional load-once-on-mount transitions, not the
-  // cascading-render anti-pattern the rule targets.
-  /* eslint-disable react-hooks/set-state-in-effect */
-  useEffect(() => {
-    if (!hydrated) return; // wait for key hydration before deciding what to do
-
-    // Demo routes stash a pre-baked AnalysisOutput here so the dashboard can
-    // skip the API call entirely.
-    if (sessionStorage.getItem(SESSION_KEYS.prebaked)) {
-      const output = readPrebaked();
-      if (!output) {
-        setState({ kind: 'error', message: 'Could not load demo data.' });
-        return;
-      }
-      setIntake(readStoredIntake());
-
-      const simulate = sessionStorage.getItem(SESSION_KEYS.demoSimulate) === '1';
-      if (!simulate) {
-        setState({ kind: 'ok', data: output });
-        return;
-      }
-
-      // Defer removing the flag until the simulation finishes — otherwise
-      // StrictMode's double-effect-invocation eats it on the first cleanup
-      // and the second run shows results instantly.
-      const programIds = PROGRAMS.map((p) => p.id);
-      let i = 0;
-      let finishTimeout: ReturnType<typeof setTimeout> | null = null;
-      const interval = setInterval(() => {
-        if (i >= programIds.length) {
-          clearInterval(interval);
-          finishTimeout = setTimeout(() => {
-            sessionStorage.removeItem(SESSION_KEYS.demoSimulate);
-            setState({ kind: 'ok', data: output });
-          }, DEMO_FINISH_DELAY_MS);
-          return;
-        }
-        setState(appendEvaluated(programIds[i++]));
-      }, DEMO_TICK_MS);
-
-      return () => {
-        clearInterval(interval);
-        if (finishTimeout) clearTimeout(finishTimeout);
-      };
-    }
-
-    // A missing, partial or corrupt intake sends the user back to the form.
-    const parsed = readStoredIntake();
-    if (!parsed) {
-      router.replace('/intake');
-      return;
-    }
-    setIntake(parsed);
-
-    if (!apiKey) {
-      setState({ kind: 'needs-key' });
-      return;
-    }
-
-    const cached = readCachedAnalysis(parsed);
-    if (cached) {
-      setState({ kind: 'ok', data: cached });
-      return;
-    }
-
-    let cancelled = false;
-    (async () => {
-      const { analyzeEligibilityStream } = await import('@/lib/claudeBrowser');
-      for await (const event of analyzeEligibilityStream(apiKey, parsed)) {
-        if (cancelled) return;
-        if (event.type === 'progress') {
-          setState(appendEvaluated(event.programId));
-        } else if (event.type === 'complete') {
-          cacheAnalysis(parsed, event.output);
-          setState({ kind: 'ok', data: event.output });
-        } else {
-          setState({ kind: 'error', message: event.message });
-        }
-      }
-    })();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [router, apiKey, hydrated]);
-  /* eslint-enable react-hooks/set-state-in-effect */
-
+  const { state, intake } = useAnalysisLoader(apiKey, hydrated);
   const originalData = state.kind === 'ok' ? state.data : null;
-
-  const handleLanguageChange = useCallback(
-    async (next: LanguageCode) => {
-      if (next === lang || pendingLang !== null) return;
-      setTranslateError(null);
-
-      if (next === 'en') {
-        setLang('en');
-        return;
-      }
-      if (translations[next]) {
-        setLang(next);
-        return;
-      }
-      if (!originalData) return;
-      // 'en' returned above, so TypeScript narrows next to a translation target.
-      const target: Exclude<LanguageCode, 'en'> = next;
-      if (!apiKey) {
-        setTranslateError(
-          'Translation requires an Anthropic API key. Click the key indicator above to add one.'
-        );
-        return;
-      }
-
-      setPendingLang(target);
-      try {
-        const { translatePayload } = await import('@/lib/claudeBrowser');
-        const translated = await translatePayload(
-          apiKey,
-          { output: originalData, chrome: CHROME_EN },
-          target
-        );
-        if (!translated?.output || !translated?.chrome) {
-          throw new Error('Translation response missing fields');
-        }
-        // Keep numbers, eligibility and ids from the English analysis; take
-        // only translated strings. The model may drop a Chrome key; fall back
-        // to English rather than render blank.
-        const bundle: TranslatedBundle = {
-          output: mergeTranslatedStrings(originalData, translated.output),
-          chrome: { ...CHROME_EN, ...translated.chrome },
-        };
-        setTranslations((prev) => ({ ...prev, [target]: bundle }));
-        setLang(target);
-      } catch (e) {
-        setTranslateError(e instanceof Error ? e.message : 'Translation failed');
-      } finally {
-        setPendingLang(null);
-      }
-    },
-    [lang, pendingLang, translations, originalData, apiKey]
-  );
-
-  // Auto-select the results language from the intake's primary_language.
-  // Fires once when originalData first becomes available and an API key is
-  // present (so the translation pipeline can run). A ref gates it to initial
-  // load only — subsequent manual toggles via handleLanguageChange win.
-  // Silently skips when no API key is present (demo path) to avoid surfacing
-  // a translation-requires-key error the user didn't ask for.
-  const autoSelectFiredRef = useRef(false);
-  /* eslint-disable react-hooks/set-state-in-effect */
-  useEffect(() => {
-    if (autoSelectFiredRef.current || !originalData || !intake || !apiKey) return;
-    autoSelectFiredRef.current = true;
-    const intakeLang = intake.primary_language;
-    if (intakeLang !== 'en' && SUPPORTED_RESULT_LANGS.has(intakeLang as LanguageCode)) {
-      // handleLanguageChange fetches the translation and then calls setLang.
-      void handleLanguageChange(intakeLang as LanguageCode);
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [originalData, intake, apiKey]);
-  /* eslint-enable react-hooks/set-state-in-effect */
+  const { lang, pendingLang, translateError, translations, handleLanguageChange } =
+    useResultsTranslation(originalData, intake, apiKey);
 
   if (state.kind === 'loading') {
     return (
