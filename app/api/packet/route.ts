@@ -4,13 +4,10 @@ import { renderToBuffer, type DocumentProps } from '@react-pdf/renderer';
 import QRCode from 'qrcode';
 
 import { Packet } from '@/lib/packet';
-import programsData from '@/data/programs.json';
+import { PROGRAM_BY_ID, compareGemThenValue } from '@/lib/programs';
 import type { AnalysisOutput, IntakeData, MatchResult, Program } from '@/types/program';
 
 export const maxDuration = 60;
-
-const PROGRAMS = programsData as Program[];
-const PROGRAM_BY_ID = new Map(PROGRAMS.map((p) => [p.id, p]));
 
 export async function POST(req: NextRequest) {
   try {
@@ -31,10 +28,7 @@ export async function POST(req: NextRequest) {
       .filter(
         (row): row is { match: MatchResult; program: Program } => row.program !== undefined
       )
-      .sort((a, b) => {
-        if (a.program.hidden_gem !== b.program.hidden_gem) return a.program.hidden_gem ? -1 : 1;
-        return b.match.estimated_annual_value - a.match.estimated_annual_value;
-      });
+      .sort(compareGemThenValue);
 
     const qrCodes: Record<string, string> = {};
     await Promise.all(

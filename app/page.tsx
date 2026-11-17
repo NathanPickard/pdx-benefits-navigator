@@ -14,12 +14,7 @@ import { formatUsd } from "@/lib/estimate";
 import mariaFixture from "@/data/scenarios/maria.json";
 import jamesFixture from "@/data/scenarios/james.json";
 import roseFixture from "@/data/scenarios/rose.json";
-import programs from "@/data/programs.json";
-
-const HIDDEN_GEM_COUNT = (programs as { hidden_gem: boolean }[]).filter(
-  (p) => p.hidden_gem,
-).length;
-const PROGRAM_COUNT = programs.length;
+import { HIDDEN_GEM_COUNT, PROGRAM_COUNT } from "@/lib/programs";
 
 const eligibleCount = (f: { matches: { eligible: boolean }[] }) =>
   f.matches.filter((m) => m.eligible).length;

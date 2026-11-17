@@ -24,11 +24,8 @@ import { mergeTranslatedStrings } from '@/lib/results/translation';
 import { CHROME_EN, LANGUAGES, type Chrome, type LanguageCode } from '@/lib/i18n';
 import { useApiKey } from '@/lib/userKey';
 import { cacheAnalysis, readCachedAnalysis } from '@/lib/resultsCache';
-import programsData from '@/data/programs.json';
+import { PROGRAMS, PROGRAM_BY_ID, compareGemThenValue } from '@/lib/programs';
 import type { AnalysisOutput, IntakeData, Program } from '@/types/program';
-
-const PROGRAMS = programsData as Program[];
-const PROGRAM_BY_ID = new Map(PROGRAMS.map((p) => [p.id, p]));
 
 // Languages supported by the results translation path (en/es/vi).
 // Used to guard the intake-language auto-select so unsupported languages
@@ -597,10 +594,7 @@ function Dashboard({
         (a, b) => b.match.estimated_annual_value - a.match.estimated_annual_value
       );
     }
-    return [...rows].sort((a, b) => {
-      if (a.program.hidden_gem !== b.program.hidden_gem) return a.program.hidden_gem ? -1 : 1;
-      return b.match.estimated_annual_value - a.match.estimated_annual_value;
-    });
+    return [...rows].sort(compareGemThenValue);
   }, [allEligible, sortMode, filterCategory, filterJurisdiction]);
 
   // Likely range: official ranges summed over all eligible rows with an

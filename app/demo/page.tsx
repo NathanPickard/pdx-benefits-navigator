@@ -7,20 +7,13 @@ import { formatUsd } from '@/lib/estimate';
 import mariaFixture from '@/data/scenarios/maria.json';
 import jamesFixture from '@/data/scenarios/james.json';
 import roseFixture from '@/data/scenarios/rose.json';
-import programs from '@/data/programs.json';
+import { PROGRAM_BY_ID, compareGemThenValue } from '@/lib/programs';
 
 type Fixture = {
   total_estimated_annual_value: number;
   matches: { program_id: string; eligible: boolean; estimated_annual_value: number }[];
 };
 
-const SHORT_BY_ID: Record<string, string> = Object.fromEntries(
-  (programs as { id: string; short_name: string }[]).map((p) => [p.id, p.short_name]),
-);
-
-const GEM_BY_ID: Record<string, boolean> = Object.fromEntries(
-  (programs as { id: string; hidden_gem: boolean }[]).map((p) => [p.id, p.hidden_gem]),
-);
 
 /**
  * Hero programs for a persona, derived from the fixture: eligible hidden-gem
@@ -28,12 +21,19 @@ const GEM_BY_ID: Record<string, boolean> = Object.fromEntries(
  * programs, capped at n. Always real and always eligible.
  */
 const heroPrograms = (f: Fixture, n = 4): string[] => {
-  const eligible = f.matches.filter((m) => m.eligible);
-  const byValueDesc = (a: Fixture['matches'][number], b: Fixture['matches'][number]) =>
-    b.estimated_annual_value - a.estimated_annual_value;
-  const gems = eligible.filter((m) => GEM_BY_ID[m.program_id]).sort(byValueDesc);
-  const others = eligible.filter((m) => !GEM_BY_ID[m.program_id]).sort(byValueDesc);
-  return [...gems, ...others].slice(0, n).map((m) => SHORT_BY_ID[m.program_id] ?? m.program_id);
+  return f.matches
+    .filter((m) => m.eligible)
+    .map((m) => {
+      const program = PROGRAM_BY_ID.get(m.program_id);
+      return {
+        match: m,
+        program: { hidden_gem: program?.hidden_gem ?? false },
+        label: program?.short_name ?? m.program_id,
+      };
+    })
+    .sort(compareGemThenValue)
+    .slice(0, n)
+    .map((row) => row.label);
 };
 
 const expectedFromFixture = (f: Fixture) =>
