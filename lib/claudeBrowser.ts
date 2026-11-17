@@ -218,8 +218,8 @@ export async function translatePayload<T>(
   });
 
   const text = response.content
-    .filter((b) => b.type === 'text')
-    .map((b) => (b as { type: 'text'; text: string }).text)
+    .filter((b): b is Anthropic.TextBlock => b.type === 'text')
+    .map((b) => b.text)
     .join('');
   // parseJsonObject is translation-only: used here to tolerantly extract the
   // returned JSON blob. The eligibility hot path uses structured output instead.

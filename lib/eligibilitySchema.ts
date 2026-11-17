@@ -15,7 +15,8 @@ export const MatchSchema = z.object({
   reasoning: z.string(),
   // Required as the live structured-output contract — forces the model to emit
   // per-requirement breakdowns on every match. The TS type keeps requirements
-  // optional for fixture compatibility; parseAnalysis casts with `as AnalysisOutput`.
+  // optional for fixture compatibility; the schema's output is still assignable
+  // to AnalysisOutput, so parseAnalysis returns it without a cast.
   requirements: z.array(RequirementSchema),
   next_steps: z.array(z.string()),
   required_documents: z.array(z.string()),
@@ -37,7 +38,10 @@ export const AnalysisOutputSchema = z.object({
   caseworker_notes: z.string().optional(),
 });
 
-/** Validate + cast a parsed object to AnalysisOutput (throws ZodError on mismatch). */
+/**
+ * Validate a parsed object as AnalysisOutput (throws ZodError on mismatch).
+ * No cast: if the schema drifts from the TS type, this stops compiling.
+ */
 export function parseAnalysis(obj: unknown): AnalysisOutput {
-  return AnalysisOutputSchema.parse(obj) as AnalysisOutput;
+  return AnalysisOutputSchema.parse(obj);
 }
