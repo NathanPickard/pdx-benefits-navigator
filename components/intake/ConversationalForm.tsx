@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useForm, Controller, type UseFormReturn } from 'react-hook-form';
@@ -9,6 +9,7 @@ import { z } from 'zod';
 import { ArrowLeft, ArrowRight, Check, KeyRound, Sparkles } from 'lucide-react';
 
 import { useApiKey } from '@/lib/userKey';
+import { fplFor } from '@/lib/fpl';
 import type { IntakeData } from '@/types/program';
 
 const schema = z.object({
@@ -573,11 +574,7 @@ function Income({ form }: { form: Form }) {
   const annual_income = form.watch('annual_income') ?? 0;
   const household_size = form.watch('household_size') ?? 1;
 
-  const pctFpl = useMemo(() => {
-    const fpl = 15650 + Math.max(0, household_size - 1) * 5500;
-    if (!fpl) return 0;
-    return Math.round((annual_income / fpl) * 100);
-  }, [annual_income, household_size]);
+  const pctFpl = Math.round((annual_income / fplFor(household_size)) * 100);
 
   return (
     <>
