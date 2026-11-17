@@ -52,7 +52,19 @@ async function loadDotEnvLocal(): Promise<void> {
   }
 }
 
-/** Positional args are case ids; `--runs N` sets attempts per case (default 1). */
+/** Parses a `--runs` value; only a plain positive integer like `3` is accepted. */
+function parseRunsValue(value: string | undefined): number {
+  const parsed = value === undefined ? NaN : Number.parseInt(value, 10);
+  if (String(parsed) !== value || parsed < 1) {
+    throw new Error('--runs must be a positive integer');
+  }
+  return parsed;
+}
+
+/**
+ * Positional args are case ids; `--runs N` sets attempts per case (default 1).
+ * Throws when `--runs` is missing its value or is not a positive integer.
+ */
 export function parseEvalArgs(argv: string[]): { caseIds: string[]; runs: number } {
   const caseIds: string[] = [];
   let runs = 1;
@@ -60,9 +72,7 @@ export function parseEvalArgs(argv: string[]): { caseIds: string[]; runs: number
   for (let i = 0; i < argv.length; i++) {
     const arg = argv[i];
     if (arg === '--runs') {
-      const next = argv[i + 1];
-      const parsed = next === undefined ? NaN : Number.parseInt(next, 10);
-      runs = Number.isNaN(parsed) ? 1 : parsed;
+      runs = parseRunsValue(argv[i + 1]);
       i++;
       continue;
     }
@@ -262,6 +272,10 @@ function todayIsoDate(date: Date): string {
 }
 
 async function main(): Promise<void> {
+  // Parse args first so a bad --runs fails fast, before any key or file checks.
+  // A throw here is printed and exits 1 via the main().catch handler below.
+  const { caseIds, runs } = parseEvalArgs(process.argv.slice(2));
+
   await loadDotEnvLocal();
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) {
@@ -274,8 +288,6 @@ async function main(): Promise<void> {
     await readFile(join(ROOT, 'data', 'programs.json'), 'utf8'),
   ) as Program[];
   const programById = new Map(allPrograms.map((p) => [p.id, p]));
-
-  const { caseIds, runs } = parseEvalArgs(process.argv.slice(2));
 
   const problems = validateCases(caseIds, allPrograms);
   if (problems.length > 0) {
