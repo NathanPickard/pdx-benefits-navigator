@@ -24,6 +24,7 @@ import type { AttemptResult, CaseResult, ReasoningScore, RunData } from './repor
 import { ELIGIBILITY_MODEL } from '../../lib/eligibility';
 import type { AnalysisOutput, Program } from '../../types/program';
 import type { EvalCase } from './types';
+import { validateCaseDefinitions } from './validate';
 import { loadDotEnvLocal } from '../lib/env';
 import { collectAnalysis } from '../lib/collectAnalysis';
 
@@ -71,52 +72,17 @@ export function eligibleSetsMatch(outputs: AnalysisOutput[]): boolean {
   return signatures.every((sig) => sig === signatures[0]);
 }
 
-interface ValidationProblem {
-  message: string;
-}
-
-function validateCases(
-  requestedCaseIds: string[],
-  allPrograms: Program[],
-): ValidationProblem[] {
-  const problems: ValidationProblem[] = [];
-  const programIds = new Set(allPrograms.map((p) => p.id));
+/**
+ * Case-definition problems plus any case id requested on the CLI that is not
+ * in CASES. An empty array means it is safe to start calling the API.
+ */
+function validateCases(requestedCaseIds: string[], allPrograms: Program[]): string[] {
   const allCaseIds = new Set(CASES.map((c) => c.id));
-
-  for (const id of requestedCaseIds) {
-    if (!allCaseIds.has(id)) {
-      problems.push({ message: `Unknown case id requested on the CLI: "${id}"` });
-    }
-  }
-
-  const seenCaseIds = new Set<string>();
-  for (const kase of CASES) {
-    if (seenCaseIds.has(kase.id)) {
-      problems.push({ message: `Duplicate case id in CASES: "${kase.id}"` });
-    }
-    seenCaseIds.add(kase.id);
-
-    const referencedIds = [...kase.expected.eligible, ...(kase.expected.uncertain ?? [])];
-    for (const programId of referencedIds) {
-      if (!programIds.has(programId)) {
-        problems.push({
-          message: `Case "${kase.id}" references unknown program id "${programId}"`,
-        });
-      }
-    }
-
-    const eligibleSet = new Set(kase.expected.eligible);
-    const uncertainSet = new Set(kase.expected.uncertain ?? []);
-    for (const id of eligibleSet) {
-      if (uncertainSet.has(id)) {
-        problems.push({
-          message: `Case "${kase.id}" lists "${id}" in both expected.eligible and expected.uncertain`,
-        });
-      }
-    }
-  }
-
-  return problems;
+  const unknownRequested = requestedCaseIds
+    .filter((id) => !allCaseIds.has(id))
+    .map((id) => `Unknown case id requested on the CLI: "${id}"`);
+  const programIds = new Set(allPrograms.map((p) => p.id));
+  return [...unknownRequested, ...validateCaseDefinitions(CASES, programIds)];
 }
 
 /** One attempt of the live eligibility pipeline plus every derived score. */
@@ -261,7 +227,7 @@ async function main(): Promise<void> {
   const problems = validateCases(caseIds, allPrograms);
   if (problems.length > 0) {
     console.error('Eval validation failed:');
-    for (const problem of problems) console.error(`  - ${problem.message}`);
+    for (const problem of problems) console.error(`  - ${problem}`);
     process.exit(1);
     return;
   }

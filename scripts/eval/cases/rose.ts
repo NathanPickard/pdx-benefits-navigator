@@ -10,7 +10,6 @@ export const rose: EvalCase = {
     annual_income: 21600,
     zip_code: '97266',
     housing_status: 'own',
-    received_eviction_notice: false,
     has_disability: false,
     is_veteran: false,
     is_pregnant: false,
