@@ -19,6 +19,7 @@ import { UrgencyBanner } from '@/components/results/UrgencyBanner';
 import { RenewalCalendar } from '@/components/results/RenewalCalendar';
 import { useApplicationStatus } from '@/lib/applicationStatus';
 import { formatEstimate, hasEstimate } from '@/lib/estimate';
+import { likelyRange } from '@/lib/results/derive';
 import { CHROME_EN, LANGUAGES, type Chrome, type LanguageCode } from '@/lib/i18n';
 import { useApiKey } from '@/lib/userKey';
 import { cacheAnalysis, readCachedAnalysis } from '@/lib/resultsCache';
@@ -599,23 +600,12 @@ function Dashboard({
     });
   }, [allEligible, sortMode, filterCategory, filterJurisdiction]);
 
-  // Confidence band: sum the program-level min/max ranges over all eligible rows
-  // (unfiltered — matches the hero total which counts all eligible programs).
-  const { bandLow, bandHigh } = useMemo(() => {
-    let low = 0;
-    let high = 0;
-    for (const { match, program } of allEligible) {
-      const range = program?.estimated_annual_value;
-      if (range && typeof range.min === 'number' && typeof range.max === 'number') {
-        low += range.min;
-        high += range.max;
-      } else {
-        low += match.estimated_annual_value;
-        high += match.estimated_annual_value;
-      }
-    }
-    return { bandLow: low, bandHigh: high };
-  }, [allEligible]);
+  // Likely range: official ranges summed over all eligible rows with an
+  // estimate (unfiltered, so it brackets the hero total).
+  const { low: bandLow, high: bandHigh } = useMemo(
+    () => likelyRange(allEligible),
+    [allEligible]
+  );
 
   // Near-misses: ineligible matches. Computed separately so they can be
   // surfaced below the eligible card grid — or front-and-center in the
