@@ -3,7 +3,8 @@ import Link from "next/link";
 import { ArrowRight, Check, Code2, ExternalLink, Heart, Lock, MapPin, Sparkles, Users } from "lucide-react";
 
 import { AppBar } from "@/components/brand/AppBar";
-import { Wordmark } from "@/components/brand/Wordmark";
+import { SectionHeading } from "@/components/brand/SectionHeading";
+import { SiteFooter } from "@/components/brand/SiteFooter";
 import { SoftBlobs } from "@/components/brand/RoseStamp";
 import { JurisdictionPill } from "@/components/brand/JurisdictionPill";
 import { formatUsd } from "@/lib/estimate";
@@ -18,6 +19,21 @@ export const metadata: Metadata = {
   description:
     "The story behind PDX Benefits Navigator — why Portland built it, how it protects your privacy, and how the AI analysis works. Built for the 2026 AI Portland Build Challenge.",
 };
+
+const SOCIAL_LINKS = [
+  { href: "https://nathanpickard.com", label: "nathanpickard.com", Icon: ExternalLink },
+  { href: "https://github.com/NathanPickard", label: "GitHub", Icon: Code2 },
+  { href: "https://www.linkedin.com/in/nathanpickard/", label: "LinkedIn", Icon: ExternalLink },
+  { href: "https://x.com/NathanPickard", label: "X", Icon: ExternalLink },
+  { href: "https://bsky.app/profile/nathanpickard.bsky.social", label: "Bluesky", Icon: ExternalLink },
+] as const;
+
+const PRIVACY_BADGES = [
+  "No tracking",
+  "No cookies",
+  "Nothing stored on our servers",
+  "Session only",
+] as const;
 
 const LOCAL_LAYER_ROUNDING = 100;
 
@@ -225,51 +241,18 @@ export default function AboutPage() {
             </p>
 
             <div className="flex items-center gap-2.5 flex-wrap">
-              <a
-                href="https://nathanpickard.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="rc-btn rc-btn-outline rc-btn-sm"
-              >
-                <ExternalLink size={14} />
-                nathanpickard.com
-              </a>
-              <a
-                href="https://github.com/NathanPickard"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="rc-btn rc-btn-outline rc-btn-sm"
-              >
-                <Code2 size={14} />
-                GitHub
-              </a>
-              <a
-                href="https://www.linkedin.com/in/nathanpickard/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="rc-btn rc-btn-outline rc-btn-sm"
-              >
-                <ExternalLink size={14} />
-                LinkedIn
-              </a>
-              <a
-                href="https://x.com/NathanPickard"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="rc-btn rc-btn-outline rc-btn-sm"
-              >
-                <ExternalLink size={14} />
-                X
-              </a>
-              <a
-                href="https://bsky.app/profile/nathanpickard.bsky.social"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="rc-btn rc-btn-outline rc-btn-sm"
-              >
-                <ExternalLink size={14} />
-                Bluesky
-              </a>
+              {SOCIAL_LINKS.map(({ href, label, Icon }) => (
+                <a
+                  key={href}
+                  href={href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="rc-btn rc-btn-outline rc-btn-sm"
+                >
+                  <Icon size={14} />
+                  {label}
+                </a>
+              ))}
             </div>
           </div>
           {/* ===== END AUTHOR BIO ===== */}
@@ -417,30 +400,15 @@ export default function AboutPage() {
                   alignItems: "center",
                 }}
               >
-                <span
-                  className="pill pill-moss"
-                  style={{ fontSize: "0.82rem" }}
-                >
-                  <Check size={13} /> No tracking
-                </span>
-                <span
-                  className="pill pill-moss"
-                  style={{ fontSize: "0.82rem" }}
-                >
-                  <Check size={13} /> No cookies
-                </span>
-                <span
-                  className="pill pill-moss"
-                  style={{ fontSize: "0.82rem" }}
-                >
-                  <Check size={13} /> Nothing stored on our servers
-                </span>
-                <span
-                  className="pill pill-moss"
-                  style={{ fontSize: "0.82rem" }}
-                >
-                  <Check size={13} /> Session only
-                </span>
+                {PRIVACY_BADGES.map((label) => (
+                  <span
+                    key={label}
+                    className="pill pill-moss"
+                    style={{ fontSize: "0.82rem" }}
+                  >
+                    <Check size={13} /> {label}
+                  </span>
+                ))}
               </div>
             </div>
           </div>
@@ -595,56 +563,11 @@ export default function AboutPage() {
         </section>
 
         {/* ─────────────────────── Footer ─────────────────────── */}
-        <footer className="rc-container" style={{ padding: "48px 16px 24px", marginTop: 24 }}>
-          <div className="rc-footer-grid">
-            <div>
-              <Wordmark />
-              <p
-                style={{
-                  color: "var(--ink-3)",
-                  fontSize: "0.86rem",
-                  lineHeight: 1.6,
-                  margin: "16px 0 0",
-                  maxWidth: 460,
-                }}
-              >
-                Estimates only — not legal advice. Confirm eligibility with each program before
-                applying. We never store your data; everything runs in your browser session.
-              </p>
-            </div>
-            <div>
-              <div className="tag" style={{ marginBottom: 8, fontWeight: 600, color: "var(--ink-2)" }}>
-                Built with
-              </div>
-              <ul
-                style={{
-                  listStyle: "none",
-                  padding: 0,
-                  margin: 0,
-                  fontSize: "0.86rem",
-                  lineHeight: 1.9,
-                  color: "var(--ink-2)",
-                }}
-              >
-                <li>2026 Federal Poverty Level</li>
-                <li>Oregon Revised Statutes</li>
-                <li>Portland &amp; Multnomah codes</li>
-              </ul>
-            </div>
-            <div>
-              <div className="tag" style={{ marginBottom: 8, fontWeight: 600, color: "var(--ink-2)" }}>
-                Navigate
-              </div>
-              <ul
-                style={{
-                  listStyle: "none",
-                  padding: 0,
-                  margin: 0,
-                  fontSize: "0.86rem",
-                  lineHeight: 1.9,
-                  color: "var(--ink-2)",
-                }}
-              >
+        <SiteFooter
+          thirdColumn={{
+            title: "Navigate",
+            children: (
+              <>
                 <li>
                   <Link href="/intake" style={{ color: "var(--ink-2)", textDecoration: "none" }}>
                     Get screened
@@ -670,47 +593,16 @@ export default function AboutPage() {
                     GitHub
                   </a>
                 </li>
-              </ul>
-            </div>
-          </div>
-        </footer>
+              </>
+            ),
+          }}
+        />
       </main>
     </>
   );
 }
 
 /* ─────────────────────── Sub-components ─────────────────────── */
-
-function SectionHeading({
-  kicker,
-  title,
-  children,
-}: {
-  kicker: string;
-  title: string;
-  children?: React.ReactNode;
-}) {
-  return (
-    <header className="flex items-end justify-between gap-6 flex-wrap mb-8">
-      <div>
-        <div className="eyebrow mb-2">{kicker}</div>
-        <h2
-          className="font-display"
-          style={{
-            fontSize: "2.2rem",
-            lineHeight: 1.1,
-            margin: 0,
-            fontWeight: 500,
-            letterSpacing: "-0.02em",
-          }}
-        >
-          {title}
-        </h2>
-      </div>
-      {children}
-    </header>
-  );
-}
 
 const HOW_TONES = {
   rose: { bg: "var(--rose-soft)", text: "oklch(0.40 0.10 150)" },
