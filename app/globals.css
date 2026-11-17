@@ -7,21 +7,7 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-sans);
-  --font-mono: var(--font-geist-mono);
   --font-heading: var(--font-display);
-  --color-sidebar-ring: var(--sidebar-ring);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar: var(--sidebar);
-  --color-chart-5: var(--chart-5);
-  --color-chart-4: var(--chart-4);
-  --color-chart-3: var(--chart-3);
-  --color-chart-2: var(--chart-2);
-  --color-chart-1: var(--chart-1);
   --color-ring: var(--ring);
   --color-input: var(--input);
   --color-border: var(--border);
@@ -49,7 +35,6 @@
 
 /* ─────────────────────────────────────────────────────────────────────────
    Rose City design tokens — soft & friendly palette.
-   Theme-able via .theme-rose / .theme-forest / .theme-sunset on <html>.
    ─────────────────────────────────────────────────────────────────────── */
 :root {
   /* Rose City defaults — warm, peachy, friendly */
@@ -105,45 +90,7 @@
   --border: var(--rule);
   --input: var(--rule-2);
   --ring: var(--rose);
-  --chart-1: var(--rose);
-  --chart-2: var(--moss);
-  --chart-3: var(--sun);
-  --chart-4: var(--sky);
-  --chart-5: var(--ink-3);
   --radius: 0.75rem;
-  --sidebar: var(--paper);
-  --sidebar-foreground: var(--ink);
-  --sidebar-primary: var(--ink);
-  --sidebar-primary-foreground: oklch(0.98 0.01 75);
-  --sidebar-accent: var(--paper-2);
-  --sidebar-accent-foreground: var(--ink);
-  --sidebar-border: var(--rule);
-  --sidebar-ring: var(--rose);
-}
-
-.theme-forest {
-  --paper: oklch(0.965 0.022 145);
-  --paper-2: oklch(0.93 0.035 140);
-  --paper-3: oklch(0.90 0.04 140);
-  --ink: oklch(0.27 0.05 175);
-  --rose: oklch(0.55 0.13 155);
-  --rose-soft: oklch(0.93 0.05 150);
-  --rule: oklch(0.86 0.03 140);
-  --rule-2: oklch(0.78 0.04 140);
-  --card-rose: oklch(0.99 0.015 140);
-}
-
-.theme-sunset {
-  --paper: oklch(0.97 0.025 50);
-  --paper-2: oklch(0.93 0.04 45);
-  --paper-3: oklch(0.89 0.05 40);
-  --ink: oklch(0.33 0.06 30);
-  --rose: oklch(0.65 0.16 22);
-  --rose-soft: oklch(0.93 0.06 25);
-  --moss: oklch(0.52 0.09 160);
-  --rule: oklch(0.87 0.045 45);
-  --rule-2: oklch(0.78 0.055 45);
-  --card-rose: oklch(0.995 0.018 55);
 }
 
 @layer base {
@@ -181,7 +128,6 @@
    Type
    ─────────────────────────────────────────────────────────────────────── */
 .font-display { font-family: var(--font-display); font-weight: 400; letter-spacing: -0.015em; }
-.font-display-italic { font-family: var(--font-display); font-style: italic; font-weight: 400; }
 .tabular { font-variant-numeric: tabular-nums; }
 .tag {
   font-family: var(--font-sans);
@@ -200,7 +146,6 @@
 }
 
 .divider { height: 1px; background: var(--rule); width: 100%; border: 0; }
-.hairline { border: 1px solid var(--rule); }
 
 /* ─────────────────────────────────────────────────────────────────────────
    Cards
@@ -290,7 +235,6 @@
 .pill-sky { background: var(--sky-soft); color: oklch(0.45 0.10 232); border-color: oklch(0.84 0.04 232); }
 .pill-sun { background: var(--sun-soft); color: oklch(0.46 0.12 65); border-color: oklch(0.86 0.07 75); }
 .pill-clay { background: var(--paper-2); color: var(--ink-2); border-color: var(--rule); }
-.pill-ink { background: var(--ink); color: oklch(0.98 0.01 75); border-color: var(--ink); }
 
 /* ─────────────────────────────────────────────────────────────────────────
    Inputs
@@ -403,12 +347,6 @@
 @media (min-width: 1024px) { .rc-page-pad { padding-top: 32px; padding-bottom: 96px; } }
 
 /* Card interior padding */
-.rc-card-pad {
-  padding: 18px;
-}
-@media (min-width: 640px) { .rc-card-pad { padding: 24px; } }
-@media (min-width: 1024px) { .rc-card-pad { padding: 28px; } }
-
 .rc-card-pad-lg {
   padding: 22px 22px;
 }
@@ -429,9 +367,6 @@
 .rc-cols-3 { display: grid; grid-template-columns: 1fr; gap: 16px; }
 @media (min-width: 640px) { .rc-cols-3 { grid-template-columns: 1fr 1fr; gap: 18px; } }
 @media (min-width: 1024px) { .rc-cols-3 { grid-template-columns: repeat(3, 1fr); gap: 20px; } }
-
-.rc-cols-4 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-@media (min-width: 768px) { .rc-cols-4 { grid-template-columns: repeat(4, 1fr); } }
 
 /* Landing hero: text + small card */
 .rc-hero-grid {
@@ -547,11 +482,6 @@
 /* Visibility helpers */
 .rc-hide-sm { display: none; }
 @media (min-width: 640px) { .rc-hide-sm { display: revert; } }
-.rc-show-sm { }
-@media (min-width: 640px) { .rc-show-sm { display: none; } }
-
-.rc-hide-md { display: none; }
-@media (min-width: 768px) { .rc-hide-md { display: revert; } }
 
 /* ─────────────────────────────────────────────────────────────────────────
    Reduced-motion — respect OS/browser "Reduce Motion" preference.
