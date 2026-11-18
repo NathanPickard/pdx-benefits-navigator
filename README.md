@@ -279,8 +279,9 @@ The only API route is `/api/packet`, which renders the PDF and has no AI cost. T
 
 ```text
 app/              Routes: landing, intake, results, demo, /api/packet
-components/       brand/ intake/ landing/ results/ ui/ (shadcn)
-lib/              Engine: prompt, browser client, Zod schema, cache, PDF, .ics
+components/       brand/ demo/ intake/ landing/ results/ ui/ (shadcn)
+lib/              Engine: prompt, browser client, Zod schemas, session state, cache, PDF, .ics
+lib/results/      Pure results derivation and translation merge (unit-tested)
 types/program.ts  Shared types: Program, IntakeData, AnalysisOutput
 data/             programs.seed.json → programs.json; scenarios/ fixtures
 scripts/          Data pipeline (scrape, merge, validate), bake, eval harness
