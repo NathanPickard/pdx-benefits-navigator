@@ -1,16 +1,16 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useCallback, useMemo, useState } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, Clipboard, Download, KeyRound, Loader2, Printer } from 'lucide-react';
+import { ArrowLeft, Clipboard, Download, Loader2, Printer } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { AppBar } from '@/components/brand/AppBar';
-import { RoseStamp } from '@/components/brand/RoseStamp';
 import { MoneyCounter } from '@/components/results/MoneyCounter';
 import { BenefitCard } from '@/components/results/BenefitCard';
 import { ComparisonChart } from '@/components/results/ComparisonChart';
+import { ErrorView, LoadingView, NeedsKeyView } from '@/components/results/StatusViews';
+import { HouseholdSummary } from '@/components/results/HouseholdSummary';
 import { FilterChips } from '@/components/results/FilterChips';
 import { LanguageToggle } from '@/components/results/LanguageToggle';
 import { NearMissSection } from '@/components/results/NearMissSection';
@@ -18,225 +18,27 @@ import { ProgressBar } from '@/components/results/ProgressBar';
 import { UrgencyBanner } from '@/components/results/UrgencyBanner';
 import { RenewalCalendar } from '@/components/results/RenewalCalendar';
 import { useApplicationStatus } from '@/lib/applicationStatus';
-import { formatEstimate, hasEstimate } from '@/lib/estimate';
-import { CHROME_EN, LANGUAGES, type Chrome, type LanguageCode } from '@/lib/i18n';
+import { downloadBlob } from '@/lib/download';
+import {
+  buildPlainTextSummary,
+  filterRows,
+  joinPrograms,
+  likelyRange,
+  sortRows,
+} from '@/lib/results/derive';
+import { CHROME_EN, type Chrome, type LanguageCode } from '@/lib/i18n';
 import { useApiKey } from '@/lib/userKey';
-import { cacheAnalysis, readCachedAnalysis } from '@/lib/resultsCache';
-import programsData from '@/data/programs.json';
+import { PROGRAM_BY_ID } from '@/lib/programs';
 import type { AnalysisOutput, IntakeData, Program } from '@/types/program';
-
-const PROGRAMS = programsData as Program[];
-const PROGRAM_BY_ID = new Map(PROGRAMS.map((p) => [p.id, p]));
-
-// Languages supported by the results translation path (en/es/vi).
-// Used to guard the intake-language auto-select so unsupported languages
-// (ru/zh/so/ar) fall back to English rather than causing a runtime error.
-const SUPPORTED_RESULT_LANGS = new Set(LANGUAGES.map((l) => l.code));
-
-type TranslatedBundle = { output: AnalysisOutput; chrome: Chrome };
-
-type LoadingProgress = { evaluated: string[] };
-
-type State =
-  | { kind: 'loading'; progress: LoadingProgress }
-  | { kind: 'ok'; data: AnalysisOutput }
-  | { kind: 'error'; message: string }
-  | { kind: 'needs-key' };
+import { useAnalysisLoader } from './useAnalysisLoader';
+import { useResultsTranslation, type TranslatedBundle } from './useResultsTranslation';
 
 export default function ResultsPage() {
-  const router = useRouter();
   const { apiKey, hydrated } = useApiKey();
-  const [state, setState] = useState<State>({
-    kind: 'loading',
-    progress: { evaluated: [] },
-  });
-  const [intake, setIntake] = useState<IntakeData | null>(null);
-  const [lang, setLang] = useState<LanguageCode>('en');
-  const [translations, setTranslations] = useState<
-    Partial<Record<Exclude<LanguageCode, 'en'>, TranslatedBundle>>
-  >({});
-  const [pendingLang, setPendingLang] = useState<LanguageCode | null>(null);
-  const [translateError, setTranslateError] = useState<string | null>(null);
-  // Sync <html lang> with the active results language so screen readers and
-  // the browser's speech engine use the correct language for translated content.
-  // Arabic is not a supported results language yet so no dir="rtl" is needed
-  // here — add that when ar/fa support is added to the translation pipeline.
-  useEffect(() => {
-    document.documentElement.lang = lang;
-  }, [lang]);
-
-  // This effect reads browser-only sessionStorage and orchestrates the on-mount
-  // data load (demo replay or live streaming analysis), so the synchronous
-  // setState calls are intentional load-once-on-mount transitions, not the
-  // cascading-render anti-pattern the rule targets.
-  /* eslint-disable react-hooks/set-state-in-effect */
-  useEffect(() => {
-    if (!hydrated) return; // wait for key hydration before deciding what to do
-
-    // Demo routes stash a pre-baked AnalysisOutput here so the dashboard can
-    // skip the API call entirely.
-    const prebaked = sessionStorage.getItem('pdx_prebaked');
-    if (prebaked) {
-      let output: AnalysisOutput;
-      try {
-        output = JSON.parse(prebaked) as AnalysisOutput;
-      } catch {
-        setState({ kind: 'error', message: 'Could not load demo data.' });
-        return;
-      }
-      const rawIntake = sessionStorage.getItem('pdx_intake');
-      if (rawIntake) setIntake(JSON.parse(rawIntake) as IntakeData);
-
-      const simulate = sessionStorage.getItem('pdx_demo_simulate') === '1';
-      if (!simulate) {
-        setState({ kind: 'ok', data: output });
-        return;
-      }
-
-      // Defer removing the flag until the simulation finishes — otherwise
-      // StrictMode's double-effect-invocation eats it on the first cleanup
-      // and the second run shows results instantly.
-      const programIds = PROGRAMS.map((p) => p.id);
-      let i = 0;
-      let finishTimeout: ReturnType<typeof setTimeout> | null = null;
-      const interval = setInterval(() => {
-        if (i >= programIds.length) {
-          clearInterval(interval);
-          finishTimeout = setTimeout(() => {
-            sessionStorage.removeItem('pdx_demo_simulate');
-            setState({ kind: 'ok', data: output });
-          }, 250);
-          return;
-        }
-        const id = programIds[i++];
-        setState((s) =>
-          s.kind === 'loading'
-            ? { ...s, progress: { evaluated: [...s.progress.evaluated, id] } }
-            : s
-        );
-      }, 438);
-
-      return () => {
-        clearInterval(interval);
-        if (finishTimeout) clearTimeout(finishTimeout);
-      };
-    }
-
-    const rawIntake = sessionStorage.getItem('pdx_intake');
-    if (!rawIntake) {
-      router.replace('/intake');
-      return;
-    }
-    const parsed = JSON.parse(rawIntake) as IntakeData;
-    setIntake(parsed);
-
-    if (!apiKey) {
-      setState({ kind: 'needs-key' });
-      return;
-    }
-
-    const cached = readCachedAnalysis(parsed);
-    if (cached) {
-      setState({ kind: 'ok', data: cached });
-      return;
-    }
-
-    let cancelled = false;
-    (async () => {
-      const { analyzeEligibilityStream } = await import('@/lib/claudeBrowser');
-      for await (const event of analyzeEligibilityStream(apiKey, parsed)) {
-        if (cancelled) return;
-        if (event.type === 'progress') {
-          setState((s) =>
-            s.kind === 'loading'
-              ? { ...s, progress: { evaluated: [...s.progress.evaluated, event.programId] } }
-              : s
-          );
-        } else if (event.type === 'complete') {
-          cacheAnalysis(parsed, event.output);
-          setState({ kind: 'ok', data: event.output });
-        } else {
-          setState({ kind: 'error', message: event.message });
-        }
-      }
-    })();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [router, apiKey, hydrated]);
-  /* eslint-enable react-hooks/set-state-in-effect */
-
+  const { state, intake } = useAnalysisLoader(apiKey, hydrated);
   const originalData = state.kind === 'ok' ? state.data : null;
-
-  const handleLanguageChange = useCallback(
-    async (next: LanguageCode) => {
-      if (next === lang || pendingLang !== null) return;
-      setTranslateError(null);
-
-      if (next === 'en') {
-        setLang('en');
-        return;
-      }
-      if (translations[next]) {
-        setLang(next);
-        return;
-      }
-      if (!originalData) return;
-      if (next !== 'es' && next !== 'vi') return;
-      if (!apiKey) {
-        setTranslateError(
-          'Translation requires an Anthropic API key. Click the key indicator above to add one.'
-        );
-        return;
-      }
-
-      setPendingLang(next);
-      try {
-        const { translatePayload } = await import('@/lib/claudeBrowser');
-        const translated = await translatePayload(
-          apiKey,
-          { output: originalData, chrome: CHROME_EN },
-          next
-        );
-        if (!translated?.output || !translated?.chrome) {
-          throw new Error('Translation response missing fields');
-        }
-        // The model may drop a Chrome key; fall back to English rather than render blank.
-        const bundle = translated as TranslatedBundle;
-        setTranslations((prev) => ({
-          ...prev,
-          [next]: { ...bundle, chrome: { ...CHROME_EN, ...bundle.chrome } },
-        }));
-        setLang(next);
-      } catch (e) {
-        setTranslateError(e instanceof Error ? e.message : 'Translation failed');
-      } finally {
-        setPendingLang(null);
-      }
-    },
-    [lang, pendingLang, translations, originalData, apiKey]
-  );
-
-  // Auto-select the results language from the intake's primary_language.
-  // Fires once when originalData first becomes available and an API key is
-  // present (so the translation pipeline can run). A ref gates it to initial
-  // load only — subsequent manual toggles via handleLanguageChange win.
-  // Silently skips when no API key is present (demo path) to avoid surfacing
-  // a translation-requires-key error the user didn't ask for.
-  const autoSelectFiredRef = useRef(false);
-  /* eslint-disable react-hooks/set-state-in-effect */
-  useEffect(() => {
-    if (autoSelectFiredRef.current || !originalData || !intake || !apiKey) return;
-    autoSelectFiredRef.current = true;
-    const intakeLang = intake.primary_language;
-    if (intakeLang !== 'en' && SUPPORTED_RESULT_LANGS.has(intakeLang as LanguageCode)) {
-      // handleLanguageChange fetches the translation and then calls setLang.
-      void handleLanguageChange(intakeLang as LanguageCode);
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [originalData, intake, apiKey]);
-  /* eslint-enable react-hooks/set-state-in-effect */
+  const { lang, pendingLang, translateError, translations, handleLanguageChange } =
+    useResultsTranslation(originalData, intake, apiKey);
 
   if (state.kind === 'loading') {
     return (
@@ -263,13 +65,10 @@ export default function ResultsPage() {
     );
   }
 
-  const bundle: TranslatedBundle =
-    lang === 'en'
-      ? { output: state.data, chrome: CHROME_EN }
-      : translations[lang as Exclude<LanguageCode, 'en'>] ?? {
-          output: state.data,
-          chrome: CHROME_EN,
-        };
+  const bundle: TranslatedBundle = (lang !== 'en' ? translations[lang] : undefined) ?? {
+    output: state.data,
+    chrome: CHROME_EN,
+  };
 
   return (
     <>
@@ -293,218 +92,7 @@ export default function ResultsPage() {
   );
 }
 
-/* ─────────────────────── Loading ─────────────────────── */
-
-function LoadingView({ progress }: { progress: LoadingProgress }) {
-  const total = PROGRAMS.length;
-  const count = progress.evaluated.length;
-  const latestId = progress.evaluated[count - 1];
-  const latestProgram = latestId ? PROGRAM_BY_ID.get(latestId) : undefined;
-  const pct = (count / total) * 100;
-
-  return (
-    <main
-      className="rc-container"
-      style={{ maxWidth: 760, paddingTop: 80, paddingBottom: 80 }}
-    >
-      <div className="text-center">
-        <div className="flex items-center justify-center mb-5" style={{ gap: 8 }}>
-          <RoseStamp size={56} />
-        </div>
-        <div className="eyebrow mb-3" style={{ color: 'var(--moss-2)' }}>
-          Just a moment
-        </div>
-        <h1
-          className="font-display"
-          style={{
-            fontSize: '2.3rem',
-            lineHeight: 1.1,
-            margin: '0 0 10px',
-            fontWeight: 500,
-            letterSpacing: '-0.02em',
-          }}
-        >
-          Checking every program for you…
-        </h1>
-        <p style={{ color: 'var(--ink-2)', margin: '0 0 32px', fontSize: '1rem' }}>
-          Reading 2026 poverty tables, Oregon statutes, and Portland city code.
-        </p>
-
-        <div className="rc-card" style={{ padding: 28, textAlign: 'left' }}>
-          <div
-            className="flex items-center justify-between mb-3 flex-wrap"
-            style={{ gap: 12 }}
-          >
-            <div style={{ fontSize: '0.94rem' }}>
-              <span style={{ color: 'var(--ink-3)' }}>Currently checking — </span>
-              <strong style={{ color: 'var(--rose)' }}>
-                {latestProgram?.name ?? 'Loading…'}
-              </strong>
-            </div>
-            <div className="tag tabular">
-              {count} / {total}
-            </div>
-          </div>
-
-          <div
-            style={{
-              height: 8,
-              borderRadius: 999,
-              background: 'var(--paper-2)',
-              overflow: 'hidden',
-              border: '1px solid var(--rule)',
-            }}
-          >
-            <div
-              style={{
-                width: `${pct}%`,
-                height: '100%',
-                background: 'var(--rose)',
-                transition: 'width 0.3s ease-out',
-                borderRadius: 999,
-              }}
-            />
-          </div>
-
-          <div
-            className="flex flex-wrap gap-1.5 mt-5"
-            style={{ minHeight: 60, gap: 6 }}
-          >
-            {progress.evaluated.slice(-20).map((id) => {
-              const p = PROGRAM_BY_ID.get(id);
-              return (
-                <span
-                  key={id}
-                  className="pill pill-moss tabular"
-                  style={{ fontSize: '0.72rem' }}
-                >
-                  ✓ {p?.short_name ?? id}
-                </span>
-              );
-            })}
-          </div>
-        </div>
-      </div>
-    </main>
-  );
-}
-
-/* ─────────────────────── Needs-key view ─────────────────────── */
-
-function NeedsKeyView() {
-  return (
-    <main
-      className="rc-container"
-      style={{
-        maxWidth: 620,
-        paddingTop: 80,
-        paddingBottom: 80,
-        textAlign: 'center',
-      }}
-    >
-      <div className="flex items-center justify-center mb-5">
-        <span
-          style={{
-            width: 56,
-            height: 56,
-            borderRadius: 999,
-            background: 'var(--rose-soft)',
-            color: 'var(--rose)',
-            display: 'inline-flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          <KeyRound size={22} />
-        </span>
-      </div>
-      <div className="eyebrow mb-3" style={{ color: 'var(--moss-2)' }}>
-        Bring your own key
-      </div>
-      <h1
-        className="font-display"
-        style={{
-          fontSize: '2rem',
-          lineHeight: 1.1,
-          margin: '0 0 12px',
-          fontWeight: 500,
-          letterSpacing: '-0.02em',
-        }}
-      >
-        We need your Anthropic API key
-      </h1>
-      <p
-        style={{
-          color: 'var(--ink-2)',
-          margin: '0 0 24px',
-          fontSize: '1rem',
-          lineHeight: 1.55,
-        }}
-      >
-        Personalized results call Claude directly from your browser using your
-        own key — it&rsquo;s never sent to our server. Tap the{' '}
-        <strong style={{ color: 'var(--ink)' }}>key indicator</strong> in the
-        top right to paste yours, then your results will appear here.
-      </p>
-      <div
-        className="flex items-center justify-center flex-wrap"
-        style={{ gap: 10 }}
-      >
-        <Link href="/" className="rc-btn rc-btn-outline">
-          <ArrowLeft size={14} /> Back to landing
-        </Link>
-        <Link href="/demo/maria" className="rc-btn rc-btn-rose">
-          Or try a demo with no key
-        </Link>
-      </div>
-    </main>
-  );
-}
-
-function ErrorView({ message }: { message: string }) {
-  return (
-    <main
-      className="flex flex-col items-center justify-center"
-      style={{ padding: '120px 32px', textAlign: 'center' }}
-    >
-      <h1
-        className="font-display"
-        style={{ fontSize: '2rem', margin: 0, fontWeight: 500 }}
-      >
-        Something went wrong
-      </h1>
-      <p style={{ marginTop: 12, color: 'var(--ink-2)', maxWidth: 460 }}>{message}</p>
-    </main>
-  );
-}
-
 /* ─────────────────────── Dashboard ─────────────────────── */
-
-const HOUSING_LABEL: Record<IntakeData['housing_status'], string> = {
-  rent: 'Renting',
-  own: 'Own home',
-  staying_with_others: 'With others',
-  unhoused: 'Unhoused',
-};
-
-const EMPLOYMENT_LABEL: Record<IntakeData['employment_status'], string> = {
-  employed_ft: 'Full-time',
-  employed_pt: 'Part-time',
-  self_employed: 'Self-employed',
-  unemployed: 'Unemployed',
-  retired: 'Retired',
-  disabled: 'On disability',
-};
-
-const LANG_LABEL: Record<IntakeData['primary_language'], string> = {
-  en: 'English',
-  es: 'Español',
-  vi: 'Tiếng Việt',
-  ru: 'Русский',
-  zh: '中文',
-  so: 'Soomaali',
-  ar: 'العربية',
-};
 
 function Dashboard({
   data,
@@ -526,13 +114,10 @@ function Dashboard({
   const { statusFor, setStatus, clearAll, hasAny } = useApplicationStatus();
 
   const handleDownloadPacket = useCallback(async () => {
-    if (packetState === 'loading') return;
+    if (packetState === 'loading' || !intake) return;
     setPacketState('loading');
     setPacketError(null);
     try {
-      const raw = sessionStorage.getItem('pdx_intake');
-      if (!raw) throw new Error('Missing intake data');
-      const intake = JSON.parse(raw) as IntakeData;
       const res = await fetch('/api/packet', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -543,20 +128,13 @@ function Dashboard({
         throw new Error(errBody.error ?? `HTTP ${res.status}`);
       }
       const blob = await res.blob();
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'pdx-benefits-packet.pdf';
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
+      downloadBlob(blob, 'pdx-benefits-packet.pdf');
       setPacketState('idle');
     } catch (e) {
       setPacketError(e instanceof Error ? e.message : 'Download failed');
       setPacketState('error');
     }
-  }, [packetState, originalData]);
+  }, [packetState, originalData, intake]);
 
   const [sortMode, setSortMode] = useState<'gems' | 'amount'>('gems');
   const [filterCategory, setFilterCategory] = useState<Program['category'] | null>(null);
@@ -574,72 +152,39 @@ function Dashboard({
   }, []);
 
   // All eligible rows (unfiltered) — used for ProgressBar denominator + hero totals
-  const allEligible = useMemo(() => {
-    const rows = data.matches
-      .filter((m) => m.eligible)
-      .map((m) => ({ match: m, program: PROGRAM_BY_ID.get(m.program_id) }))
-      .filter((row): row is { match: typeof row.match; program: Program } => !!row.program);
-    return rows;
-  }, [data]);
+  const allEligible = useMemo(
+    () => joinPrograms(data.matches.filter((m) => m.eligible), PROGRAM_BY_ID),
+    [data]
+  );
 
   // Filtered + sorted eligible rows shown in the card grid
-  const eligible = useMemo(() => {
-    let rows = allEligible;
-    if (filterCategory) rows = rows.filter((r) => r.program.category === filterCategory);
-    if (filterJurisdiction) rows = rows.filter((r) => r.program.jurisdiction === filterJurisdiction);
+  const eligible = useMemo(
+    () =>
+      sortRows(
+        filterRows(allEligible, { category: filterCategory, jurisdiction: filterJurisdiction }),
+        sortMode
+      ),
+    [allEligible, sortMode, filterCategory, filterJurisdiction]
+  );
 
-    if (sortMode === 'amount') {
-      return [...rows].sort(
-        (a, b) => b.match.estimated_annual_value - a.match.estimated_annual_value
-      );
-    }
-    return [...rows].sort((a, b) => {
-      if (a.program.hidden_gem !== b.program.hidden_gem) return a.program.hidden_gem ? -1 : 1;
-      return b.match.estimated_annual_value - a.match.estimated_annual_value;
-    });
-  }, [allEligible, sortMode, filterCategory, filterJurisdiction]);
-
-  // Confidence band: sum the program-level min/max ranges over all eligible rows
-  // (unfiltered — matches the hero total which counts all eligible programs).
-  const { bandLow, bandHigh } = useMemo(() => {
-    let low = 0;
-    let high = 0;
-    for (const { match, program } of allEligible) {
-      const range = program?.estimated_annual_value;
-      if (range && typeof range.min === 'number' && typeof range.max === 'number') {
-        low += range.min;
-        high += range.max;
-      } else {
-        low += match.estimated_annual_value;
-        high += match.estimated_annual_value;
-      }
-    }
-    return { bandLow: low, bandHigh: high };
-  }, [allEligible]);
+  // Likely range: official ranges summed over all eligible rows with an
+  // estimate (unfiltered, so it brackets the hero total).
+  const { low: bandLow, high: bandHigh } = useMemo(
+    () => likelyRange(allEligible),
+    [allEligible]
+  );
 
   // Near-misses: ineligible matches. Computed separately so they can be
   // surfaced below the eligible card grid — or front-and-center in the
   // zero-eligible empty state. Pre-rebake fixtures have no requirements[]
   // arrays; NearMissSection falls back to match.reasoning for the reason.
-  const nearMisses = useMemo(
-    () => data.matches.filter((m) => !m.eligible),
+  const nearMissRows = useMemo(
+    () => joinPrograms(data.matches.filter((m) => !m.eligible), PROGRAM_BY_ID),
     [data]
   );
 
   const handleCopySummary = useCallback(async () => {
-    const total = data.total_estimated_annual_value.toLocaleString();
-    const count = allEligible.length;
-    const lines: string[] = [
-      `PDX Benefits Navigator — estimated $${total}/year across ${count} program${count !== 1 ? 's' : ''}`,
-      '',
-    ];
-    for (const { match, program } of allEligible) {
-      const value = match.estimated_annual_value;
-      const amount = hasEstimate(value) ? `~${formatEstimate(value)}/yr` : formatEstimate(value);
-      const step = match.next_steps?.[0] ?? program.short_name;
-      lines.push(`• ${program.name} — ${amount} — ${step}`);
-    }
-    const text = lines.join('\n');
+    const text = buildPlainTextSummary(data.total_estimated_annual_value, allEligible);
     try {
       if (!navigator.clipboard) throw new Error('unavailable');
       await navigator.clipboard.writeText(text);
@@ -682,7 +227,7 @@ function Dashboard({
           <button
             type="button"
             onClick={handleDownloadPacket}
-            disabled={packetState === 'loading'}
+            disabled={packetState === 'loading' || !intake}
             className="rc-btn rc-btn-outline rc-btn-sm"
           >
             {packetState === 'loading' ? (
@@ -767,12 +312,12 @@ function Dashboard({
               }}
             >
               across{' '}
-              <strong style={{ color: 'var(--ink)' }}>{allEligible.length} programs</strong>
+              <strong style={{ color: 'var(--ink)' }}>{allEligible.length} program{allEligible.length !== 1 ? 's' : ''}</strong>
               {gemCount > 0 && (
                 <>
                   , including{' '}
                   <strong style={{ color: 'var(--rose)' }}>
-                    {gemCount} hyperlocal Portland gem{gemCount > 1 ? 's' : ''}
+                    {gemCount} hyperlocal Portland gem{gemCount !== 1 ? 's' : ''}
                   </strong>{' '}
                   that national tools would miss
                 </>
@@ -781,49 +326,7 @@ function Dashboard({
             </p>
           </div>
 
-          {intake && (
-            <aside className="rc-card" style={{ padding: 24 }}>
-              <div className="flex items-start justify-between mb-3">
-                <div>
-                  <div
-                    className="font-display"
-                    style={{
-                      fontSize: '1.55rem',
-                      lineHeight: 1.1,
-                      fontWeight: 500,
-                      letterSpacing: '-0.015em',
-                    }}
-                  >
-                    Your household
-                  </div>
-                  <div className="tag mt-1">{intake.zip_code || '—'}</div>
-                </div>
-                <RoseStamp size={48} />
-              </div>
-              <div className="divider mb-3" />
-              <div
-                className="grid"
-                style={{
-                  gridTemplateColumns: '1fr 1fr',
-                  gap: 12,
-                  fontSize: '0.86rem',
-                }}
-              >
-                <KV k="Household" v={`${intake.household_size} people`} />
-                <KV k="Children" v={String(intake.num_children)} />
-                <KV
-                  k="Income"
-                  v={`$${(intake.annual_income || 0).toLocaleString()}`}
-                />
-                <KV k="Housing" v={HOUSING_LABEL[intake.housing_status]} />
-                <KV k="Language" v={LANG_LABEL[intake.primary_language]} />
-                <KV
-                  k="Employment"
-                  v={EMPLOYMENT_LABEL[intake.employment_status]}
-                />
-              </div>
-            </aside>
-          )}
+          {intake && <HouseholdSummary intake={intake} />}
         </section>
       )}
 
@@ -958,12 +461,8 @@ function Dashboard({
             </div>
           </div>
 
-          {nearMisses.length > 0 && (
-            <NearMissSection
-              matches={nearMisses}
-              programById={PROGRAM_BY_ID}
-              chrome={chrome}
-            />
+          {nearMissRows.length > 0 && (
+            <NearMissSection rows={nearMissRows} chrome={chrome} />
           )}
         </section>
       ) : (
@@ -973,7 +472,7 @@ function Dashboard({
             <header className="flex items-end justify-between gap-6 flex-wrap mb-8">
               <div>
                 <div className="eyebrow mb-2">
-                  {allEligible.length} programs ·{' '}
+                  {allEligible.length} program{allEligible.length !== 1 ? 's' : ''} ·{' '}
                   {sortMode === 'gems' ? 'hidden gems first' : 'largest amount first'}
                 </div>
                 <h2
@@ -1106,12 +605,8 @@ function Dashboard({
 
           <RenewalCalendar entries={allEligible} chrome={chrome} lang={lang} />
 
-          {nearMisses.length > 0 && (
-            <NearMissSection
-              matches={nearMisses}
-              programById={PROGRAM_BY_ID}
-              chrome={chrome}
-            />
+          {nearMissRows.length > 0 && (
+            <NearMissSection rows={nearMissRows} chrome={chrome} />
           )}
         </>
       )}
@@ -1129,17 +624,6 @@ function Dashboard({
         {chrome.disclaimer}
       </footer>
     </main>
-  );
-}
-
-function KV({ k, v }: { k: string; v: string }) {
-  return (
-    <div>
-      <div className="tag" style={{ fontWeight: 500 }}>
-        {k}
-      </div>
-      <div style={{ fontWeight: 600, marginTop: 2 }}>{v}</div>
-    </div>
   );
 }
 

@@ -4,7 +4,8 @@ import { useState } from 'react';
 import { ChevronDown, ChevronUp, Phone } from 'lucide-react';
 
 import type { Chrome } from '@/lib/i18n';
-import type { EligibilityRequirement, MatchResult, Program } from '@/types/program';
+import type { CalendarEntry } from '@/lib/calendar';
+import type { EligibilityRequirement, MatchResult } from '@/types/program';
 
 
 function firstSentence(text: string): string {
@@ -24,18 +25,13 @@ function failingReason(match: MatchResult, noReasonKnown: string): string {
 }
 
 interface NearMissSectionProps {
-  matches: MatchResult[];
-  programById: Map<string, Program>;
+  /** Ineligible matches joined to their programs (pre-filtered by the caller). */
+  rows: CalendarEntry[];
   chrome: Chrome;
 }
 
-export function NearMissSection({ matches, programById, chrome }: NearMissSectionProps) {
+export function NearMissSection({ rows, chrome }: NearMissSectionProps) {
   const [open, setOpen] = useState(false);
-
-  // Caller (results/page.tsx) pre-filters to ineligible matches; map to programs here.
-  const rows = matches
-    .map((m) => ({ match: m, program: programById.get(m.program_id) }))
-    .filter((r): r is { match: MatchResult; program: Program } => !!r.program);
 
   if (rows.length === 0) return null;
 

@@ -22,6 +22,16 @@ test('parseEvalArgs: picks up case ids and --runs N', () => {
   assert.deepEqual(parseEvalArgs(['maria', 'rose', '--runs', '3']), { caseIds: ['maria', 'rose'], runs: 3 });
 });
 
+test('parseEvalArgs: rejects non-positive or non-numeric --runs', () => {
+  for (const bad of ['0', '-1', 'abc', '2x']) {
+    assert.throws(() => parseEvalArgs(['--runs', bad]), /--runs must be a positive integer/, bad);
+  }
+});
+
+test('parseEvalArgs: rejects --runs with no value', () => {
+  assert.throws(() => parseEvalArgs(['maria', '--runs']), /--runs must be a positive integer/);
+});
+
 test('eligibleSetsMatch: order-insensitive equality across attempts', () => {
   assert.equal(eligibleSetsMatch([out(['a', 'b']), out(['b', 'a'])]), true);
   assert.equal(eligibleSetsMatch([out(['a', 'b']), out(['a'])]), false);

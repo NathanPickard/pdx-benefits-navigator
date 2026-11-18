@@ -9,6 +9,19 @@ export function hasEstimate(value: number): boolean {
 }
 
 /**
+ * A number with en-US thousands grouping ("48,000"), regardless of the
+ * visitor's locale. Does not round; callers round where they need to.
+ */
+export function formatNumber(n: number): string {
+  return n.toLocaleString('en-US');
+}
+
+/** A dollar figure with en-US grouping ("$48,000"). Does not round. */
+export function formatUsd(n: number): string {
+  return `$${formatNumber(n)}`;
+}
+
+/**
  * The display text for a match's annual value: "$12,000" for an estimate,
  * otherwise the "Ask the program" label (pass the translated Chrome label in
  * the UI; English surfaces use the default).
@@ -17,5 +30,5 @@ export function formatEstimate(
   value: number,
   askLabel: string = CHROME_EN.askTheProgram
 ): string {
-  return hasEstimate(value) ? `$${value.toLocaleString('en-US')}` : askLabel;
+  return hasEstimate(value) ? formatUsd(value) : askLabel;
 }

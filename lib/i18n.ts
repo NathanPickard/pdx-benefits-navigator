@@ -40,7 +40,6 @@ export interface Chrome {
   renewalCalendarTitle: string;
   renewalCalendarSubtitle: string;
   renewalUpcoming: string;
-  renewalLater: string;
   renewalNoneLabel: string;
   urgencyEvictionTitle: string;
   urgencyEvictionBody: string;
@@ -123,7 +122,6 @@ export const CHROME_EN: Chrome = {
   renewalCalendarSubtitle:
     'When each benefit needs to be renewed so you never lose coverage.',
   renewalUpcoming: 'Next 6 months',
-  renewalLater: 'Later this year',
   renewalNoneLabel: 'No renewals required',
   urgencyEvictionTitle: 'Apply today — your eviction can likely be stopped',
   urgencyEvictionBody:

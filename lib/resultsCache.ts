@@ -1,10 +1,20 @@
+import { AnalysisOutputSchema } from './eligibilitySchema';
 import type { AnalysisOutput, IntakeData } from '@/types/program';
 
 const KEY = 'pdx_analysis';
 
-/** Cheap stable hash of the intake (FNV-1a over canonical JSON). */
+/** JSON with object keys sorted at every level, so key order never changes the output. */
+function canonicalJson(value: unknown): string {
+  return JSON.stringify(value, (_key, v: unknown) =>
+    v && typeof v === 'object' && !Array.isArray(v)
+      ? Object.fromEntries(Object.entries(v).sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0)))
+      : v
+  );
+}
+
+/** Cheap stable hash of the intake (FNV-1a over key-sorted JSON). */
 export function hashIntake(intake: IntakeData): string {
-  const s = JSON.stringify(intake);
+  const s = canonicalJson(intake);
   let h = 0x811c9dc5;
   for (let i = 0; i < s.length; i++) {
     h ^= s.charCodeAt(i);
@@ -25,8 +35,11 @@ export function readCachedAnalysis(intake: IntakeData): AnalysisOutput | null {
   try {
     const raw = sessionStorage.getItem(KEY);
     if (!raw) return null;
-    const parsed = JSON.parse(raw) as { hash: string; output: AnalysisOutput };
-    return parsed.hash === hashIntake(intake) ? parsed.output : null;
+    const parsed = JSON.parse(raw) as { hash?: unknown; output?: unknown };
+    if (parsed?.hash !== hashIntake(intake)) return null;
+    // A malformed cached analysis counts as a cache miss.
+    const output = AnalysisOutputSchema.safeParse(parsed.output);
+    return output.success ? output.data : null;
   } catch {
     return null;
   }

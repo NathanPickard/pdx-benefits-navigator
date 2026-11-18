@@ -2,7 +2,7 @@
 
 import { Calendar, Download } from 'lucide-react';
 
-import { buildIcsCalendar, downloadIcsFile, renewalIntervalMonths } from '@/lib/calendar';
+import { buildIcsCalendar, downloadIcsFile, nextRenewalDate } from '@/lib/calendar';
 import { formatEstimate } from '@/lib/estimate';
 import type { Chrome, LanguageCode } from '@/lib/i18n';
 import type { MatchResult, Program } from '@/types/program';
@@ -14,7 +14,6 @@ interface Entry {
 
 interface RenderableEntry extends Entry {
   renewalDate: Date;
-  intervalMonths: number;
 }
 
 const LOCALE: Record<LanguageCode, string> = {
@@ -22,8 +21,6 @@ const LOCALE: Record<LanguageCode, string> = {
   es: 'es-US',
   vi: 'vi-VN',
 };
-
-const SHORT_MONTH = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
 function startOfMonth(d: Date): Date {
   return new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), 1));
@@ -35,6 +32,10 @@ function monthKey(d: Date): string {
 
 function formatYear(d: Date): string {
   return String(d.getUTCFullYear());
+}
+
+function formatShortMonth(d: Date, locale: string): string {
+  return new Intl.DateTimeFormat(locale, { month: 'short', timeZone: 'UTC' }).format(d);
 }
 
 function formatShortDate(d: Date, locale: string): string {
@@ -60,24 +61,10 @@ export function RenewalCalendar({
   const today = new Date(
     Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate())
   );
-  const oneYearOut = new Date(today);
-  oneYearOut.setUTCFullYear(oneYearOut.getUTCFullYear() + 1);
 
-  const renderable: RenderableEntry[] = entries
-    .map((e) => {
-      const months = renewalIntervalMonths(e.program.renewal_cycle);
-      const renewalDate = new Date(today);
-      renewalDate.setUTCMonth(renewalDate.getUTCMonth() + months);
-      return { ...e, renewalDate, intervalMonths: months };
-    })
-    .filter((e) => e.intervalMonths > 0);
-
-  if (renderable.length === 0) return null;
-
-  renderable.sort((a, b) => a.renewalDate.getTime() - b.renewalDate.getTime());
-
-  const upcoming = renderable.filter((e) => e.renewalDate <= oneYearOut);
-  const later = renderable.filter((e) => e.renewalDate > oneYearOut);
+  const upcoming: RenderableEntry[] = entries
+    .map((e) => ({ ...e, renewalDate: nextRenewalDate(e.program, today) }))
+    .sort((a, b) => a.renewalDate.getTime() - b.renewalDate.getTime());
 
   const handleExport = () => {
     const ics = buildIcsCalendar(entries);
@@ -134,23 +121,12 @@ export function RenewalCalendar({
         </button>
       </header>
 
-      {upcoming.length > 0 && (
-        <CalendarBucket
-          label={chrome.renewalUpcoming}
-          entries={upcoming}
-          locale={locale}
-          askLabel={chrome.askTheProgram}
-          highlight
-        />
-      )}
-      {later.length > 0 && (
-        <CalendarBucket
-          label={chrome.renewalLater}
-          entries={later}
-          locale={locale}
-          askLabel={chrome.askTheProgram}
-        />
-      )}
+      <CalendarBucket
+        label={chrome.renewalUpcoming}
+        entries={upcoming}
+        locale={locale}
+        askLabel={chrome.askTheProgram}
+      />
     </section>
   );
 }
@@ -160,13 +136,11 @@ function CalendarBucket({
   entries,
   locale,
   askLabel,
-  highlight,
 }: {
   label: string;
   entries: RenderableEntry[];
   locale: string;
   askLabel: string;
-  highlight?: boolean;
 }) {
   const groups = new Map<string, { date: Date; items: RenderableEntry[] }>();
   for (const e of entries) {
@@ -195,10 +169,10 @@ function CalendarBucket({
                   fontSize: '1.7rem',
                   lineHeight: 1,
                   fontWeight: 500,
-                  color: highlight ? 'var(--rose)' : 'var(--ink)',
+                  color: 'var(--rose)',
                 }}
               >
-                {SHORT_MONTH[group.date.getUTCMonth()]}
+                {formatShortMonth(group.date, locale)}
               </div>
               <div className="tag" style={{ marginTop: 4 }}>
                 {formatYear(group.date)} · {group.items.length}{' '}

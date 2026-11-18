@@ -34,19 +34,54 @@ export type AnalyzeStreamEvent =
   | { type: 'complete'; output: AnalysisOutput }
   | { type: 'error'; message: string };
 
+/** Output cap for streamed requests (Sonnet 4.6's maximum). */
+const MAX_OUTPUT_TOKENS = 64000;
+
+/** Shown when a translation still ran past the output cap. */
+const TRANSLATION_TRUNCATED_MESSAGE =
+  'The translation was cut off before it finished. Please try again.';
+
+/** One initial attempt plus one retry on truncation, parse or server failure. */
+const MAX_ATTEMPTS = 2;
+
 /**
- * Run one stream attempt. Returns { parsed, stopReason }. Yields progress
- * events into the provided callback so the generator can forward them.
- * On the retry attempt, `onProgress` is still called (uses the same seenIds
- * set so no duplicate program_id events are emitted across attempts).
+ * Shown when every attempt was truncated or produced an unusable result. A
+ * parse or pipeline failure on the final attempt also lands here.
  */
-async function runStreamAttempt(
+const TRUNCATED_MESSAGE = 'The analysis response was cut off — please try again.';
+
+/**
+ * Client errors (status < 500: bad key, rate limit, bad request) fail the same
+ * way on a retry. Server errors and mid-stream errors (no status) may not.
+ */
+function isNonRetryableApiError(err: unknown): boolean {
+  return err instanceof Anthropic.APIError && typeof err.status === 'number' && err.status < 500;
+}
+
+/** Derive eligibility, check consistency and recompute dollar totals. */
+function finalize(parsed: AnalysisOutput): AnalysisOutput {
+  const derived = deriveEligibility(parsed);
+  assertConsistency(derived);
+  return recomputeTotals(derived);
+}
+
+interface StreamAttemptResult {
+  parsed: AnalysisOutput;
+  stopReason: string | null;
+}
+
+/**
+ * Run one stream attempt. Yields a progress event as soon as each new
+ * program_id appears in the streamed text, then returns { parsed, stopReason }.
+ * The retry attempt shares the same seenIds set, so no program_id is emitted
+ * twice across attempts.
+ */
+async function* runStreamAttempt(
   anthropic: Anthropic,
   intake: IntakeData,
   model: string,
-  seenIds: Set<string>,
-  onProgress: (programId: string) => void
-): Promise<{ parsed: AnalysisOutput; stopReason: string | null }> {
+  seenIds: Set<string>
+): AsyncGenerator<AnalyzeStreamEvent, StreamAttemptResult> {
   const stream = anthropic.messages.stream({
     model,
     // The full 24-program per-requirement analysis runs ~8-12K output tokens;
@@ -54,7 +89,7 @@ async function runStreamAttempt(
     // NOTE: adaptive thinking was tried and removed — on this 20-program task it
     // pushed a streamed analysis past several minutes with no accuracy gain over
     // Sonnet 4.6's default reasoning (which Phase 0 already validated).
-    max_tokens: 64000,
+    max_tokens: MAX_OUTPUT_TOKENS,
     system: [
       {
         type: 'text',
@@ -83,7 +118,7 @@ async function runStreamAttempt(
         const id = match[1];
         if (!seenIds.has(id)) {
           seenIds.add(id);
-          onProgress(id);
+          yield { type: 'progress', programId: id };
         }
       }
     }
@@ -111,98 +146,31 @@ export async function* analyzeEligibilityStream(
   model: string = ELIGIBILITY_MODEL
 ): AsyncGenerator<AnalyzeStreamEvent> {
   const anthropic = makeClient(apiKey);
+  // Shared across attempts, so already-seen program ids aren't re-emitted.
   const seenIds = new Set<string>();
 
-  // Collected progress events from the first attempt to yield them in order.
-  const pendingProgress: string[] = [];
-
   try {
-    let firstAttemptError: unknown = null;
-
-    // ── Attempt 1 ──────────────────────────────────────────────────────────
-    try {
-      const result = await runStreamAttempt(
-        anthropic,
-        intake,
-        model,
-        seenIds,
-        (id) => pendingProgress.push(id)
-      );
-
-      // Flush progress events from the first attempt.
-      for (const id of pendingProgress) {
-        yield { type: 'progress', programId: id };
+    for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+      const isFinalAttempt = attempt === MAX_ATTEMPTS;
+      let output: AnalysisOutput | null = null;
+      try {
+        const { parsed, stopReason } = yield* runStreamAttempt(anthropic, intake, model, seenIds);
+        // A truncated response leaves output null, so the loop retries.
+        if (stopReason !== 'max_tokens') output = finalize(parsed);
+      } catch (err) {
+        // Client errors (bad key, rate limit, bad request) won't change on a
+        // retry. API errors on the final attempt go to the outer handler for
+        // a specific message. Anything else (parse or pipeline failure) retries,
+        // and on the final attempt falls through to TRUNCATED_MESSAGE.
+        if (isNonRetryableApiError(err)) throw err;
+        if (isFinalAttempt && err instanceof Anthropic.APIError) throw err;
       }
-
-      if (result.stopReason === 'max_tokens') {
-        // Truncated — treat as retryable.
-        firstAttemptError = new Error('max_tokens');
-      } else {
-        // Apply derive → assert → recompute and yield complete.
-        const derived = deriveEligibility(result.parsed);
-        assertConsistency(derived);
-        yield { type: 'complete', output: recomputeTotals(derived) };
+      if (output) {
+        yield { type: 'complete', output };
         return;
       }
-    } catch (err) {
-      // Flush whatever progress we collected before the error.
-      for (const id of pendingProgress) {
-        yield { type: 'progress', programId: id };
-      }
-      firstAttemptError = err;
     }
-
-    // ── Attempt 2 (retry once on truncation or validation failure) ──────────
-    // Collect attempt-2 progress ids so we can yield them after the call
-    // resolves (can't yield from inside a plain callback).
-    const retryProgress: string[] = [];
-
-    let attempt2Result: { parsed: AnalysisOutput; stopReason: string | null };
-    try {
-      attempt2Result = await runStreamAttempt(
-        anthropic,
-        intake,
-        model,
-        seenIds, // shared — won't re-emit already-seen program ids
-        (id) => retryProgress.push(id)
-      );
-    } catch (err) {
-      // Re-throw typed API errors so the outer handler produces the correct
-      // user-facing message (auth failure, rate limit, etc.). Only absorb
-      // truncation/parse failures here.
-      if (
-        err instanceof Anthropic.AuthenticationError ||
-        err instanceof Anthropic.RateLimitError ||
-        err instanceof Anthropic.APIError
-      ) {
-        throw err;
-      }
-      yield {
-        type: 'error',
-        message: 'The analysis response was cut off — please try again.',
-      };
-      return;
-    }
-
-    // Flush attempt-2 progress events (mirroring attempt-1 flush above).
-    for (const id of retryProgress) {
-      yield { type: 'progress', programId: id };
-    }
-
-    if (attempt2Result.stopReason === 'max_tokens') {
-      yield {
-        type: 'error',
-        message: 'The analysis response was cut off — please try again.',
-      };
-      return;
-    }
-
-    // Both attempts succeeded enough to reach here; apply pipeline.
-    void firstAttemptError; // acknowledged, not rethrown
-    const parsed = attempt2Result.parsed;
-    const derived = deriveEligibility(parsed);
-    assertConsistency(derived);
-    yield { type: 'complete', output: recomputeTotals(derived) };
+    yield { type: 'error', message: TRUNCATED_MESSAGE };
   } catch (e) {
     if (e instanceof Anthropic.AuthenticationError) {
       yield {
@@ -234,20 +202,27 @@ export async function translatePayload<T>(
   targetLanguage: 'es' | 'vi'
 ): Promise<T> {
   const anthropic = makeClient(apiKey);
-  const response = await anthropic.messages.create({
+  // Streamed so the request can use the full output allowance: a non-streamed
+  // call had to cap at 16K tokens, which a Vietnamese translation of a large
+  // analysis overflows.
+  const response = await anthropic.messages.stream({
     model: ELIGIBILITY_MODEL,
-    max_tokens: 16000,
+    max_tokens: MAX_OUTPUT_TOKENS,
     messages: [
       {
         role: 'user',
         content: `Translate the human-readable STRING VALUES in this JSON to ${targetLanguage}. Keep all JSON keys, numbers, IDs (e.g. snake_case program_ids like "snap", "pdx-renter-relocation"), URLs, dates, and the object structure exactly as given. Do not translate proper-noun program names (SNAP, WIC, OHP, ERDC, LIHEAP, PCEF, ADVSD, SUN, PGE), but DO translate descriptive phrases. Return ONLY the translated JSON object — no markdown, no preamble, no trailing prose.\n\n${JSON.stringify(payload)}`,
       },
     ],
-  });
+  }).finalMessage();
+
+  if (response.stop_reason === 'max_tokens') {
+    throw new Error(TRANSLATION_TRUNCATED_MESSAGE);
+  }
 
   const text = response.content
-    .filter((b) => b.type === 'text')
-    .map((b) => (b as { type: 'text'; text: string }).text)
+    .filter((b): b is Anthropic.TextBlock => b.type === 'text')
+    .map((b) => b.text)
     .join('');
   // parseJsonObject is translation-only: used here to tolerantly extract the
   // returned JSON blob. The eligibility hot path uses structured output instead.

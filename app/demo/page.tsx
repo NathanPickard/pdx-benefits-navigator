@@ -3,23 +3,15 @@ import { ArrowRight, Briefcase, Heart, ShieldCheck } from 'lucide-react';
 
 import { buttonVariants } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import mariaFixture from '@/data/scenarios/maria.json';
-import jamesFixture from '@/data/scenarios/james.json';
-import roseFixture from '@/data/scenarios/rose.json';
-import programs from '@/data/programs.json';
+import { formatUsd } from '@/lib/estimate';
+import { DEMO_FIXTURES } from '@/lib/demoFixtures';
+import { PROGRAM_BY_ID, PROGRAM_COUNT, compareGemThenValue } from '@/lib/programs';
 
 type Fixture = {
   total_estimated_annual_value: number;
   matches: { program_id: string; eligible: boolean; estimated_annual_value: number }[];
 };
 
-const SHORT_BY_ID: Record<string, string> = Object.fromEntries(
-  (programs as { id: string; short_name: string }[]).map((p) => [p.id, p.short_name]),
-);
-
-const GEM_BY_ID: Record<string, boolean> = Object.fromEntries(
-  (programs as { id: string; hidden_gem: boolean }[]).map((p) => [p.id, p.hidden_gem]),
-);
 
 /**
  * Hero programs for a persona, derived from the fixture: eligible hidden-gem
@@ -27,16 +19,23 @@ const GEM_BY_ID: Record<string, boolean> = Object.fromEntries(
  * programs, capped at n. Always real and always eligible.
  */
 const heroPrograms = (f: Fixture, n = 4): string[] => {
-  const eligible = f.matches.filter((m) => m.eligible);
-  const byValueDesc = (a: Fixture['matches'][number], b: Fixture['matches'][number]) =>
-    b.estimated_annual_value - a.estimated_annual_value;
-  const gems = eligible.filter((m) => GEM_BY_ID[m.program_id]).sort(byValueDesc);
-  const others = eligible.filter((m) => !GEM_BY_ID[m.program_id]).sort(byValueDesc);
-  return [...gems, ...others].slice(0, n).map((m) => SHORT_BY_ID[m.program_id] ?? m.program_id);
+  return f.matches
+    .filter((m) => m.eligible)
+    .map((m) => {
+      const program = PROGRAM_BY_ID.get(m.program_id);
+      return {
+        match: m,
+        program: { hidden_gem: program?.hidden_gem ?? false },
+        label: program?.short_name ?? m.program_id,
+      };
+    })
+    .sort(compareGemThenValue)
+    .slice(0, n)
+    .map((row) => row.label);
 };
 
 const expectedFromFixture = (f: Fixture) =>
-  `~$${f.total_estimated_annual_value.toLocaleString()}/year`;
+  `~${formatUsd(f.total_estimated_annual_value)}/year`;
 
 interface ScenarioCard {
   slug: string;
@@ -60,8 +59,8 @@ const SCENARIOS: ScenarioCard[] = [
       { label: 'Where', value: 'Cully (97218) · renting' },
       { label: 'Language', value: 'Spanish · LPR status' },
     ],
-    hero: heroPrograms(mariaFixture),
-    expected: expectedFromFixture(mariaFixture),
+    hero: heroPrograms(DEMO_FIXTURES.maria),
+    expected: expectedFromFixture(DEMO_FIXTURES.maria),
     icon: <Heart className="h-5 w-5" />,
     accentClass: 'border-emerald-200 bg-emerald-50/40 hover:border-emerald-300',
   },
@@ -75,8 +74,8 @@ const SCENARIOS: ScenarioCard[] = [
       { label: 'Where', value: 'St. Johns (97203) · homeowner' },
       { label: 'Status', value: 'Veteran · service-connected disability' },
     ],
-    hero: heroPrograms(jamesFixture),
-    expected: expectedFromFixture(jamesFixture),
+    hero: heroPrograms(DEMO_FIXTURES.james),
+    expected: expectedFromFixture(DEMO_FIXTURES.james),
     icon: <ShieldCheck className="h-5 w-5" />,
     accentClass: 'border-blue-200 bg-blue-50/40 hover:border-blue-300',
   },
@@ -90,8 +89,8 @@ const SCENARIOS: ScenarioCard[] = [
       { label: 'Where', value: 'Lents (97266) · homeowner' },
       { label: 'Language', value: 'Vietnamese' },
     ],
-    hero: heroPrograms(roseFixture),
-    expected: expectedFromFixture(roseFixture),
+    hero: heroPrograms(DEMO_FIXTURES.rose),
+    expected: expectedFromFixture(DEMO_FIXTURES.rose),
     icon: <Briefcase className="h-5 w-5" />,
     accentClass: 'border-amber-200 bg-amber-50/40 hover:border-amber-300',
   },
@@ -112,7 +111,7 @@ export default function DemoHubPage() {
           Three example Portland households.
         </h1>
         <p className="max-w-2xl text-muted-foreground">
-          Each scenario runs against all 24 federal, Oregon, Multnomah County, and Portland
+          Each scenario runs against all {PROGRAM_COUNT} federal, Oregon, Multnomah County, and Portland
           programs in a single pass. Pick one — we&rsquo;ll show exactly what they qualify
           for and how to apply.
         </p>

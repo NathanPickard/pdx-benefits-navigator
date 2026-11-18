@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 import { animate, motion, useMotionValue, useReducedMotion, useTransform } from 'framer-motion';
+import { formatNumber, formatUsd } from '@/lib/estimate';
 
 export function MoneyCounter({
   value,
@@ -18,7 +19,7 @@ export function MoneyCounter({
 }) {
   const shouldReduceMotion = useReducedMotion();
   const count = useMotionValue(0);
-  const formatted = useTransform(count, (v) => Math.round(v).toLocaleString());
+  const formatted = useTransform(count, (v) => formatNumber(Math.round(v)));
 
   useEffect(() => {
     if (shouldReduceMotion) {
@@ -57,7 +58,7 @@ export function MoneyCounter({
             letterSpacing: '0.01em',
           }}
         >
-          Estimated range ${(low as number).toLocaleString()} – ${(high as number).toLocaleString()} / year
+          Estimated range {formatUsd(low as number)} – {formatUsd(high as number)} / year
         </p>
       )}
     </div>

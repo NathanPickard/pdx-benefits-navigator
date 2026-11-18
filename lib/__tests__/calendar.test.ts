@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { buildIcsCalendar, renewalIntervalMonths } from '../calendar.js';
+import { buildIcsCalendar, nextRenewalDate, renewalIntervalMonths } from '../calendar.js';
 import type { CalendarEntry } from '../calendar.js';
 import type { MatchResult, Program } from '../../types/program.js';
 
@@ -33,6 +33,26 @@ test('renewalIntervalMonths: undefined → 12 (default)', () => {
 
 test('renewalIntervalMonths: unrecognized string → 12 (default)', () => {
   assert.equal(renewalIntervalMonths('Upon re-application'), 12);
+});
+
+// ──── nextRenewalDate ────
+
+test('nextRenewalDate: adds the renewal interval to the given date', () => {
+  const from = new Date(Date.UTC(2026, 0, 15));
+  assert.equal(nextRenewalDate({ renewal_cycle: 'Annual' }, from).toISOString(), '2027-01-15T00:00:00.000Z');
+  assert.equal(nextRenewalDate({ renewal_cycle: 'Quarterly' }, from).toISOString(), '2026-04-15T00:00:00.000Z');
+  assert.equal(nextRenewalDate({ renewal_cycle: 'Monthly' }, from).toISOString(), '2026-02-15T00:00:00.000Z');
+});
+
+test('nextRenewalDate: defaults to 12 months when the cycle is missing', () => {
+  const from = new Date(Date.UTC(2026, 5, 1));
+  assert.equal(nextRenewalDate({}, from).toISOString(), '2027-06-01T00:00:00.000Z');
+});
+
+test('nextRenewalDate: does not mutate the input date', () => {
+  const from = new Date(Date.UTC(2026, 0, 15));
+  nextRenewalDate({ renewal_cycle: 'Annual' }, from);
+  assert.equal(from.toISOString(), '2026-01-15T00:00:00.000Z');
 });
 
 // ──── buildIcsCalendar ────

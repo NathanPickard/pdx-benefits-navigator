@@ -6,6 +6,7 @@
  */
 import fs from 'node:fs';
 import path from 'node:path';
+import { formatUsd } from '../lib/estimate';
 
 const ROOT = process.cwd();
 const README = path.join(ROOT, 'README.md');
@@ -18,7 +19,6 @@ type Fixture = {
 const load = (slug: string): Fixture =>
   JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'scenarios', `${slug}.json`), 'utf8'));
 
-const usd = (n: number) => `$${n.toLocaleString('en-US')}`;
 const eligible = (f: Fixture) => f.matches.filter((m) => m.eligible).length;
 
 const maria = load('maria');
@@ -43,14 +43,14 @@ const tableRows =
   '\n' +
   personas
     .map(([name, situation, f]) =>
-      `| **${name}** | ${situation} | ${usd(f.federal_only_value)}/yr | **${usd(f.total_estimated_annual_value)}/yr** across ${eligible(f)} programs |`,
+      `| **${name}** | ${situation} | ${formatUsd(f.federal_only_value)}/yr | **${formatUsd(f.total_estimated_annual_value)}/yr** across ${eligible(f)} programs |`,
     )
     .join('\n');
 
 const mDelta = maria.total_estimated_annual_value - maria.federal_only_value;
 const hook =
-  `> Federal and Oregon programs alone come to **${usd(maria.federal_only_value)}/yr** for María's family.\n` +
-  `> Adding Multnomah County and City of Portland programs brings the estimate to **${usd(maria.total_estimated_annual_value)}/yr**: **${usd(mDelta)} more** that federal-and-state screeners don't check.`;
+  `> Federal and Oregon programs alone come to **${formatUsd(maria.federal_only_value)}/yr** for María's family.\n` +
+  `> Adding Multnomah County and City of Portland programs brings the estimate to **${formatUsd(maria.total_estimated_annual_value)}/yr**: **${formatUsd(mDelta)} more** that federal-and-state screeners don't check.`;
 
 function replaceRegion(text: string, name: string, body: string): string {
   const re = new RegExp(`(<!-- README:${name}:START -->\\n)[\\s\\S]*?(\\n<!-- README:${name}:END -->)`);

@@ -1,6 +1,6 @@
 import { Document, Image, Page, StyleSheet, Text, View } from '@react-pdf/renderer';
 import type { AnalysisOutput, IntakeData, MatchResult, Program } from '@/types/program';
-import { formatEstimate, hasEstimate } from './estimate';
+import { formatEstimate, formatUsd, hasEstimate } from './estimate';
 
 const C = {
   fg: '#18181b',
@@ -224,7 +224,7 @@ function CoverPage({
         <SummaryRow label="Children" value={`${intake.num_children}${ages}`} />
         <SummaryRow
           label="Annual income"
-          value={`$${intake.annual_income.toLocaleString()}`}
+          value={formatUsd(intake.annual_income)}
         />
         <SummaryRow label="ZIP code" value={intake.zip_code} />
         <SummaryRow label="Housing" value={intake.housing_status.replace(/_/g, ' ')} />
@@ -234,14 +234,14 @@ function CoverPage({
 
       <Text style={styles.sectionLabel}>Estimated annual value</Text>
       <Text style={styles.bigNumber}>
-        ${analysis.total_estimated_annual_value.toLocaleString()}
+        {formatUsd(analysis.total_estimated_annual_value)}
       </Text>
       <Text style={styles.bigSub}>per year, across {programCount} programs</Text>
 
       <Text style={styles.splitLine}>
-        Federal &amp; state: ${analysis.federal_only_value.toLocaleString()}
+        Federal &amp; state: {formatUsd(analysis.federal_only_value)}
         {'  ·  '}
-        Portland &amp; Multnomah: ${analysis.pdx_specific_value.toLocaleString()}
+        Portland &amp; Multnomah: {formatUsd(analysis.pdx_specific_value)}
       </Text>
       <Text style={styles.splitDetail}>
         Most national benefits tools only check federal programs. This packet includes hyperlocal

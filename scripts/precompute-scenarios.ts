@@ -1,8 +1,8 @@
 /**
  * Re-bakes the pre-computed demo scenario fixtures at data/scenarios/*.json.
  *
- * Calls analyzeEligibilityStream from lib/claudeBrowser.ts directly in a Node
- * context, using ANTHROPIC_API_KEY from .env.local. The runtime app still uses
+ * Calls analyzeEligibilityStream from lib/claudeBrowser.ts (via
+ * scripts/lib/collectAnalysis.ts) directly in a Node context, using ANTHROPIC_API_KEY from .env.local. The runtime app still uses
  * the same function from the browser with the user's BYOK — this script is the
  * build-time path for refreshing demo fixtures after the seed or eligibility
  * prompt changes. The server never sees an API key in production.
@@ -14,40 +14,19 @@
  * Env (.env.local): ANTHROPIC_API_KEY
  */
 
-import { readFile, writeFile } from 'node:fs/promises';
+import { writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { scenarios } from '../lib/scenarios';
-import { analyzeEligibilityStream } from '../lib/claudeBrowser';
-import { ELIGIBILITY_MODEL } from '../lib/eligibility';
+import { formatUsd } from '../lib/estimate';
+import type { AnalysisOutput } from '../types/program';
+import { collectAnalysis } from './lib/collectAnalysis';
+import { loadDotEnvLocal } from './lib/env';
 
 const ROOT = process.cwd();
 const OUT_DIR = join(ROOT, 'data', 'scenarios');
 
 // Precompute and runtime now share ELIGIBILITY_MODEL (Sonnet 4.6), so the
 // baked demo fixtures match what live BYOK users get.
-
-async function loadDotEnvLocal(): Promise<void> {
-  try {
-    const text = await readFile(join(ROOT, '.env.local'), 'utf8');
-    for (const raw of text.split('\n')) {
-      const line = raw.trim();
-      if (!line || line.startsWith('#')) continue;
-      const eq = line.indexOf('=');
-      if (eq === -1) continue;
-      const key = line.slice(0, eq).trim();
-      let val = line.slice(eq + 1).trim();
-      if (
-        (val.startsWith('"') && val.endsWith('"')) ||
-        (val.startsWith("'") && val.endsWith("'"))
-      ) {
-        val = val.slice(1, -1);
-      }
-      if (!process.env[key]) process.env[key] = val;
-    }
-  } catch {
-    // Fall back to shell env.
-  }
-}
 
 async function runOne(
   slug: keyof typeof scenarios,
@@ -57,30 +36,20 @@ async function runOne(
   console.log(`\n→ ${slug}`);
 
   let progressCount = 0;
-  let output = null;
-  let errorMessage: string | null = null;
-
-  for await (const event of analyzeEligibilityStream(
-    apiKey,
-    intake,
-    ELIGIBILITY_MODEL,
-  )) {
-    if (event.type === 'progress') {
+  let output: AnalysisOutput;
+  try {
+    output = await collectAnalysis(apiKey, intake, () => {
       progressCount++;
       process.stdout.write('.');
-    } else if (event.type === 'complete') {
-      output = event.output;
-    } else if (event.type === 'error') {
-      errorMessage = event.message;
-    }
+    });
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : String(error);
+    throw new Error(`${slug}: ${message}`);
   }
-
-  if (errorMessage) throw new Error(`${slug}: ${errorMessage}`);
-  if (!output) throw new Error(`${slug}: no complete event received`);
 
   const eligibleCount = output.matches.filter((m) => m.eligible).length;
   console.log(
-    `\n✓ ${slug}: $${output.total_estimated_annual_value.toLocaleString()} across ${eligibleCount} eligible programs (${progressCount} program IDs streamed)`,
+    `\n✓ ${slug}: ${formatUsd(output.total_estimated_annual_value)} across ${eligibleCount} eligible programs (${progressCount} program IDs streamed)`,
   );
 
   const path = join(OUT_DIR, `${slug}.json`);
@@ -89,7 +58,7 @@ async function runOne(
 }
 
 async function main() {
-  await loadDotEnvLocal();
+  await loadDotEnvLocal(ROOT);
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) {
     console.error('Missing ANTHROPIC_API_KEY in .env.local');

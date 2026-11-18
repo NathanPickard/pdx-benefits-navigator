@@ -1,4 +1,4 @@
-import type { ProgramSetScore, DollarScore, ConfidenceScore } from './types';
+import type { ProgramSetScore, DollarScore, ConfidenceScore, JudgeTranscript } from './types';
 import type { AnalysisOutput } from '../../types/program';
 
 export interface ReasoningScore {
@@ -14,7 +14,7 @@ export interface AttemptResult {
   dollars: DollarScore;
   confidence: ConfidenceScore;
   reasoning: ReasoningScore;
-  judgeTranscripts: Array<{ program_id: string; verdict: string; issue?: string; prompt: string; raw: string }>;
+  judgeTranscripts: JudgeTranscript[];
 }
 
 export interface CaseResult {
@@ -34,7 +34,7 @@ export interface RunData {
   cases: CaseResult[];
 }
 
-/** Row of rendered scoreboard numbers for one attempt, or `undefined` fields for an errored case. */
+/** Row of rendered scoreboard cells for one attempt; errored cases and empty aggregates get placeholder dashes. */
 interface ScoreboardRow {
   label: string;
   f1: string;

@@ -54,7 +54,7 @@ type ScrapedProgram = Program & { _provenance?: Record<string, ProvenanceEntry> 
 
 function isNullish(v: unknown): boolean {
   if (v === null || v === undefined) return true;
-  if (typeof v === 'object' && v !== null && !Array.isArray(v)) {
+  if (typeof v === 'object' && !Array.isArray(v)) {
     // Nested object like estimated_annual_value or eligibility — recurse on values.
     return Object.values(v).every(isNullish);
   }
@@ -170,7 +170,8 @@ async function main() {
     return result;
   });
 
-  const sourceUrlCount = merged.filter((p) => (p as unknown as Record<string, unknown>).source_url).length;
+  // Count only programs whose source_url came from the scrape, not ones the seed already had.
+  const sourceUrlCount = merged.filter((p, i) => p.source_url && !seed[i].source_url).length;
 
   await fs.writeFile(OUT_PATH, JSON.stringify(merged, null, 2) + '\n');
 

@@ -21,38 +21,28 @@ import { scoreProgramSet, scoreDollars, scoreConfidence } from './scorers';
 import { judgeMatch, JUDGE_MODEL } from './judge';
 import { renderReport } from './report';
 import type { AttemptResult, CaseResult, ReasoningScore, RunData } from './report';
-import { analyzeEligibilityStream } from '../../lib/claudeBrowser';
 import { ELIGIBILITY_MODEL } from '../../lib/eligibility';
 import type { AnalysisOutput, Program } from '../../types/program';
 import type { EvalCase } from './types';
+import { validateCaseDefinitions } from './validate';
+import { loadDotEnvLocal } from '../lib/env';
+import { collectAnalysis } from '../lib/collectAnalysis';
 
 const ROOT = process.cwd();
 
-// ── loadDotEnvLocal — copied verbatim from scripts/precompute-scenarios.ts ──
-async function loadDotEnvLocal(): Promise<void> {
-  try {
-    const text = await readFile(join(ROOT, '.env.local'), 'utf8');
-    for (const raw of text.split('\n')) {
-      const line = raw.trim();
-      if (!line || line.startsWith('#')) continue;
-      const eq = line.indexOf('=');
-      if (eq === -1) continue;
-      const key = line.slice(0, eq).trim();
-      let val = line.slice(eq + 1).trim();
-      if (
-        (val.startsWith('"') && val.endsWith('"')) ||
-        (val.startsWith("'") && val.endsWith("'"))
-      ) {
-        val = val.slice(1, -1);
-      }
-      if (!process.env[key]) process.env[key] = val;
-    }
-  } catch {
-    // Fall back to shell env.
+/** Parses a `--runs` value; only a plain positive integer like `3` is accepted. */
+function parseRunsValue(value: string | undefined): number {
+  const parsed = value === undefined ? NaN : Number.parseInt(value, 10);
+  if (String(parsed) !== value || parsed < 1) {
+    throw new Error('--runs must be a positive integer');
   }
+  return parsed;
 }
 
-/** Positional args are case ids; `--runs N` sets attempts per case (default 1). */
+/**
+ * Positional args are case ids; `--runs N` sets attempts per case (default 1).
+ * Throws when `--runs` is missing its value or is not a positive integer.
+ */
 export function parseEvalArgs(argv: string[]): { caseIds: string[]; runs: number } {
   const caseIds: string[] = [];
   let runs = 1;
@@ -60,9 +50,7 @@ export function parseEvalArgs(argv: string[]): { caseIds: string[]; runs: number
   for (let i = 0; i < argv.length; i++) {
     const arg = argv[i];
     if (arg === '--runs') {
-      const next = argv[i + 1];
-      const parsed = next === undefined ? NaN : Number.parseInt(next, 10);
-      runs = Number.isNaN(parsed) ? 1 : parsed;
+      runs = parseRunsValue(argv[i + 1]);
       i++;
       continue;
     }
@@ -84,52 +72,17 @@ export function eligibleSetsMatch(outputs: AnalysisOutput[]): boolean {
   return signatures.every((sig) => sig === signatures[0]);
 }
 
-interface ValidationProblem {
-  message: string;
-}
-
-function validateCases(
-  requestedCaseIds: string[],
-  allPrograms: Program[],
-): ValidationProblem[] {
-  const problems: ValidationProblem[] = [];
-  const programIds = new Set(allPrograms.map((p) => p.id));
+/**
+ * Case-definition problems plus any case id requested on the CLI that is not
+ * in CASES. An empty array means it is safe to start calling the API.
+ */
+function validateCases(requestedCaseIds: string[], allPrograms: Program[]): string[] {
   const allCaseIds = new Set(CASES.map((c) => c.id));
-
-  for (const id of requestedCaseIds) {
-    if (!allCaseIds.has(id)) {
-      problems.push({ message: `Unknown case id requested on the CLI: "${id}"` });
-    }
-  }
-
-  const seenCaseIds = new Set<string>();
-  for (const kase of CASES) {
-    if (seenCaseIds.has(kase.id)) {
-      problems.push({ message: `Duplicate case id in CASES: "${kase.id}"` });
-    }
-    seenCaseIds.add(kase.id);
-
-    const referencedIds = [...kase.expected.eligible, ...(kase.expected.uncertain ?? [])];
-    for (const programId of referencedIds) {
-      if (!programIds.has(programId)) {
-        problems.push({
-          message: `Case "${kase.id}" references unknown program id "${programId}"`,
-        });
-      }
-    }
-
-    const eligibleSet = new Set(kase.expected.eligible);
-    const uncertainSet = new Set(kase.expected.uncertain ?? []);
-    for (const id of eligibleSet) {
-      if (uncertainSet.has(id)) {
-        problems.push({
-          message: `Case "${kase.id}" lists "${id}" in both expected.eligible and expected.uncertain`,
-        });
-      }
-    }
-  }
-
-  return problems;
+  const unknownRequested = requestedCaseIds
+    .filter((id) => !allCaseIds.has(id))
+    .map((id) => `Unknown case id requested on the CLI: "${id}"`);
+  const programIds = new Set(allPrograms.map((p) => p.id));
+  return [...unknownRequested, ...validateCaseDefinitions(CASES, programIds)];
 }
 
 /** One attempt of the live eligibility pipeline plus every derived score. */
@@ -139,21 +92,13 @@ async function runAttempt(
   allPrograms: Program[],
   programById: Map<string, Program>,
 ): Promise<AttemptResult> {
-  let output: AnalysisOutput | null = null;
-  let errorMessage: string | null = null;
-
-  for await (const event of analyzeEligibilityStream(apiKey, kase.intake, ELIGIBILITY_MODEL)) {
-    if (event.type === 'progress') {
-      process.stdout.write('.');
-    } else if (event.type === 'complete') {
-      output = event.output;
-    } else if (event.type === 'error') {
-      errorMessage = event.message;
-    }
+  let output: AnalysisOutput;
+  try {
+    output = await collectAnalysis(apiKey, kase.intake, () => process.stdout.write('.'));
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : String(error);
+    throw new Error(`${kase.id}: ${message}`);
   }
-
-  if (errorMessage) throw new Error(errorMessage);
-  if (!output) throw new Error(`${kase.id}: no complete event received`);
 
   const programSet = scoreProgramSet(output, kase.expected, allPrograms);
   const dollars = scoreDollars(output, allPrograms, kase.expected.valueOverrides);
@@ -262,7 +207,11 @@ function todayIsoDate(date: Date): string {
 }
 
 async function main(): Promise<void> {
-  await loadDotEnvLocal();
+  // Parse args first so a bad --runs fails fast, before any key or file checks.
+  // A throw here is printed and exits 1 via the main().catch handler below.
+  const { caseIds, runs } = parseEvalArgs(process.argv.slice(2));
+
+  await loadDotEnvLocal(ROOT);
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) {
     console.error('Missing ANTHROPIC_API_KEY in .env.local');
@@ -275,12 +224,10 @@ async function main(): Promise<void> {
   ) as Program[];
   const programById = new Map(allPrograms.map((p) => [p.id, p]));
 
-  const { caseIds, runs } = parseEvalArgs(process.argv.slice(2));
-
   const problems = validateCases(caseIds, allPrograms);
   if (problems.length > 0) {
     console.error('Eval validation failed:');
-    for (const problem of problems) console.error(`  - ${problem.message}`);
+    for (const problem of problems) console.error(`  - ${problem}`);
     process.exit(1);
     return;
   }

@@ -1,125 +1,21 @@
 import Link from "next/link";
-import { ArrowRight, Check, Heart, Play, Sparkles, Users } from "lucide-react";
+import { ArrowRight, Check, Heart, Play, Sparkles } from "lucide-react";
 
 import { AppBar } from "@/components/brand/AppBar";
-import { Wordmark } from "@/components/brand/Wordmark";
-import {
-  RoseStamp,
-  SoftBlobs,
-  SunBadge,
-} from "@/components/brand/RoseStamp";
-import { JurisdictionPill } from "@/components/brand/JurisdictionPill";
+import { SectionHeading } from "@/components/brand/SectionHeading";
+import { SiteFooter } from "@/components/brand/SiteFooter";
+import { RoseStamp, SoftBlobs } from "@/components/brand/RoseStamp";
+import { DemoFamilies } from "@/components/landing/DemoFamilies";
+import { HiddenGems } from "@/components/landing/HiddenGems";
 import { StatReveal } from "@/components/landing/StatReveal";
-import mariaFixture from "@/data/scenarios/maria.json";
-import jamesFixture from "@/data/scenarios/james.json";
-import roseFixture from "@/data/scenarios/rose.json";
-import programs from "@/data/programs.json";
-
-const HIDDEN_GEM_COUNT = (programs as { hidden_gem: boolean }[]).filter(
-  (p) => p.hidden_gem,
-).length;
-const PROGRAM_COUNT = programs.length;
-
-const eligibleCount = (f: { matches: { eligible: boolean }[] }) =>
-  f.matches.filter((m) => m.eligible).length;
-
-const MARIA_TOTAL = mariaFixture.total_estimated_annual_value;
-const MARIA_FEDERAL = mariaFixture.federal_only_value;
-const MARIA_ELIGIBLE = eligibleCount(mariaFixture);
-
-const HIDDEN_GEMS = [
-  {
-    id: "renter",
-    name: "Portland Renter Relocation",
-    value: "$2,900 – $4,500",
-    jurisdiction: "portland" as const,
-    blurb:
-      "When your rent goes up more than 10% in a year, your landlord owes you a lump sum.",
-  },
-  {
-    id: "cep",
-    name: "CEP Home Weatherization",
-    value: "up to $15,000",
-    jurisdiction: "portland" as const,
-    blurb:
-      "Free weatherization, heat pumps, and home repairs, funded by Portland's clean energy tax on large retailers.",
-  },
-  {
-    id: "sun",
-    name: "SUN Service System",
-    value: "$1,000 – $6,000",
-    jurisdiction: "multnomah" as const,
-    blurb:
-      "After-school, family meals, mental health, and basic-needs case management.",
-  },
-  {
-    id: "evict",
-    name: "Multnomah Eviction Prevention",
-    value: "up to $5,000",
-    jurisdiction: "multnomah" as const,
-    blurb: "Emergency rent paid directly to landlords — within days.",
-  },
-  {
-    id: "water",
-    name: "Water Bureau Discount",
-    value: "80% off bill",
-    jurisdiction: "portland" as const,
-    blurb:
-      "Up to 80% off water + sewer for households under 60% State Median Income.",
-  },
-  {
-    id: "wallet",
-    name: "Transportation Wallet",
-    value: "$100 – $308 / yr",
-    jurisdiction: "portland" as const,
-    blurb:
-      "TriMet, BIKETOWN, and parking credits for income-qualified residents.",
-  },
-];
-
-const SCENARIO_SUMMARIES = [
-  {
-    slug: "maria",
-    name: "María & family",
-    short: "María",
-    zip: "97218 · Cully",
-    blurb:
-      "Family of 4 · 2 kids · part-time at Fred Meyer · rent went up 12%.",
-    total: MARIA_TOTAL,
-    eligibleCount: MARIA_ELIGIBLE,
-    accent: "rose" as const,
-  },
-  {
-    slug: "james",
-    name: "James",
-    short: "James",
-    zip: "97203 · St. Johns",
-    blurb: "Single · disabled vet · unemployed · owns home in St. Johns.",
-    total: jamesFixture.total_estimated_annual_value,
-    eligibleCount: eligibleCount(jamesFixture),
-    accent: "moss" as const,
-  },
-  {
-    slug: "rose",
-    name: "Rose",
-    short: "Rose",
-    zip: "97266 · Lents",
-    blurb: "Senior · widow · Social Security only · owns home in Lents.",
-    total: roseFixture.total_estimated_annual_value,
-    eligibleCount: eligibleCount(roseFixture),
-    accent: "sun" as const,
-  },
-];
-
-const MARQUEE_ITEMS = [
-  ["Portland Renter Relocation", "$4,500"],
-  ["CEP Home Weatherization", "up to $15,000"],
-  ["SUN Service System", "$3,000"],
-  ["Multnomah Eviction Prevention", "$2,000"],
-  ["Water Bureau Discount", "80% off"],
-  ["Transportation Wallet", "$308 / yr"],
-  ["Inclusionary Housing", "$9,000 / yr"],
-];
+import {
+  MARIA_ELIGIBLE,
+  MARIA_FEDERAL,
+  MARIA_TOTAL,
+} from "@/components/landing/content";
+import { formatUsd } from "@/lib/estimate";
+import { HIDDEN_GEM_COUNT, PROGRAM_COUNT } from "@/lib/programs";
+import { MARQUEE_ITEMS } from "@/lib/hiddenGemHighlights";
 
 const STEP_TONES = {
   rose: { bg: "var(--rose-soft)", text: "oklch(0.40 0.10 150)" },
@@ -284,7 +180,7 @@ export default function HomePage() {
                         fontWeight: 500,
                       }}
                     >
-                      ${MARIA_TOTAL.toLocaleString()}
+                      {formatUsd(MARIA_TOTAL)}
                     </div>
                     <div
                       className="flex items-center gap-2 mt-3"
@@ -335,7 +231,7 @@ export default function HomePage() {
                   className="flex items-center gap-12"
                   style={{ flexShrink: 0 }}
                 >
-                  {MARQUEE_ITEMS.map(([n, v]) => (
+                  {MARQUEE_ITEMS.map(({ name: n, value: v }) => (
                     <span
                       key={n}
                       className="flex items-center gap-3"
@@ -402,7 +298,7 @@ export default function HomePage() {
             <Step
               n="2"
               tone="moss"
-              title="We check all 24 programs at once"
+              title={`We check all ${PROGRAM_COUNT} programs at once`}
               body="An AI reads the 2026 poverty tables and every active rule — ORS, City Code, county ordinances — and writes you a brief in plain language."
             />
             <Step
@@ -414,208 +310,9 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* ─────────────────────── Hidden gems ─────────────────────── */}
-        <section className="rc-container rc-section-pad">
-          <SectionHeading
-            kicker="The hidden gems"
-            title="Programs Portland built — but most tools miss."
-          >
-            <p
-              style={{
-                maxWidth: 380,
-                color: "var(--ink-3)",
-                margin: 0,
-                fontSize: "0.94rem",
-              }}
-            >
-              Portland&rsquo;s {HIDDEN_GEM_COUNT} hidden-gem programs alone add{" "}
-              <strong style={{ color: "var(--rose)" }}>
-                $10–25K a year
-              </strong>{" "}
-              for the average family.
-            </p>
-          </SectionHeading>
+        <HiddenGems />
 
-          <div className="rc-cols-3">
-            {HIDDEN_GEMS.map((g) => (
-              <article key={g.id} className="rc-card" style={{ padding: 24 }}>
-                <div
-                  className="flex items-center justify-between mb-3 flex-wrap"
-                  style={{ gap: 6 }}
-                >
-                  <JurisdictionPill jurisdiction={g.jurisdiction} />
-                  <span
-                    className="pill pill-sun"
-                    style={{ fontSize: "0.72rem" }}
-                  >
-                    <Sparkles size={11} /> Hidden gem
-                  </span>
-                </div>
-                <h3
-                  className="font-display"
-                  style={{
-                    fontSize: "1.3rem",
-                    lineHeight: 1.2,
-                    margin: "0 0 8px",
-                    fontWeight: 500,
-                    letterSpacing: "-0.015em",
-                  }}
-                >
-                  {g.name}
-                </h3>
-                <p
-                  style={{
-                    color: "var(--ink-2)",
-                    fontSize: "0.92rem",
-                    lineHeight: 1.55,
-                    margin: 0,
-                  }}
-                >
-                  {g.blurb}
-                </p>
-                <div className="divider my-4" />
-                <div className="flex items-end justify-between">
-                  <span
-                    className="tabular"
-                    style={{
-                      fontSize: "1.1rem",
-                      color: "var(--rose)",
-                      fontWeight: 600,
-                    }}
-                  >
-                    {g.value}
-                  </span>
-                  <span className="tag">per year</span>
-                </div>
-              </article>
-            ))}
-          </div>
-        </section>
-
-        {/* ─────────────────────── Demo families ─────────────────────── */}
-        <section className="rc-container rc-section-pad">
-          <SectionHeading
-            kicker="Meet three Portland families"
-            title="Same questions. Very different answers."
-          >
-            <span className="tag">Click any to see their full results</span>
-          </SectionHeading>
-
-          <div className="rc-cols-3">
-            {SCENARIO_SUMMARIES.map((s) => (
-              <Link
-                key={s.slug}
-                href={`/demo/${s.slug}`}
-                className="rc-card group"
-                style={{
-                  padding: 26,
-                  textAlign: "left",
-                  textDecoration: "none",
-                  color: "var(--ink)",
-                  display: "block",
-                  transition: "transform 0.2s, border-color 0.2s",
-                }}
-              >
-                <div className="flex items-start justify-between mb-3">
-                  <div>
-                    <div
-                      className="font-display"
-                      style={{
-                        fontSize: "1.6rem",
-                        lineHeight: 1.05,
-                        fontWeight: 500,
-                        letterSpacing: "-0.015em",
-                      }}
-                    >
-                      {s.name}
-                    </div>
-                    <div
-                      style={{
-                        color: "var(--ink-3)",
-                        fontSize: "0.82rem",
-                        marginTop: 3,
-                      }}
-                    >
-                      {s.zip}
-                    </div>
-                  </div>
-                  {s.accent === "rose" && <RoseStamp size={40} />}
-                  {s.accent === "moss" && (
-                    <div
-                      style={{
-                        width: 40,
-                        height: 40,
-                        borderRadius: 999,
-                        background: "var(--moss-soft)",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        color: "var(--moss-2)",
-                      }}
-                    >
-                      <Users size={18} />
-                    </div>
-                  )}
-                  {s.accent === "sun" && <SunBadge size={40} />}
-                </div>
-                <p
-                  style={{
-                    color: "var(--ink-2)",
-                    fontSize: "0.9rem",
-                    lineHeight: 1.55,
-                    margin: "0 0 18px",
-                  }}
-                >
-                  {s.blurb}
-                </p>
-                <div className="rc-card-soft" style={{ padding: 14 }}>
-                  <div className="flex items-baseline justify-between">
-                    <div>
-                      <div className="tag">Benefits found</div>
-                      <div
-                        className="tabular font-display"
-                        style={{
-                          fontSize: "1.85rem",
-                          lineHeight: 1,
-                          color: "var(--rose)",
-                          fontWeight: 500,
-                          marginTop: 2,
-                        }}
-                      >
-                        ${s.total.toLocaleString()}
-                      </div>
-                    </div>
-                    <div style={{ textAlign: "right" }}>
-                      <div className="tag">Programs</div>
-                      <div
-                        className="tabular"
-                        style={{
-                          fontSize: "1.4rem",
-                          color: "var(--moss-2)",
-                          fontWeight: 600,
-                          marginTop: 2,
-                        }}
-                      >
-                        {s.eligibleCount}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div
-                  className="flex items-center gap-1.5 mt-4"
-                  style={{
-                    fontSize: "0.86rem",
-                    color: "var(--ink-2)",
-                    fontWeight: 500,
-                  }}
-                >
-                  <span>See {s.short}&rsquo;s full results</span>
-                  <ArrowRight size={14} />
-                </div>
-              </Link>
-            ))}
-          </div>
-        </section>
+        <DemoFamilies />
 
         {/* ─────────────────────── Closing CTA ─────────────────────── */}
         <section className="rc-container rc-section-pad">
@@ -651,13 +348,13 @@ export default function HomePage() {
                 >
                   Federal &amp; state tools find{" "}
                   <span style={{ color: "var(--ink-3)" }}>
-                    ${MARIA_FEDERAL.toLocaleString()}
+                    {formatUsd(MARIA_FEDERAL)}
                   </span>
                   .
                   <br />
                   We find{" "}
                   <span style={{ color: "var(--rose)" }}>
-                    ${MARIA_TOTAL.toLocaleString()}
+                    {formatUsd(MARIA_TOTAL)}
                   </span>
                   .
                 </h3>
@@ -686,114 +383,20 @@ export default function HomePage() {
         </section>
 
         {/* ─────────────────────── Footer ─────────────────────── */}
-        <footer
-          className="rc-container"
-          style={{ padding: "48px 16px 24px", marginTop: 24 }}
-        >
-          <div className="rc-footer-grid">
-            <div>
-              <Wordmark />
-              <p
-                style={{
-                  color: "var(--ink-3)",
-                  fontSize: "0.86rem",
-                  lineHeight: 1.6,
-                  margin: "16px 0 0",
-                  maxWidth: 460,
-                }}
-              >
-                Estimates only — not legal advice. Confirm eligibility with
-                each program before applying. We never store your data;
-                everything runs in your browser session.
-              </p>
-            </div>
-            <div>
-              <div
-                className="tag"
-                style={{
-                  marginBottom: 8,
-                  fontWeight: 600,
-                  color: "var(--ink-2)",
-                }}
-              >
-                Built with
-              </div>
-              <ul
-                style={{
-                  listStyle: "none",
-                  padding: 0,
-                  margin: 0,
-                  fontSize: "0.86rem",
-                  lineHeight: 1.9,
-                  color: "var(--ink-2)",
-                }}
-              >
-                <li>2026 Federal Poverty Level</li>
-                <li>Oregon Revised Statutes</li>
-                <li>Portland & Multnomah codes</li>
-              </ul>
-            </div>
-            <div>
-              <div
-                className="tag"
-                style={{
-                  marginBottom: 8,
-                  fontWeight: 600,
-                  color: "var(--ink-2)",
-                }}
-              >
-                Friends we&rsquo;d love
-              </div>
-              <ul
-                style={{
-                  listStyle: "none",
-                  padding: 0,
-                  margin: 0,
-                  fontSize: "0.86rem",
-                  lineHeight: 1.9,
-                  color: "var(--ink-2)",
-                }}
-              >
+        <SiteFooter
+          thirdColumn={{
+            title: "Friends we’d love",
+            children: (
+              <>
                 <li>211info</li>
                 <li>Multnomah County DCHS</li>
                 <li>Oregon Food Bank</li>
-              </ul>
-            </div>
-          </div>
-        </footer>
+              </>
+            ),
+          }}
+        />
       </main>
     </>
-  );
-}
-
-function SectionHeading({
-  kicker,
-  title,
-  children,
-}: {
-  kicker: string;
-  title: string;
-  children?: React.ReactNode;
-}) {
-  return (
-    <header className="flex items-end justify-between gap-6 flex-wrap mb-8">
-      <div>
-        <div className="eyebrow mb-2">{kicker}</div>
-        <h2
-          className="font-display"
-          style={{
-            fontSize: "2.2rem",
-            lineHeight: 1.1,
-            margin: 0,
-            fontWeight: 500,
-            letterSpacing: "-0.02em",
-          }}
-        >
-          {title}
-        </h2>
-      </div>
-      {children}
-    </header>
   );
 }
 

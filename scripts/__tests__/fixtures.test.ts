@@ -2,6 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import programs from '../../data/programs.json';
 import { scenarios } from '../../lib/scenarios';
+import { DEMO_SLUGS } from '../../lib/demoFixtures';
 import maria from '../../data/scenarios/maria.json';
 import james from '../../data/scenarios/james.json';
 import rose from '../../data/scenarios/rose.json';
@@ -9,13 +10,12 @@ import rose from '../../data/scenarios/rose.json';
 const ids = new Set((programs as { id: string }[]).map((p) => p.id));
 const fixtures = { maria, james, rose } as const;
 
-// ──── SLUG_MAP check ────
-// SLUG_MAP is defined in app/demo/[scenario]/page.tsx with keys: maria, james, rose.
-// Because that file is a Next.js client component, it cannot be imported in a
-// plain Node test without the full Next.js compilation stack. We therefore
-// assert the invariant as a comment-level contract: its keys are statically
-// { maria, james, rose } — identical to Object.keys(scenarios). If that file
-// ever drifts, this note and the scenarios-key test below are the guard.
+// ──── Demo slug check ────
+// /demo/[scenario] serves DEMO_FIXTURES; its slugs must match scenarios.ts.
+
+test('DEMO_FIXTURES slugs match scenarios.ts keys', () => {
+  assert.deepEqual([...DEMO_SLUGS].sort(), Object.keys(scenarios).sort());
+});
 
 test('scenarios.ts keys match the baked fixture set', () => {
   assert.deepEqual(Object.keys(scenarios).sort(), Object.keys(fixtures).sort());

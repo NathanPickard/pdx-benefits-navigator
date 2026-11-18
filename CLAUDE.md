@@ -26,8 +26,16 @@ Use the domain terms in `CONTEXT.md` (match, estimate, unestimated match, offici
 | BYOK localStorage + provider | `lib/userKey.tsx` |
 | Programs database (source of truth) | `data/programs.seed.json` |
 | Programs database (live build artifact) | `data/programs.json` |
+| Program list, lookup by id, counts | `lib/programs.ts` |
+| Intake zod schema | `lib/intakeSchema.ts` |
+| sessionStorage keys + validated readers | `lib/sessionState.ts` |
+| Money formatting (`formatUsd`) | `lib/estimate.ts` |
+| Results derivation (filters, sorts, likely range) | `lib/results/derive.ts` |
+| Results loading state machine | `app/results/useAnalysisLoader.ts` |
 | Demo intake fixtures | `lib/scenarios.ts` |
-| Demo analysis fixtures | `data/scenarios/*.json` |
+| Demo analysis fixtures | `data/scenarios/*.json` (registered in `lib/demoFixtures.ts`) |
+| Landing hidden-gem copy | `lib/hiddenGemHighlights.ts` |
+| Site URL, name, description | `lib/site.ts` |
 | UI chrome strings + language list | `lib/i18n.ts` |
 | PDF packet | `lib/packet.tsx` |
 | `.ics` renewal calendar | `lib/calendar.ts` |
@@ -44,7 +52,9 @@ Use the domain terms in `CONTEXT.md` (match, estimate, unestimated match, offici
 
 ## Common tasks
 
-**Adding a new program.** Edit `data/programs.seed.json` following the schema in `types/program.ts`. Include a citation to the official program page. Mark `hidden_gem: true` if it's locally-funded and unlikely to be on national screening tools. The merge script reconciles seed + scraped data into `data/programs.json`.
+**Adding a new program.** Edit `data/programs.seed.json` following the schema in `types/program.ts`. Include a citation to the official program page. Mark `hidden_gem: true` if it's locally-funded and unlikely to be on national screening tools. The merge script reconciles seed + scraped data into `data/programs.json`. Program counts in site copy are derived from `lib/programs.ts`, so they update on their own; never hard-code them.
+
+**Adding an intake question.** Update `IntakeData` in `types/program.ts` and `IntakeSchema` in `lib/intakeSchema.ts` together (a compile-time check fails if they drift), add the step UI in `components/intake/steps.tsx`, then update `lib/scenarios.ts` and the matching eval personas (`npm test` checks they agree) and re-bake.
 
 **Changing the runtime model.** Edit `ELIGIBILITY_MODEL` in `lib/eligibility.ts`. The README badge advertises the current value — update both together.
 

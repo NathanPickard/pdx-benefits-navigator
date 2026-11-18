@@ -6,7 +6,7 @@ Machine-oriented blueprint. Read this before touching code. Prose rationale live
 
 ```
 what:     BYOK eligibility screener for Portland, OR benefit programs (federal → city)
-stack:    Next.js 16 App Router · React 19 · TS · Tailwind 4 · shadcn · zod 4 · @anthropic-ai/sdk
+stack:    Next.js 16 App Router · React 19 · TS · Tailwind 4 · Base UI · zod 4 · @anthropic-ai/sdk
 runtime:  Vercel (Node), one server route. All AI calls run in the browser with the user's key.
 data:     24 programs in JSON, embedded whole into the system prompt. No DB. No vector store.
 model:    ELIGIBILITY_MODEL in lib/eligibility.ts (shared by runtime, bake, eval)
@@ -17,37 +17,61 @@ verify:   npm run lint && npm run typecheck && npm run validate:data && npm test
 
 ```
 ┌ app/            routes (pages + 1 API route)                                  ─┐
-├ components/     brand/ intake/ landing/ results/ ui/(shadcn)                   │ UI, client-only
-├ lib/            engine: prompt, browser client, schema, cache, i18n, pdf, ics  ┘
+├ components/     brand/ demo/ intake/ landing/ results/ ui/(button, sonner)     │ UI, mostly client
+├ lib/            engine: prompt, browser client, schemas, session state, cache, ┘
+│                 i18n, pdf, ics, shared helpers; lib/results/ = pure results derivation
 ├ types/          program.ts = the shared vocabulary (Program, IntakeData, AnalysisOutput)
 ├ data/           programs.seed.json → programs.json (runtime) ; scenarios/*.json (demo fixtures)
 ├ scripts/        data pipeline (scrape/merge/validate), bake, eval harness
 └ evals/          REPORT.md scoreboard (runs/ is gitignored)
 ```
 
-Dependency direction: `app → components → lib → types/data`. `scripts` import `lib` directly (Node, via tsx). Nothing imports from `app`.
+Dependency direction: `app → components → lib → types/data`. `scripts` import `lib` directly (Node, via tsx); shared script helpers live in `scripts/lib/` (`loadDotEnvLocal`, `collectAnalysis`). Nothing imports from `app`.
+
+Shared modules (use these instead of re-deriving):
+
+| need | module |
+|---|---|
+| program list, lookup, counts, gem-first sort | `lib/programs.ts` (`PROGRAMS`, `PROGRAM_BY_ID`, `PROGRAM_COUNT`, `HIDDEN_GEM_COUNT`, `compareGemThenValue`) |
+| money and number formatting (en-US) | `lib/estimate.ts` (`formatUsd`, `formatNumber`, `formatEstimate`, `hasEstimate`) |
+| sessionStorage keys and validated readers | `lib/sessionState.ts` (`SESSION_KEYS`, `readStoredIntake`, `readPrebaked`) |
+| intake zod schema | `lib/intakeSchema.ts` (`IntakeSchema`, `parseStoredIntakeFields`) |
+| results joins, filters, sorts, likely range, text summary | `lib/results/derive.ts` |
+| translation merge (strings only) | `lib/results/translation.ts` (`mergeTranslatedStrings`) |
+| 2026 FPL for UI hints | `lib/fpl.ts` (`fplFor`) |
+| site URL, name, description | `lib/site.ts` |
+| landing hidden-gem and marquee copy | `lib/hiddenGemHighlights.ts` (drift-tested against programs.json) |
+| demo fixture registry | `lib/demoFixtures.ts` (`DEMO_FIXTURES`, `isDemoSlug`) |
+| program category labels, file download | `lib/programLabels.ts`, `lib/download.ts` |
+
+Program counts and dollar figures in copy come from these modules, not literals. Keep `lib/programs.ts` out of client components where possible: it pulls the whole programs JSON into the bundle. Pass counts down from a server page instead (see `app/intake/page.tsx`).
 
 ## 2. Request flow (live path)
 
 ```
-/intake  ConversationalForm ──writes──▶ sessionStorage.pdx_intake (IntakeData)
-                                       clears pdx_prebaked, pdx_demo_simulate
+/intake  app/intake/page.tsx (server) → ConversationalForm (client; steps.tsx, fields.tsx)
+         seeds from pdx_intake_draft ?? pdx_intake after mount (never during render: no hydration mismatch)
+         ──autosaves (debounced)──▶ sessionStorage.pdx_intake_draft (partial answers)
+         ──on submit──▶ sessionStorage.pdx_intake (IntakeData; rent fields dropped for non-renters)
+                        cancels pending autosave; clears pdx_intake_draft, pdx_prebaked, pdx_demo_simulate
    │ router.push
    ▼
-/results  app/results/page.tsx   decision order in the mount effect:
-   1. pdx_prebaked present?     → demo path (§3), never calls Claude
-   2. no pdx_intake?            → redirect /intake
+/results  app/results/page.tsx (dashboard) + useAnalysisLoader.ts (state machine), decision order:
+   1. pdx_prebaked present?     → demo path (§3), never calls Claude (readPrebaked validates with zod)
+   2. no valid pdx_intake?      → redirect /intake (readStoredIntake validates with zod)
    3. no apiKey (useApiKey)?    → state 'needs-key' (ApiKeyControl UI)
-   4. resultsCache hit?         → state 'ok' (hash(intake) == cached hash)
+   4. resultsCache hit?         → state 'ok' (hash(intake) == cached hash; hash is key-order independent)
    5. else analyzeEligibilityStream(apiKey, intake)
-         'progress' {programId} → progress bar, ids regex-sniffed from streamed JSON
+         'progress' {programId} → progress bar, yielded live as ids are regex-sniffed from the stream
          'complete' {output}    → cacheAnalysis + state 'ok'
          'error'    {message}   → state 'error'
    ▼
 dashboard: MoneyCounter · FilterChips · BenefitCard[] · ComparisonChart · NearMissSection ·
            UrgencyBanner · RenewalCalendar(.ics via lib/calendar) · LanguageToggle
-   ├ "Download packet"  POST /api/packet {intake, analysis} → PDF (lib/packet.tsx + QR codes)
-   └ LanguageToggle es/vi → translatePayload() (browser, same key) rewrites string values only
+           (rows derived by lib/results/derive.ts; status views in components/results/StatusViews)
+   ├ "Download packet"  POST /api/packet {intake, analysis} → zod-validated (400 on bad body) → PDF
+   └ LanguageToggle es/vi → useResultsTranslation → translatePayload() (browser, same key)
+                           → mergeTranslatedStrings: only string fields are taken from the translation
 ```
 
 `lib/claudeBrowser.ts::analyzeEligibilityStream` internals:
@@ -56,7 +80,9 @@ dashboard: MoneyCounter · FilterChips · BenefitCard[] · ComparisonChart · Ne
 messages.stream(model, system=[PROMPT w/ cache_control ephemeral], user=JSON(intake),
                 output_config=zodOutputFormat(AnalysisOutputSchema), max_tokens=64000)
 → parsed_output (structured) ?? parseAnalysis(JSON.parse(buffer))
-→ retry ONCE on stop_reason=max_tokens or parse/validation failure; API errors are NOT retried
+→ up to MAX_ATTEMPTS=2: retry on stop_reason=max_tokens, parse/validation failure, or server error
+  (5xx or mid-stream, no status). Client errors (status < 500: bad key, rate limit) are NOT retried.
+  Attempts share one seenIds set, so no program_id progress event is emitted twice.
 → deriveEligibility → assertConsistency (warn only) → recomputeTotals → yield complete
 ```
 
@@ -68,11 +94,13 @@ Post-processing contract (`lib/eligibility.ts`):
 ## 3. Demo path (no key)
 
 ```
-/demo/[scenario]  (maria|james|rose)
+/demo/[scenario]  server page, generateStaticParams over DEMO_SLUGS (maria|james|rose)
+   unknown slug → redirect('/intake')
+   passes ONLY the chosen fixture to components/demo/DemoLoader (client):
    sessionStorage.pdx_intake        ← lib/scenarios.ts (IntakeData fixture)
-   sessionStorage.pdx_prebaked      ← data/scenarios/<name>.json (AnalysisOutput fixture)
+   sessionStorage.pdx_prebaked      ← data/scenarios/<name>.json via lib/demoFixtures.ts
    sessionStorage.pdx_demo_simulate ← '1'   (results page fakes streaming progress, then clears)
-   router.replace('/results')
+   router.replace('/results')   (storage write failure → /intake)
 ```
 
 Fixtures go stale whenever the prompt, model, or programs change. Re-bake: `npm run bake` (needs `ANTHROPIC_API_KEY` in `.env.local`; runs `analyzeEligibilityStream` in Node).
@@ -82,12 +110,13 @@ Fixtures go stale whenever the prompt, model, or programs change. Re-bake: `npm 
 | key | store | shape | writer | reader |
 |---|---|---|---|---|
 | `pdx_anthropic_key` | localStorage | string | lib/userKey.tsx | `useApiKey()` everywhere |
-| `pdx_intake` | sessionStorage | IntakeData | ConversationalForm, demo route | results page, packet download |
-| `pdx_analysis` | sessionStorage | `{hash, output}` | lib/resultsCache.ts | results page |
-| `pdx_prebaked` | sessionStorage | AnalysisOutput | demo route | results page |
-| `pdx_demo_simulate` | sessionStorage | `'1'` | demo route | results page (clears after simulation) |
+| `pdx_intake` | sessionStorage | IntakeData | ConversationalForm (on submit), DemoLoader | useAnalysisLoader, packet download, ConversationalForm (seed fallback) |
+| `pdx_intake_draft` | sessionStorage | in-progress form values | ConversationalForm (debounced autosave; cleared on submit) | ConversationalForm only (seeds the form first; never starts an analysis) |
+| `pdx_analysis` | sessionStorage | `{hash, output}` | lib/resultsCache.ts | useAnalysisLoader |
+| `pdx_prebaked` | sessionStorage | AnalysisOutput | DemoLoader | useAnalysisLoader |
+| `pdx_demo_simulate` | sessionStorage | `'1'` | DemoLoader | useAnalysisLoader (clears after simulation) |
 
-Nothing else persists. No cookies, no server storage, no analytics on answers.
+All sessionStorage key names live in `SESSION_KEYS` (`lib/sessionState.ts`); never write the string literals. Stored values are untrusted: read them through the zod-validated readers there (or `readCachedAnalysis`). Nothing else persists. No cookies, no server storage, no analytics on answers.
 
 ## 5. Data pipeline
 
@@ -133,9 +162,12 @@ Run it after any prompt or model change. The scoreboard in `evals/REPORT.md` is 
 
 - `ELIGIBILITY_MODEL` is advertised in the README badge. `npm run sync:readme` syncs numeric claims; change model and badge together.
 - Adaptive thinking was tried and removed: multi-minute streams, no accuracy gain. Do not re-add without eval evidence.
-- Progress events come from regex-sniffing `"program_id"` in the partial stream, so progress order equals model output order, not program order.
-- Results page effect is guarded against React StrictMode double-invocation; `pdx_demo_simulate` is removed only after the fake stream finishes.
-- `translatePayload` returns a full re-parsed object; program ids and numbers must survive untouched. `LanguageToggle` keeps the English original and swaps views.
+- Progress events come from regex-sniffing `"program_id"` in the partial stream, so progress order equals model output order, not program order. Because progress is yielded from inside the stream loop, leaving the results page stops the analysis at the next streamed event (the loader returns from its `for await`, which closes the SDK stream).
+- The loader effect in `app/results/useAnalysisLoader.ts` is guarded against React StrictMode double-invocation; `pdx_demo_simulate` is removed only after the fake stream finishes.
+- `translatePayload` returns whatever the model sends back. Never store it directly: `mergeTranslatedStrings` starts from the English analysis and copies only string fields, so totals, `eligible`, estimates and program ids can't drift. `LanguageToggle` keeps the English original and swaps views.
+- `lib/fpl.ts` duplicates the 2026 FPL table in the system prompt (for the intake hint only). When the prompt's FPL year changes, update `FPL_2026` and `lib/__tests__/fpl.test.ts` with it.
+- `IntakeData` (`types/program.ts`) and `IntakeSchema` (`lib/intakeSchema.ts`) are kept in sync by a compile-time equality check; adding an intake field means editing both.
+- The `npm test` script lists test globs explicitly. A test in a new `__tests__` directory won't run until its glob is added to `package.json`.
 - ES/VI chrome strings are AI-generated at runtime via the same key. `lib/i18n.ts` only ships English.
 - CSP in `next.config.ts` limits `connect-src` to `'self'` and `https://api.anthropic.com`. A new external host is silently blocked in the browser until it is added there.
 - Tests run on Node's built-in runner (`node:test` + `node:assert/strict` via `tsx`), not Jest or Vitest. Client components cannot be imported in these tests; `scripts/__tests__/fixtures.test.ts` asserts the `SLUG_MAP` invariant as a contract check instead.
@@ -150,19 +182,21 @@ Run it after any prompt or model change. The scoreboard in `evals/REPORT.md` is 
 | eligibility rule or wording | `lib/eligibility.ts` (prompt) | `npm test`, `npm run eval`, `npm run bake` |
 | add/edit program | `data/programs.seed.json` | `npm run merge && npm run validate:data && npm run bake` |
 | output shape | `types/program.ts` + `lib/eligibilitySchema.ts` + prompt schema block | tests in `lib/__tests__` |
-| results UI | `app/results/page.tsx`, `components/results/*` | `/demo/maria` for keyless visual check |
-| intake question | `components/intake/ConversationalForm.tsx`, `IntakeData` type, `lib/scenarios.ts` | re-bake |
+| results UI | `app/results/page.tsx`, `components/results/*`; data shaping in `lib/results/derive.ts`; loading in `app/results/useAnalysisLoader.ts` | `/demo/maria` for keyless visual check |
+| intake question | `components/intake/steps.tsx` (+ `fields.tsx`), `IntakeData` type, `lib/intakeSchema.ts`, `lib/scenarios.ts`, matching eval persona in `scripts/eval/cases/` | `npm test` (drift checks), re-bake |
+| landing / about copy with numbers | `components/landing/content.ts`, `lib/hiddenGemHighlights.ts`; counts from `lib/programs.ts` | `npm test` (highlight drift test) |
 | PDF | `lib/packet.tsx` | POST `/api/packet` locally |
 | model | `ELIGIBILITY_MODEL` + README badge | eval + bake |
 
 ## 10. Size map (largest files, for context budgeting)
 
 ```
-app/results/page.tsx                  ~1200 lines   dashboard + state machine
-components/intake/ConversationalForm  ~1000         wizard, validation, sessionStorage writes
-app/page.tsx / app/about/page.tsx     ~850 / ~800   landing + about, mostly markup
+app/about/page.tsx                     ~700 lines   about, mostly markup
+app/results/page.tsx                   ~680         dashboard (state machine is useAnalysisLoader.ts)
 scripts/scrape-programs.ts             ~550         Firecrawl, not on the runtime path
-components/results/BenefitCard.tsx     ~500
+components/results/BenefitCard.tsx     ~490
+app/page.tsx                           ~460         landing (sections in components/landing/)
+components/intake/steps.tsx            ~450         the five intake steps (wizard shell is ConversationalForm, ~300)
 lib/packet.tsx                         ~360         react-pdf document
 ```
 
