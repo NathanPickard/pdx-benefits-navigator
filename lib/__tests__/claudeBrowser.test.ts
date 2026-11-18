@@ -2,7 +2,11 @@ import { test, afterEach } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import Anthropic from '@anthropic-ai/sdk';
-import { analyzeEligibilityStream, type AnalyzeStreamEvent } from '../claudeBrowser.js';
+import {
+  analyzeEligibilityStream,
+  translatePayload,
+  type AnalyzeStreamEvent,
+} from '../claudeBrowser.js';
 import { scenarios } from '../scenarios.js';
 import type { AnalysisOutput } from '../../types/program.js';
 
@@ -145,4 +149,33 @@ test('progress ids are not re-emitted across attempts', async () => {
 
   assert.equal(events.filter((e) => e.type === 'progress').length, 1);
   assert.equal(lastEvent(events).type, 'complete');
+});
+
+/** Replace messages.stream with a fake whose final message carries `text`. */
+function mockTranslationStream(stopReason: string, text: string): void {
+  Anthropic.Messages.prototype.stream = function fakeStream() {
+    return {
+      finalMessage: async () => ({
+        stop_reason: stopReason,
+        content: [{ type: 'text', text }],
+      }),
+    } as unknown as ReturnType<typeof originalStream>;
+  };
+}
+
+test('translatePayload returns the translated JSON object', async () => {
+  mockTranslationStream('end_turn', '{"greeting":"hola","total":42}');
+
+  const result = await translatePayload('test-key', { greeting: 'hello', total: 42 }, 'es');
+
+  assert.deepEqual(result, { greeting: 'hola', total: 42 });
+});
+
+test('translatePayload reports a cut-off translation in plain words', async () => {
+  mockTranslationStream('max_tokens', '{"greeting":"xin ch');
+
+  await assert.rejects(
+    translatePayload('test-key', { greeting: 'hello' }, 'vi'),
+    /translation was cut off/i,
+  );
 });

@@ -34,6 +34,13 @@ export type AnalyzeStreamEvent =
   | { type: 'complete'; output: AnalysisOutput }
   | { type: 'error'; message: string };
 
+/** Output cap for streamed requests (Sonnet 4.6's maximum). */
+const MAX_OUTPUT_TOKENS = 64000;
+
+/** Shown when a translation still ran past the output cap. */
+const TRANSLATION_TRUNCATED_MESSAGE =
+  'The translation was cut off before it finished. Please try again.';
+
 /** One initial attempt plus one retry on truncation, parse or server failure. */
 const MAX_ATTEMPTS = 2;
 
@@ -82,7 +89,7 @@ async function* runStreamAttempt(
     // NOTE: adaptive thinking was tried and removed — on this 20-program task it
     // pushed a streamed analysis past several minutes with no accuracy gain over
     // Sonnet 4.6's default reasoning (which Phase 0 already validated).
-    max_tokens: 64000,
+    max_tokens: MAX_OUTPUT_TOKENS,
     system: [
       {
         type: 'text',
@@ -195,16 +202,23 @@ export async function translatePayload<T>(
   targetLanguage: 'es' | 'vi'
 ): Promise<T> {
   const anthropic = makeClient(apiKey);
-  const response = await anthropic.messages.create({
+  // Streamed so the request can use the full output allowance: a non-streamed
+  // call had to cap at 16K tokens, which a Vietnamese translation of a large
+  // analysis overflows.
+  const response = await anthropic.messages.stream({
     model: ELIGIBILITY_MODEL,
-    max_tokens: 16000,
+    max_tokens: MAX_OUTPUT_TOKENS,
     messages: [
       {
         role: 'user',
         content: `Translate the human-readable STRING VALUES in this JSON to ${targetLanguage}. Keep all JSON keys, numbers, IDs (e.g. snake_case program_ids like "snap", "pdx-renter-relocation"), URLs, dates, and the object structure exactly as given. Do not translate proper-noun program names (SNAP, WIC, OHP, ERDC, LIHEAP, PCEF, ADVSD, SUN, PGE), but DO translate descriptive phrases. Return ONLY the translated JSON object — no markdown, no preamble, no trailing prose.\n\n${JSON.stringify(payload)}`,
       },
     ],
-  });
+  }).finalMessage();
+
+  if (response.stop_reason === 'max_tokens') {
+    throw new Error(TRANSLATION_TRUNCATED_MESSAGE);
+  }
 
   const text = response.content
     .filter((b): b is Anthropic.TextBlock => b.type === 'text')
