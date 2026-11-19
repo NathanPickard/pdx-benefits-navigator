@@ -181,8 +181,9 @@ An AI eligibility tool is only as trustworthy as its data, so the repo checks it
 - **Eligibility evals**: [`npm run eval`](scripts/eval/run-eval.ts) scores the live engine against 14 hand-derived households on program accuracy, dollar estimates, confidence, and reasoning. The latest run is committed at [`evals/REPORT.md`](evals/REPORT.md), failures included.
 - **Schema and invariant gate**: [`npm run validate:data`](scripts/validate-data.ts) validates the curated seed and the merged runtime data with Zod, and fails if a merge changes eligibility policy such as income limits or residency rules.
 - **Fixture regression tests**: each demo household's totals must add up, every match must point at a real program, and signature programs (Renter Relocation for María) must stay eligible.
-- **Script-maintained README numbers**: [`npm run sync:readme`](scripts/sync-readme-numbers.ts) rewrites the household table and María's comparison from the fixtures.
-- **CI on every pull request and push to main**: lint, typecheck, data validation, tests, and a production build ([workflow](.github/workflows/ci.yml)).
+- **Script-maintained README numbers**: [`npm run sync:readme`](scripts/sync-readme-numbers.ts) rewrites the household table and María's comparison from the fixtures. CI fails if they drift.
+- **Browser smoke tests**: [`npm run test:e2e`](e2e/smoke.spec.ts) drives a production build with Playwright, with no API key: each demo household shows its baked total with no console errors, the intake form advances, and the key dialog traps and returns focus.
+- **CI on every pull request and push to main**: lint, typecheck, data validation, tests, README drift check, production build, browser smoke tests, and an `npm audit` of production dependencies ([workflow](.github/workflows/ci.yml)). Dependabot opens weekly update PRs.
 
 What the eval caught, including bugs in the eval itself, is in the [engineering case study](CASE_STUDY.md#3-grading-the-ai-with-receipts).
 
@@ -237,10 +238,12 @@ npm run dev
 
 Then open [http://localhost:3000](http://localhost:3000). Click the **key icon** in the top right to paste your Anthropic API key, or go straight to a `/demo/*` route, which needs no key.
 
-The full verification chain, identical to CI:
+The full verification chain, matching CI:
 
 ```bash
 npm run lint && npm run typecheck && npm run validate:data && npm test && npm run build
+npx playwright install chromium   # once
+npm run test:e2e                  # browser smoke tests against the build
 ```
 
 ### Environment variables
