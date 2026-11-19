@@ -10,7 +10,8 @@ stack:    Next.js 16 App Router · React 19 · TS · Tailwind 4 · Base UI · zo
 runtime:  Vercel (Node), one server route. All AI calls run in the browser with the user's key.
 data:     24 programs in JSON, embedded whole into the system prompt. No DB. No vector store.
 model:    ELIGIBILITY_MODEL in lib/eligibility.ts (shared by runtime, bake, eval)
-verify:   npm run lint && npm run typecheck && npm run validate:data && npm test && npm run build   (== CI)
+verify:   npm run lint && npm run typecheck && npm run validate:data && npm test && npm run build && npm run test:e2e
+          (CI also fails on README drift from fixtures and on high/critical npm audit advisories in prod deps)
 ```
 
 ## 1. Layers

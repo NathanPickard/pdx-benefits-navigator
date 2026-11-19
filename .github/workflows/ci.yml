@@ -3,6 +3,9 @@ on:
   pull_request:
   push:
     branches: [main]
+# Read-only token for every job; none of them writes to the repo.
+permissions:
+  contents: read
 jobs:
   verify:
     runs-on: ubuntu-latest
@@ -17,4 +20,47 @@ jobs:
       - run: npm run typecheck
       - run: npm run validate:data
       - run: npm run test
+      - name: README persona numbers match the baked fixtures
+        run: |
+          npm run sync:readme
+          git diff --exit-code README.md || {
+            echo "::error file=README.md::README numbers are out of date. Run 'npm run sync:readme' and commit the result."
+            exit 1
+          }
       - run: npm run build
+
+  # Separate job so a newly published advisory shows up as its own red
+  # check, distinct from a broken build. Dev-only tooling is excluded:
+  # it never ships to users.
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm audit --omit=dev --audit-level=high
+
+  # Keyless browser smoke tests: demo personas, intake, key dialog.
+  e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run build
+      - run: npm run test:e2e
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-report
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 7
