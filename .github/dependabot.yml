@@ -7,6 +7,11 @@ updates:
       interval: weekly
       day: monday
     open-pull-requests-limit: 5
+    ignore:
+      # 4.9.0 pulls in @react-pdf/hyphenate 0.1.0, whose deep import
+      # './en-us' isn't in its "exports" map (ERR_PACKAGE_PATH_NOT_EXPORTED),
+      # breaking the /api/packet PDF route. Remove once upstream fixes it.
+      - dependency-name: '@react-pdf/renderer'
     groups:
       # One PR for all minor/patch bumps instead of one per package.
       minor-and-patch:
