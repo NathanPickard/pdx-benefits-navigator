@@ -6,7 +6,7 @@ A program's official range is its published minimum and maximum, widened to incl
 
 - **Published range only.** Rejected. It flags official SNAP and WIC amounts as violations, and a household's own SNAP estimate can sit above its likely range.
 - **Pick the schedule row matching the household.** Rejected. Schedule rows are labeled with free text ("Household of 3", "Pregnant, postpartum") that differs by program, so the matching would be fragile.
-- **Widen with any schedule.** Rejected. Some schedules are not benefit amounts: ERDC's holds monthly copays and the veterans property tax exemption's holds assessed values. Requiring overlap with the published range excludes them.
+- **Widen with any schedule.** Rejected. Some schedules are not benefit amounts: ERDC's holds monthly copays and the veterans property tax exemption's holds assessed values. Requiring overlap with the published range excludes them. ADR 0002 replaces this check with an explicit `kind` label on the schedule.
 
 ## Consequences
 

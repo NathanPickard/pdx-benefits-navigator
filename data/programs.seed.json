@@ -451,7 +451,7 @@
     "jurisdiction": "oregon",
     "hidden_gem": false,
     "urgency": "standard",
-    "description": "Disabled veterans and surviving spouses receive a property tax exemption on the assessed value of their home, currently $25,489 or $30,587 depending on disability rating.",
+    "description": "Disabled veterans and surviving spouses receive a property tax exemption on part of their home's assessed value; the exempt amount depends on disability status.",
     "legal_basis": "ORS 307.250",
     "estimated_annual_value": { "min": 200, "max": 600, "median": 300 },
     "eligibility": {

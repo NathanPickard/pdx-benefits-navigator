@@ -24,6 +24,23 @@ test('buildJudgePrompt includes the facts the judge needs', () => {
   assert.ok(p.includes('income_max_pct_fpl'));
 });
 
+test('buildJudgePrompt includes the benefit schedule the engine was given', () => {
+  // Without it, the judge fails ERDC reasoning for citing real copay rows.
+  const erdc = {
+    ...program,
+    id: 'erdc',
+    benefit_schedule: {
+      description: 'Monthly copay by family size',
+      unit: 'usd_monthly',
+      kind: 'copay',
+      amounts: [{ condition: 'Family of 3, income $3,415–$3,984.99', value: 10 }],
+    },
+  } as Program;
+  const p = buildJudgePrompt(intake, erdc, match);
+  assert.ok(p.includes('Family of 3, income $3,415–$3,984.99'));
+  assert.ok(p.includes('"kind": "copay"'));
+});
+
 test('buildJudgePrompt includes the official reference tables from the eligibility engine', () => {
   const p = buildJudgePrompt(intake, program, match);
   assert.ok(p.includes('OFFICIAL REFERENCE TABLES'));
