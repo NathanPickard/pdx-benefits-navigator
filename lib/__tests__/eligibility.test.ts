@@ -1,7 +1,8 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { deriveEligibility, recomputeTotals } from '../eligibility.js';
-import type { AnalysisOutput, MatchResult } from '../../types/program.js';
+import type { AnalysisOutput, MatchResult, Program } from '../../types/program.js';
+import programs from '../../data/programs.json';
 
 const mk = (over: Partial<MatchResult>): MatchResult => ({
   program_id: 'x',
@@ -184,8 +185,13 @@ test('deriveEligibility: eligible at $0 falls back to the published median', () 
   const out = deriveEligibility(
     wrap([mk({ program_id: 'erdc', estimated_annual_value: 0, requirements: allMet })]),
   );
+  // Derived, not hardcoded: a data refresh that moves ERDC's median must not
+  // fail this test.
+  const erdc = (programs as Program[]).find((p) => p.id === 'erdc');
+  assert.ok(erdc, 'erdc must exist in programs.json');
+  assert.ok(erdc.estimated_annual_value.min > 0, 'fixture assumes a range above $0');
   assert.equal(out.matches[0].eligible, true);
-  assert.equal(out.matches[0].estimated_annual_value, 12000);
+  assert.equal(out.matches[0].estimated_annual_value, erdc.estimated_annual_value.median);
 });
 
 test('deriveEligibility: keeps $0 when the published range starts at $0', () => {

@@ -132,13 +132,13 @@ ${JSON.stringify(programs, null, 2)}
   "matches": [
     {
       "program_id": string,
+      "eligible": boolean,
+      "confidence": "high" | "medium" | "low",
       "requirements": [
         { "key": "income"|"residency"|"citizenship"|"household"|"age"|"status"|"event"|"enrollment", "met": "yes"|"no"|"unknown", "detail": string }
       ],
-      "reasoning": string,
-      "eligible": boolean,
-      "confidence": "high" | "medium" | "low",
       "estimated_annual_value": number,
+      "reasoning": string,
       "next_steps": [string],
       "required_documents": [string],
       "application_deadline": string | null,
