@@ -41,7 +41,7 @@
       "program_id": "ohp",
       "eligible": true,
       "confidence": "high",
-      "estimated_annual_value": 8000,
+      "estimated_annual_value": 6000,
       "reasoning": "Oregon Health Plan covers adults at 138% FPL and children at 305% FPL. For a household of 4, 138% FPL = $45,540. The household income is $48,000 which is slightly above 138% FPL for adults, so the adults may not qualify under OHP unless they are on the OHP Plus Bridge (200% FPL). However, children in the household are eligible at 305% FPL. 305% FPL for a family of 4 = ~$100,650 — both children (ages 5 and 8) qualify. For adults, 200% FPL for a 4-person household = $66,000; the program states income_max_pct_fpl=200 overall. Adults may qualify through CHIP/OHP Plus. Using the program's stated limit of 200% FPL, $48,000 is well under $66,000. Eligible for the whole household.",
       "requirements": [
         {
@@ -802,8 +802,8 @@
       "urgency_note": null
     }
   ],
-  "total_estimated_annual_value": 45764,
-  "federal_only_value": 23200,
+  "total_estimated_annual_value": 43764,
+  "federal_only_value": 21200,
   "pdx_specific_value": 22564,
   "priority_application_order": [
     "pdx-renter-relocation",

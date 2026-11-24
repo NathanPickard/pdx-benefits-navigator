@@ -1,27 +1,34 @@
 import programs from '@/data/programs.json';
 import type { AnalysisOutput, Program } from '@/types/program';
+import { officialRange } from './benefitSchedule';
 
 const JURISDICTION_BY_ID: Record<string, Program['jurisdiction']> =
   Object.fromEntries(
     (programs as Program[]).map((p) => [p.id, p.jurisdiction]),
   );
 
-const PUBLISHED_VALUE_BY_ID: Record<string, Program['estimated_annual_value']> =
-  Object.fromEntries(
-    (programs as Program[]).map((p) => [p.id, p.estimated_annual_value]),
-  );
+const PROGRAM_BY_ID: Record<string, Program> = Object.fromEntries(
+  (programs as Program[]).map((p) => [p.id, p]),
+);
 
 /**
- * The model sometimes reports $0 for a program it judged eligible (seen with
- * ERDC, whose copay table includes $0 rows, and Double Up Food Bucks). When the
- * published range starts above $0, $0 cannot be right, so fall back to the
- * published median: still grounded in programs.json (hard rule #2).
+ * Keep an eligible match's estimate inside its program's official range
+ * (hard rule #2: every dollar figure comes from programs.json).
+ * - $0 or below: the model sometimes reports $0 for a program it judged
+ *   eligible (seen with ERDC, whose copay table has $0 rows, and Double Up Food
+ *   Bucks). If the published range starts above $0, use the published median;
+ *   otherwise $0 is a legitimate estimate.
+ * - Otherwise: clamp into officialRange, the published range widened by any
+ *   benefit-kind schedule (seen with OHP at $8,000–$16,000 against $3,000–$6,000).
+ * Unknown program ids pass through unchanged.
  */
 function groundedValue(programId: string, modelValue: number): number {
-  if (modelValue > 0) return modelValue;
-  const published = PUBLISHED_VALUE_BY_ID[programId];
-  if (!published || published.min <= 0) return modelValue;
-  return published.median;
+  const program = PROGRAM_BY_ID[programId];
+  if (!program) return modelValue;
+  const published = program.estimated_annual_value;
+  if (modelValue <= 0) return published.min > 0 ? published.median : 0;
+  const [min, max] = officialRange(program);
+  return Math.min(Math.max(modelValue, min), max);
 }
 
 export const ELIGIBILITY_MODEL = 'claude-sonnet-4-6';
@@ -163,8 +170,8 @@ const INELIGIBILITY_MARKERS =
  * Derive each match's `eligible` from its requirements (the auditable source
  * of truth). A program is eligible unless a requirement is definitively unmet
  * (met === 'no'); 'unknown' requirements do not exclude — they lower confidence.
- * An eligible match at $0 gets its program's published median when the
- * published range starts above $0 (see groundedValue).
+ * An eligible match's estimate is kept inside its program's official range
+ * (see groundedValue).
  * Matches without a requirements array (e.g. pre-rebake fixtures) are left as-is,
  * trusting the model's own `eligible`.
  */
@@ -172,12 +179,14 @@ export function deriveEligibility(output: AnalysisOutput): AnalysisOutput {
   const matches = output.matches.map((m) => {
     if (!m.requirements || m.requirements.length === 0) return m;
     const eligible = m.requirements.every((r) => r.met !== 'no');
+    if (!eligible) return { ...m, eligible, estimated_annual_value: 0 };
+    const grounded = groundedValue(m.program_id, m.estimated_annual_value);
+    if (grounded === m.estimated_annual_value) return { ...m, eligible };
     return {
       ...m,
       eligible,
-      estimated_annual_value: eligible
-        ? groundedValue(m.program_id, m.estimated_annual_value)
-        : 0,
+      estimated_annual_value: grounded,
+      adjusted_from: m.estimated_annual_value,
     };
   });
   return { ...output, matches };

@@ -70,8 +70,11 @@ export function scoreDollars(
     if (!program) continue;
     const [min, max] = valueOverrides?.[m.program_id] ?? officialRange(program);
     checked++;
-    if (m.estimated_annual_value < min || m.estimated_annual_value > max) {
-      violations.push({ program_id: m.program_id, value: m.estimated_annual_value, min, max });
+    // Score the model's own estimate: deriveEligibility clamps the reported
+    // value into the official range and keeps the original in adjusted_from.
+    const value = m.adjusted_from ?? m.estimated_annual_value;
+    if (value < min || value > max) {
+      violations.push({ program_id: m.program_id, value, min, max });
     }
   }
 

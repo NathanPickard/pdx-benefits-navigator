@@ -197,3 +197,10 @@ test('scoreConfidence: no declarations means vacuous pass', () => {
   assert.equal(s.checked, 0);
   assert.equal(s.agreementRate, 1);
 });
+
+test('scoreDollars: scores the model value in adjusted_from, not the clamped value', () => {
+  const out = output([{ program_id: 'a', estimated_annual_value: 1000, adjusted_from: 5000 }]);
+  const score = scoreDollars(out, PROGRAMS);
+  assert.equal(score.inRangeRate, 0);
+  assert.deepEqual(score.violations, [{ program_id: 'a', value: 5000, min: 100, max: 1000 }]);
+});

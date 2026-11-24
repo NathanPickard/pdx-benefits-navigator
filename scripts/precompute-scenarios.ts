@@ -19,6 +19,7 @@ import { join } from 'node:path';
 import { scenarios } from '../lib/scenarios';
 import { formatUsd } from '../lib/estimate';
 import type { AnalysisOutput } from '../types/program';
+import { parseAnalysis } from '../lib/eligibilitySchema';
 import { collectAnalysis } from './lib/collectAnalysis';
 import { loadDotEnvLocal } from './lib/env';
 
@@ -53,7 +54,9 @@ async function runOne(
   );
 
   const path = join(OUT_DIR, `${slug}.json`);
-  await writeFile(path, JSON.stringify(output, null, 2) + '\n', 'utf8');
+  // Save the validated form: it drops code-only fields such as adjusted_from,
+  // so a fixture equals what readPrebaked returns for it.
+  await writeFile(path, JSON.stringify(parseAnalysis(output), null, 2) + '\n', 'utf8');
   console.log(`  wrote ${path}`);
 }
 

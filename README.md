@@ -75,8 +75,8 @@ To see it working without a key, open [María's demo](https://pdx-benefits-navig
 National benefit screeners check federal programs, and some add state programs. They skip the county and city programs where Portland invests its own money, such as Renter Relocation Assistance ($2,900–$4,500 after a rent increase of 10% or more) and the Water Bureau's bill discount. For the three demo households, those local programs add about $8,600 to $19,800 a year.
 
 <!-- README:HOOK:START -->
-> Federal and Oregon programs alone come to **$23,200/yr** for María's family.
-> Adding Multnomah County and City of Portland programs brings the estimate to **$45,764/yr**: **$22,564 more** that federal-and-state screeners don't check.
+> Federal and Oregon programs alone come to **$21,200/yr** for María's family.
+> Adding Multnomah County and City of Portland programs brings the estimate to **$43,764/yr**: **$22,564 more** that federal-and-state screeners don't check.
 <!-- README:HOOK:END -->
 
 ## What it does
@@ -110,7 +110,7 @@ Each household was run through the same engine and model as production, and the 
 <!-- README:TABLE:START -->
 | Family | Situation | Federal & state programs | PDX Benefits Navigator (full local layer) |
 |---|---|---|---|
-| **María & family** | Household of 4 with 2 kids, part-time at Fred Meyer, renter in Cully, Spanish-speaking, 12% rent increase | $23,200/yr | **$45,764/yr** across 14 programs |
+| **María & family** | Household of 4 with 2 kids, part-time at Fred Meyer, renter in Cully, Spanish-speaking, 12% rent increase | $21,200/yr | **$43,764/yr** across 14 programs |
 | **James** | Single, disabled veteran, unemployed, owns home in St. Johns | $13,667/yr | **$22,431/yr** across 14 programs |
 | **Rose** | Senior widow, Social Security only, owns home in Lents, Vietnamese-speaking | $13,367/yr | **$21,987/yr** across 13 programs |
 <!-- README:TABLE:END -->
