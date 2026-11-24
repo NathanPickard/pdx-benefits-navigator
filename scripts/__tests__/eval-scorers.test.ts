@@ -1,8 +1,12 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { scoreProgramSet, scoreDollars, scoreConfidence } from '../eval/scorers';
-import type { ScheduleUnit } from '../eval/scorers';
-import type { AnalysisOutput, Program } from '../../types/program';
+import type {
+  AnalysisOutput,
+  BenefitSchedule,
+  BenefitScheduleKind,
+  Program,
+} from '../../types/program';
 import programs from '../../data/programs.json';
 
 // Minimal synthetic programs — only the fields scorers read.
@@ -88,12 +92,18 @@ test('scoreDollars: valueOverrides tighten the accepted range', () => {
   assert.equal(s.violations[0].max, 600);
 });
 
-function withSchedule(program: Program, unit: ScheduleUnit, values: number[]): Program {
+function withSchedule(
+  program: Program,
+  unit: BenefitSchedule['unit'],
+  values: number[],
+  kind?: BenefitScheduleKind,
+): Program {
   return {
     ...program,
     benefit_schedule: {
       description: 'test schedule',
       unit,
+      ...(kind ? { kind } : {}),
       amounts: values.map((value, i) => ({ condition: `row ${i}`, value })),
     },
   };
@@ -107,9 +117,9 @@ test('scoreDollars: an annualized schedule row above the coarse range is accepte
   assert.deepEqual(s.violations, []);
 });
 
-test('scoreDollars: a schedule that never overlaps the range is ignored', () => {
+test('scoreDollars: a copay schedule does not widen the range', () => {
   // ERDC-shaped: the schedule is a monthly copay table, not the benefit value.
-  const erdc = withSchedule(prog('erdc', false, 8000, 18000), 'usd_monthly', [0, 5, 130]);
+  const erdc = withSchedule(prog('erdc', false, 8000, 18000), 'usd_monthly', [0, 5, 130], 'copay');
   const out = output([{ program_id: 'erdc', estimated_annual_value: 0 }]);
   const s = scoreDollars(out, [erdc]);
   assert.equal(s.violations.length, 1);
@@ -153,7 +163,7 @@ test('scoreDollars: valueOverrides still win over a schedule', () => {
   assert.equal(s.violations.length, 1);
 });
 
-test('scoreDollars: real programs.json — SNAP/WIC schedule rows pass, ERDC copays and veterans assessed values do not', () => {
+test('scoreDollars: real programs.json — SNAP/WIC schedule rows pass, ERDC copays and veterans assessed values do not widen', () => {
   const all = programs as unknown as Program[];
   // Derived, not hardcoded: WIC amounts change each fiscal year.
   const wicRows = all.find((p) => p.id === 'wic')?.benefit_schedule?.amounts ?? [];

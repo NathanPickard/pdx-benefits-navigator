@@ -2,37 +2,36 @@
   "matches": [
     {
       "program_id": "snap",
-      "eligible": true,
+      "eligible": false,
       "confidence": "high",
-      "estimated_annual_value": 11928,
-      "reasoning": "Household of 4 with annual income $48,000. SNAP income limit at 130% FPL for household of 4 is $42,900/year ($3,575/month × 12). Wait — $48,000 exceeds 130% FPL ($33,000 × 1.30 = $42,900). However, SNAP uses gross monthly income vs the 130% FPL limit, and also allows net income deductions (earned income deduction of 20%, standard deduction, shelter deduction, dependent care). With $48,000 gross annual = $4,000/month, the 130% FPL limit for HH of 4 is $3,575/month. Gross income exceeds the gross limit. However, SNAP also applies a net income test at 100% FPL ($2,750/month for HH of 4). With the 20% earned income deduction: $4,000 × 0.80 = $3,200, plus standard deduction ~$198, net = ~$3,002 before shelter deductions. Net income still exceeds 100% FPL. BUT Oregon has a categorical eligibility expansion — broad-based categorical eligibility (BBCE) raises the gross income limit to 185% FPL ($5,088/month for HH of 4) for households receiving a TANF-funded service (which Oregon uses). Under Oregon BBCE, the gross income limit is 185% FPL = $60,945/year for HH of 4. $48,000 < $60,945, so the household qualifies under BBCE. Benefit amount: using the SNAP benefit schedule for HH of 4 max allotment of $994/month, but actual benefit is reduced by net income. With earned income deductions applied, estimated benefit is moderate — using median estimate scaled to HH of 4 at this income level, approximately $994/month max minus ~$3,000/mo net × 30% = ~$994 - $900 = ~$94-$200/month. Conservative estimate ~$150/month × 12 = ~$1,800/year. Actually, let me reconsider: with $4,000/month gross, 20% EI deduction = $800, net earned = $3,200; standard deduction $198 = $3,002; shelter deduction assume $1,200 rent - 50% of $3,002 = $1,501 threshold, excess = $0 (rent $1,200 < $1,501). So shelter deduction may be $0. Net income ~$3,002. That exceeds 100% FPL ($2,750) so under standard SNAP rules this household would fail net income test. Under BBCE Oregon, the net income test is waived for households with gross income under 185% FPL. So benefit = $994 - ($3,002 × 0.30) = $994 - $900 = $94/month. Annual: $94 × 12 = $1,128. Using ~$1,200/year as conservative estimate.",
+      "estimated_annual_value": 0,
+      "reasoning": "Household of 4 with annual income of $48,000. The SNAP gross income limit at 130% FPL for a household of 4 is $42,900/year ($3,575/month). However, SNAP uses NET income after deductions (standard deduction, earned income deduction of 20%, shelter deduction, etc.). The gross income test at 130% FPL is $42,900 for a household of 4. At $48,000 gross, this household exceeds the gross income limit. Wait — let me re-check: 130% FPL for household of 4 = $33,000 × 1.30 = $42,900. $48,000 > $42,900, so the household FAILS the gross income test. However, households with an elderly or disabled member are exempt from the gross income test. This household has no elderly/disabled member, so they must pass both gross and net tests. At $48,000/year the household exceeds 130% FPL ($42,900) for a family of 4. Therefore they are likely ineligible for SNAP. Setting eligible=false.",
       "requirements": [
         {
           "key": "income",
-          "met": "yes",
-          "detail": "Annual income $48,000 ($4,000/month) is below Oregon's BBCE gross income limit of 185% FPL for household of 4 ($60,945/year). Standard 130% gross limit ($42,900) would be exceeded, but Oregon broad-based categorical eligibility applies."
+          "met": "no",
+          "detail": "Household income of $48,000/year exceeds the 130% FPL limit of $42,900/year for a household of 4 ($33,000 × 1.30)."
         },
         {
           "key": "residency",
           "met": "yes",
-          "detail": "ZIP 97218 (Cully neighborhood) is within Portland, Oregon — residency requirement met."
+          "detail": "ZIP 97218 is in Portland, Oregon — Oregon residency confirmed."
         },
         {
           "key": "citizenship",
           "met": "yes",
-          "detail": "LPR status meets the citizenship requirement for SNAP (LPR or citizen required)."
+          "detail": "LPR status satisfies the citizenship requirement (LPR or citizen required)."
         }
       ],
       "next_steps": [
-        "Visit oregon.gov/odhs/food to start your online SNAP application in Spanish (select 'Español')",
-        "Call 211 for help with the application or to find a local ODHS office",
-        "Gather your last 30 days of pay stubs and proof of housing costs before applying",
-        "Ask the caseworker about expedited SNAP benefits — if approved, benefits can arrive within 7 days"
+        "Call 211 to speak with an ODHS benefits counselor — net income after deductions may bring you under the threshold.",
+        "Visit oregon.gov/odhs/food to use the online prescreening tool with your actual deductions.",
+        "Ask about expedited SNAP if your situation changes (e.g., income drops or you lose a job)."
       ],
       "required_documents": [
         "Photo ID",
-        "Pay stubs from last 30 days",
-        "Proof of housing costs (lease or utility bills)",
+        "Proof of income (last 30 days pay stubs)",
+        "Proof of housing/rent costs",
         "Social Security numbers for all household members"
       ],
       "application_deadline": null,
@@ -42,161 +41,154 @@
       "program_id": "ohp",
       "eligible": true,
       "confidence": "high",
-      "estimated_annual_value": 16000,
-      "reasoning": "Household of 4, annual income $48,000. OHP for adults covers up to 138% FPL ($45,540 for HH of 4). At $48,000 the adults may be slightly over 138% FPL. However, children qualify up to 305% FPL ($100,650 for HH of 4) — both children ages 5 and 8 clearly qualify. For adults: 138% FPL for HH of 4 = $33,000 × 1.38 = $45,540. $48,000 slightly exceeds this, but OHP uses MAGI household income and the children's household may be counted differently. The adults may qualify for COFA or OHP Coverage for All (Oregon Healthier Oregon includes LPR). Likely children definitely qualify; adults marginal. Marking eligible=true at medium confidence due to adult income borderline. Both children (ages 5 and 8) qualify for CHIP/OHP at 305% FPL with certainty. Estimated value: 2 children at $3,000/year each = $6,000 + adults potentially $5,000 each = $16,000 total household.",
+      "estimated_annual_value": 8000,
+      "reasoning": "Oregon Health Plan covers adults at 138% FPL and children at 305% FPL. For a household of 4, 138% FPL = $45,540. The household income is $48,000 which is slightly above 138% FPL for adults, so the adults may not qualify under OHP unless they are on the OHP Plus Bridge (200% FPL). However, children in the household are eligible at 305% FPL. 305% FPL for a family of 4 = ~$100,650 — both children (ages 5 and 8) qualify. For adults, 200% FPL for a 4-person household = $66,000; the program states income_max_pct_fpl=200 overall. Adults may qualify through CHIP/OHP Plus. Using the program's stated limit of 200% FPL, $48,000 is well under $66,000. Eligible for the whole household.",
       "requirements": [
         {
           "key": "income",
           "met": "yes",
-          "detail": "Children (ages 5 and 8) qualify at 305% FPL limit ($100,650 for HH of 4); adults at $48,000 are slightly above 138% FPL adult limit ($45,540 for HH of 4) — adult coverage uncertain, children's coverage confirmed."
+          "detail": "Household income $48,000 is under 200% FPL ($66,000) for a household of 4; children qualify at up to 305% FPL, adults at 138%–200% FPL depending on program tier."
         },
         {
           "key": "residency",
           "met": "yes",
-          "detail": "Oregon resident (ZIP 97218, Portland) — residency requirement met."
+          "detail": "ZIP 97218 is in Oregon — residency confirmed."
         },
         {
           "key": "citizenship",
           "met": "yes",
-          "detail": "LPR status qualifies for OHP under Oregon's Healthier Oregon program, which covers all immigration statuses."
+          "detail": "LPR status is accepted; OHP is available to all Oregon residents regardless of immigration status under Healthier Oregon."
         }
       ],
       "next_steps": [
-        "Apply at oregon.gov/oha/hsd/ohp or call 1-800-273-0557 to apply in Spanish",
-        "Apply for the children first — they qualify clearly at 305% FPL",
-        "Ask the OHP worker to screen both adults for all available coverage categories including Healthier Oregon",
-        "Renew every two years once enrolled"
+        "Apply online at oregon.gov/oha/hsd/ohp/pages/eligibility.aspx",
+        "Gather proof of income and Oregon residency before starting the application.",
+        "Call 1-800-273-0557 for help in Spanish (ask for español).",
+        "Renew every two years once enrolled."
       ],
       "required_documents": [
-        "Photo ID for all adults",
-        "Proof of income (pay stubs)",
+        "Photo ID",
+        "Proof of income",
         "Proof of Oregon residency",
-        "Social Security numbers or immigration documents"
+        "Social Security numbers (or immigration documents)"
       ],
       "application_deadline": null,
-      "urgency_note": "Children ages 5 and 8 qualify with high confidence. Apply immediately to ensure continuous coverage."
+      "urgency_note": null
     },
     {
       "program_id": "pdx-renter-relocation",
       "eligible": true,
       "confidence": "high",
       "estimated_annual_value": 4200,
-      "reasoning": "The household is renting in Portland (ZIP 97218) and has received a 12% rent increase in the past 12 months, which exceeds the 10% trigger threshold under Portland City Code 30.01.085. This is a one-time payment — assuming a 2-bedroom unit for a family of 4, the relocation assistance amount is $4,200. The tenant must demand payment in writing within 45 days of the triggering notice. The landlord must own 2+ rental units in Portland (assumed; needs verification).",
+      "reasoning": "This household has experienced a 12% rent increase in the past 12 months, which exceeds the 10% threshold that triggers Portland's Mandatory Renter Relocation Assistance. ZIP 97218 is within Portland city limits (Cully/airport area neighborhood). The household rents. The landlord must own 2+ rental units in Portland (unknown but assumed standard). Based on a likely 2-bedroom unit for a family of 4, the relocation assistance amount is $4,200 (one-time payment). The tenant must demand payment in writing within 45 days of the triggering rent increase notice. This is a significant, time-sensitive right the family should be aware of immediately.",
       "requirements": [
         {
           "key": "residency",
           "met": "yes",
-          "detail": "ZIP 97218 is within Portland city limits (Cully/Airport Way neighborhood) — Portland jurisdiction confirmed."
+          "detail": "ZIP 97218 is within Portland city limits — program requirement met."
         },
         {
           "key": "status",
           "met": "yes",
-          "detail": "Household is a renter — required housing status met."
+          "detail": "Household is a renter, as required by this program."
         },
         {
           "key": "event",
           "met": "yes",
-          "detail": "Rent increase of 12% in the past 12 months exceeds the 10% threshold triggering relocation assistance eligibility."
+          "detail": "Reported 12% rent increase exceeds the 10% threshold in a 12-month period that triggers relocation assistance eligibility."
         }
       ],
       "next_steps": [
-        "Send a written demand letter to your landlord within 45 days of the rent increase notice — this is required to claim the payment",
-        "Call the Portland Rental Services Helpdesk at 503-823-1303 for a template letter in Spanish",
-        "Gather your rent increase notice and current lease agreement",
-        "If landlord does not pay within 45 days of your demand, contact the Rental Services Office about enforcement options"
+        "Send a written demand letter to your landlord immediately — you have 45 days from the rent increase notice to demand payment.",
+        "Call the Portland Rental Services Helpdesk at 503-823-1303 for guidance and template letters (Spanish-language assistance available).",
+        "Document the rent increase notice and keep a copy of your lease agreement.",
+        "Visit portland.gov/phb/rental-services/mandatory-renter-relocation-assistance for official information."
       ],
       "required_documents": [
-        "Current lease agreement",
-        "Written rent increase notice showing the 12% increase",
-        "Written demand letter sent to landlord"
+        "Lease agreement",
+        "Rent increase notice from landlord",
+        "Written demand letter to landlord"
       ],
-      "application_deadline": "45 days from the date of the rent increase notice to submit written demand to landlord",
-      "urgency_note": "URGENT: You must send a written demand to your landlord within 45 days of the rent increase notice or you forfeit this right. A $4,200 one-time payment (estimated for 2BR unit) is at stake."
+      "application_deadline": "45 days from date of rent increase notice",
+      "urgency_note": "URGENT: You have only 45 days from the rent increase notice to send a written demand to your landlord. Missing this deadline forfeits your right to relocation assistance."
     },
     {
       "program_id": "erdc",
       "eligible": true,
       "confidence": "high",
-      "estimated_annual_value": 0,
-      "reasoning": "ERDC requires children under age 13. The household has children ages 5 and 8, both under 13 — household composition requirement is met. Employment is partially met (employed part-time). Income limit to newly qualify is 200% FPL for HH of 4 = $66,000. $48,000 < $66,000, so income is met. However, ERDC requires employment and that the parent is working — part-time employment qualifies. Actually all requirements appear met: children under 13, employed, Oregon resident, income under 200% FPL. Re-evaluating: eligible=true.",
+      "estimated_annual_value": 12000,
+      "reasoning": "ERDC requires children under age 13. The children in this household are ages 5 and 8, so both qualify on age. Income limit for new applicants is 200% FPL = $66,000 for a household of 4 — $48,000 qualifies. However, ERDC requires employment AND the applicant is employed part-time, which may qualify. The key disqualifier: the children are ages 5 and 8 — age 5 qualifies (under 13), age 8 qualifies (under 13). Actually both children DO meet the age requirement. Re-evaluating: the household appears eligible for ERDC. The 5-year-old and 8-year-old both qualify (under 13). Part-time employment counts. Income $48,000 is under $66,000 (200% FPL for 4-person household). Setting eligible=true with medium confidence due to potential waitlist.",
       "requirements": [
         {
           "key": "income",
           "met": "yes",
-          "detail": "Annual income $48,000 is below the 200% FPL limit for household of 4 ($66,000) for new ERDC applicants."
+          "detail": "Household income $48,000 is under the 200% FPL new-applicant limit of $66,000 for a household of 4."
         },
         {
           "key": "household",
           "met": "yes",
-          "detail": "Household has children ages 5 and 8, both under the age-13 requirement for ERDC eligibility."
+          "detail": "Two children ages 5 and 8 — both are under 13 and qualify for ERDC child care subsidy."
         },
         {
           "key": "residency",
           "met": "yes",
-          "detail": "Oregon resident (ZIP 97218, Portland) — residency requirement met."
+          "detail": "Residing in Oregon (ZIP 97218, Portland) — residency requirement met."
         },
         {
           "key": "status",
           "met": "yes",
-          "detail": "Part-time employment satisfies the employment requirement for ERDC."
+          "detail": "Employed part-time satisfies the employment requirement for ERDC."
         }
       ],
       "next_steps": [
-        "Apply at oregon.gov/delc/programs/pages/erdc.aspx or call 800-699-9075",
-        "Ask about current waitlist status — ERDC may have a waitlist due to limited funding",
-        "Gather pay stubs from the last 30 days and childcare provider information",
-        "Request a Spanish-language application or interpreter when calling"
+        "Apply online at oregon.gov/delc/programs/pages/erdc.aspx",
+        "Call the ERDC line at 800-699-9075 to check current waitlist status before applying.",
+        "Gather pay stubs from the last 30 days and have child care provider information ready.",
+        "Ask about priority enrollment if you are receiving TANF or Child Welfare services."
       ],
       "required_documents": [
         "Pay stubs or proof of income (last 30 days)",
-        "Proof of Oregon residency",
+        "Photo ID",
         "Children's birth certificates",
-        "Childcare provider name and license number"
+        "Child care provider information"
       ],
       "application_deadline": null,
-      "urgency_note": "Note: ERDC may have an active waitlist. Apply as soon as possible to get on the list."
+      "urgency_note": "ERDC may have an active waitlist — apply as soon as possible to secure your place."
     },
     {
       "program_id": "oregon-eitc",
-      "eligible": true,
+      "eligible": false,
       "confidence": "medium",
-      "estimated_annual_value": 1800,
-      "reasoning": "Household has earned income (employed part-time), two children ages 5 and 8, annual income $48,000. Oregon EITC is 9% (or 12% with a dependent under 3) of federal EITC. However, the program's income_max_annual is listed as $30,000 — at $48,000 the household exceeds this threshold for Oregon EIC. But note: Oregon EITC eligibility tracks federal EITC eligibility; the $30,000 figure is a conservative approximation. Federal EITC income limits for 2 children filing MFJ can be up to ~$53,000 (2025 thresholds). At $48,000 with part-time employment, it depends on whether this is a single filer or married. If a single parent with 2 children, federal EITC phase-out limit is ~$48,108 (2025 for single/HoH with 2 children). At exactly $48,000 the household would be at the very edge of eligibility. Oregon Kids Credit ($1,000 per child ages 0-5) applies to the 5-year-old for the current tax year — that child is age 5 which may or may not be under 6 depending on birth date. Marking medium confidence due to income borderline and single vs. married status unknown.",
+      "estimated_annual_value": 0,
+      "reasoning": "Oregon EITC requires Oregon earned income and filing an Oregon state tax return. The income_max_annual listed is $30,000 as a coarse filter. This household earns $48,000, which exceeds the $30,000 threshold listed in the program. However, the actual federal EITC income limits for 2025 (tax year) with 2 qualifying children are higher (~$53,000+ depending on filing status). The program's listed $30,000 is a conservative estimate. With part-time employment and 2 children, this household may still qualify for a reduced federal EITC and therefore the Oregon EITC. Marking as ineligible based on the program's stated $30,000 ceiling, but noting this is worth verifying with a tax preparer.",
       "requirements": [
         {
           "key": "income",
-          "met": "unknown",
-          "detail": "Stated income $48,000 is near the EITC phase-out threshold (~$48,000-$53,000 depending on filing status); exact eligibility depends on filing status (single/MFJ) and split between the two employed adults."
+          "met": "no",
+          "detail": "Household annual income of $48,000 exceeds the program's $30,000 income ceiling listed for Oregon EITC eligibility."
         },
         {
           "key": "residency",
           "met": "yes",
-          "detail": "Oregon resident — must file Oregon state tax return."
+          "detail": "Oregon resident (ZIP 97218, Portland) — must file Oregon state tax return, which applies."
         },
         {
           "key": "status",
           "met": "yes",
-          "detail": "Part-time employment generates earned income, satisfying the employment requirement."
-        },
-        {
-          "key": "household",
-          "met": "yes",
-          "detail": "Two dependent children ages 5 and 8 meet the qualifying child requirement for EITC."
+          "detail": "Employed part-time — earned income exists, satisfying the employment requirement."
         }
       ],
       "next_steps": [
-        "File an Oregon state tax return even if federal refund is small — the Oregon Kids Credit for the 5-year-old child may be worth up to $1,000",
-        "Call Oregon Department of Revenue at 800-356-4222 to ask about EITC eligibility in Spanish",
-        "Visit a free VITA (Volunteer Income Tax Assistance) site in Portland for free tax preparation — call 211 to find the nearest site",
-        "Gather W-2s, 1099s, and Social Security cards for all household members before filing"
+        "Consult a free tax preparer (VITA/TCE sites — call 211) to confirm actual federal EITC eligibility based on exact earned income, filing status, and 2 qualifying children.",
+        "If federal EITC is owed, the Oregon credit is 9%–12% of the federal credit — file Oregon Form OR-40.",
+        "Visit oregon.gov/dor/programs/individuals/pages/credits.aspx for details."
       ],
       "required_documents": [
-        "W-2s or 1099s for all earners",
+        "W-2s or 1099s",
         "Social Security cards for all household members",
-        "Children's birth certificates",
-        "Prior year tax return if available"
+        "Children's birth certificates"
       ],
-      "application_deadline": "April 15 annual tax filing deadline (Oregon follows federal)",
+      "application_deadline": "Oregon state tax return due date (typically April 15)",
       "urgency_note": null
     },
     {
@@ -204,28 +196,27 @@
       "eligible": true,
       "confidence": "high",
       "estimated_annual_value": 600,
-      "reasoning": "Household of 4, annual income $48,000. PGE IQBD uses 60% of Oregon State Median Income (SMI). At 60% SMI for household of 4, the limit is $73,816/year. $48,000 is well below this limit. The household is in Portland (ZIP 97218) which is in PGE service territory. Discount tier: at $48,000 the household falls in a mid-range SMI band, likely qualifying for a 15-50% discount. Using median estimate of $600/year (mid-range discount on typical PGE bill).",
+      "reasoning": "PGE's Income-Qualified Bill Discount uses 60% Oregon SMI as the income ceiling. For a household of 4, 60% SMI = $73,816/year. Household income of $48,000 is well under this threshold. If this household is a PGE customer (likely given Portland ZIP 97218), they qualify for a discount of 15%–80% on their energy use. At $48,000, they fall in the mid-to-lower tier. Using median estimated value of $600/year as the program estimate.",
       "requirements": [
         {
           "key": "income",
           "met": "yes",
-          "detail": "Annual income $48,000 is below the 60% SMI limit of $73,816 for a household of 4 — well within eligibility."
+          "detail": "Household income $48,000 is under the 60% Oregon SMI limit of $73,816 for a household of 4."
         },
         {
           "key": "status",
           "met": "unknown",
-          "detail": "Must be a PGE electric customer and account holder. Assumed likely for Portland ZIP 97218 but not confirmed in intake data."
+          "detail": "Must be a PGE customer — not confirmed in intake data."
         }
       ],
       "next_steps": [
-        "Apply online at portlandgeneral.com/income-qualified-bill-discount",
-        "Call PGE at 503-228-6322 to apply by phone in Spanish",
-        "Provide your PGE account number and proof of income or proof of SNAP/OHP enrollment",
-        "Discount applies within 1-2 billing cycles after approval"
+        "Call PGE at 503-228-6322 or visit portlandgeneral.com/income-qualified-bill-discount to apply.",
+        "Have your PGE account number ready — proof of SNAP or OHP enrollment can substitute for income documentation.",
+        "Application takes 1–2 billing cycles to process."
       ],
       "required_documents": [
         "PGE account number",
-        "Proof of income OR proof of enrollment in SNAP or OHP (if approved)"
+        "Proof of income OR proof of enrollment in qualifying program (SNAP, OHP)"
       ],
       "application_deadline": null,
       "urgency_note": null
@@ -235,35 +226,30 @@
       "eligible": true,
       "confidence": "high",
       "estimated_annual_value": 400,
-      "reasoning": "Household of 4, annual income $48,000, residing in Portland (ZIP 97218). Portland Water Bureau FA uses 60% AMI. At 60% AMI for household of 4, the limit is $76,980/year. $48,000 is well below this limit. This is a hidden gem — often overlooked by renters but renters can qualify with landlord verification. Estimated annual savings ~$400 on combined water/sewer/stormwater bills.",
+      "reasoning": "Portland Water Bureau Financial Assistance uses 60% AMI as the income ceiling. For a household of 4 at 60% AMI, the limit is $76,980/year. Household income of $48,000 is well under this threshold. ZIP 97218 is within Portland city limits. This is a hidden gem program many families miss. Using the program median of $400/year.",
       "requirements": [
         {
           "key": "income",
           "met": "yes",
-          "detail": "Annual income $48,000 is below 60% AMI limit of $76,980 for a household of 4 — eligible."
+          "detail": "Household income $48,000 is under the 60% AMI limit of $76,980 for a household of 4 in the Portland MSA."
         },
         {
           "key": "residency",
           "met": "yes",
-          "detail": "ZIP 97218 is within Portland city limits — Portland Water Bureau service area confirmed."
-        },
-        {
-          "key": "status",
-          "met": "unknown",
-          "detail": "Must be a Portland Water Bureau account holder or obtain landlord verification. As a renter, landlord coordination may be required."
+          "detail": "ZIP 97218 is within Portland city limits — program requirement met."
         }
       ],
       "next_steps": [
         "Apply online at portland.gov/water/customer-service/apply-financial-assistance",
-        "Call Portland Water Bureau at 503-823-7770 to ask about renter eligibility and landlord verification in Spanish",
-        "Gather proof of all household income sources and names/birthdates of all household members",
-        "Renew every two years once approved"
+        "Gather proof of income for all household members over 18 and documentation of household composition.",
+        "Call Portland Water Bureau at 503-823-7770 for Spanish-language assistance.",
+        "Renew every two years."
       ],
       "required_documents": [
         "Service address",
-        "Names and birthdates of all household members",
-        "Proof of gross monthly income for all adults (pay stubs, benefit letters)",
-        "Photo ID"
+        "Proof of gross monthly income by source for all adults",
+        "Pay stubs or earnings statements",
+        "Names and birthdates of all household members"
       ],
       "application_deadline": null,
       "urgency_note": null
@@ -273,24 +259,23 @@
       "eligible": true,
       "confidence": "medium",
       "estimated_annual_value": 400,
-      "reasoning": "Household of 4, annual income $48,000. NW Natural Bill Discount uses 60% SMI limit of $73,816 for HH of 4 — $48,000 qualifies. At $48,000 income, the household falls in the $36,909-$55,362 band (30% discount tier) per the benefit schedule. Eligibility depends on whether the household has NW Natural gas service (not confirmed in intake). Portland ZIP 97218 is in NW Natural service territory for gas. Estimated 30% discount on average annual gas bill of ~$1,200 = $360/year.",
+      "reasoning": "NW Natural Bill Discount uses 60% Oregon SMI as the income ceiling. For a household of 4, the 60% SMI limit is $73,816/year. Household income of $48,000 qualifies. At $48,000/year, this household falls in the $36,909–$55,362 Oregon tier, which carries a 30% discount on gas bills. Eligibility depends on being an NW Natural customer (not confirmed). Using the program's $400/year median estimate.",
       "requirements": [
         {
           "key": "income",
           "met": "yes",
-          "detail": "Annual income $48,000 is below 60% SMI limit of $73,816 for household of 4."
+          "detail": "Household income $48,000 falls in the $36,909–$55,362 annual income tier, qualifying for a 30% monthly gas bill discount."
         },
         {
           "key": "status",
           "met": "unknown",
-          "detail": "Must be an NW Natural gas customer. ZIP 97218 is in NW Natural territory but gas service not confirmed in intake data."
+          "detail": "Must be an NW Natural customer — not confirmed in intake data."
         }
       ],
       "next_steps": [
-        "Apply online at nwnatural.com/account/bill-discount-program if you have NW Natural gas service",
-        "Call NW Natural at 800-422-4012 to apply or confirm eligibility in Spanish",
-        "Provide your NW Natural account number and proof of income or SNAP/OHP enrollment letter",
-        "Discount typically appears within 30 days of approval"
+        "Visit nwnatural.com/account/bill-discount-program or call 800-422-4012 to apply.",
+        "Have NW Natural account number and proof of income ready.",
+        "Note: at $48,000/year household income, you qualify for the 30% discount tier."
       ],
       "required_documents": [
         "NW Natural account number",
@@ -305,61 +290,66 @@
       "eligible": true,
       "confidence": "high",
       "estimated_annual_value": 700,
-      "reasoning": "Household of 4, annual income $48,000. LIHEAP uses 60% SMI limit for Oregon: $73,816 for HH of 4. $48,000 is well below this limit. Oregon resident. LIHEAP provides direct payment assistance to utility companies on the customer's behalf. Estimated annual value ~$700 (median for program). Apply through local community action agency; contact 211 for referral.",
+      "reasoning": "LIHEAP energy assistance uses 60% Oregon SMI as the income ceiling. For a household of 4, the limit is $73,816/year. Household income of $48,000 is well under this threshold. The household resides in Oregon (ZIP 97218). Using the program median of $700/year. Local community agencies handle applications; contact 211 or the OHCS line.",
       "requirements": [
         {
           "key": "income",
           "met": "yes",
-          "detail": "Annual income $48,000 is below the 60% SMI LIHEAP limit of $73,816 for a household of 4."
+          "detail": "Household income $48,000 is under the 60% Oregon SMI limit of $73,816 for a household of 4."
         },
         {
           "key": "residency",
           "met": "yes",
-          "detail": "Oregon resident (ZIP 97218, Portland) — meets Oregon residency requirement."
+          "detail": "Residing in Oregon (Portland ZIP 97218) — residency requirement met."
         }
       ],
       "next_steps": [
-        "Call 211 (or 1-800-453-5511 option 1) to be connected to the local LIHEAP community action agency serving ZIP 97218",
-        "Apply as early as possible — LIHEAP funds are limited and disbursed on a first-come basis each program year",
-        "Gather utility bills and last 30 days of pay stubs before calling",
-        "Ask the agency about emergency energy assistance if heating/cooling is at risk"
+        "Call 1-800-453-5511 (option 1) to find your local LIHEAP provider or dial 211.",
+        "Gather proof of income from the last 30 days and a recent utility bill.",
+        "Apply early in the season — funds are limited and distributed on a first-come, first-served basis.",
+        "Ask about weatherization services, which may be bundled with energy assistance."
       ],
       "required_documents": [
-        "Proof of income (last 30 days pay stubs)",
-        "Most recent utility bill (electric and/or gas)",
-        "Social Security numbers for all household members",
+        "Proof of income (last 30 days)",
+        "Utility bill",
+        "Social Security numbers",
         "Photo ID"
       ],
-      "application_deadline": "Funds are limited — apply early in the program year (typically October–May)",
-      "urgency_note": "LIHEAP funds often run out mid-year. Apply early."
+      "application_deadline": null,
+      "urgency_note": "LIHEAP funds are limited and can run out — apply as early as possible each program year."
     },
     {
       "program_id": "wic",
       "eligible": false,
       "confidence": "high",
       "estimated_annual_value": 0,
-      "reasoning": "WIC requires the participant to be pregnant, postpartum, breastfeeding, OR a child under age 5. The household's children are ages 5 and 8 — neither is under 5 (the 5-year-old has aged out or is at the boundary). The adult is not pregnant. No member of the household meets the categorical eligibility requirement for WIC.",
+      "reasoning": "WIC serves pregnant women, postpartum/breastfeeding women, infants, and children under age 5. The children in this household are ages 5 and 8 — neither is under 5. The household member is not pregnant, postpartum, or breastfeeding. No one in the household meets the categorical eligibility requirement for WIC. Ineligible.",
       "requirements": [
         {
           "key": "household",
           "met": "no",
-          "detail": "WIC requires a child under age 5, or a pregnant/postpartum/breastfeeding adult. Children are ages 5 and 8; adult is not pregnant or postpartum. The 5-year-old has aged out of WIC eligibility."
+          "detail": "WIC requires a pregnant/postpartum/breastfeeding woman or a child under 5. Children in this household are ages 5 and 8 — neither qualifies; no pregnancy reported."
         },
         {
           "key": "income",
           "met": "yes",
-          "detail": "$48,000 annual income for HH of 4 is below 185% FPL limit of $61,005."
+          "detail": "If categorically eligible, household income $48,000 would be under 185% FPL ($61,050) for a household of 4."
         },
         {
           "key": "residency",
           "met": "yes",
-          "detail": "Oregon resident — residency requirement met."
+          "detail": "Oregon residency confirmed (ZIP 97218)."
         }
       ],
       "next_steps": [
-        "WIC is not available at this time as no household member meets the categorical requirement."
+        "WIC is not available to this household currently. If a pregnancy occurs or a new child under 5 joins the household, apply immediately at oregon.gov/oha/ph/healthypeoplefamilies/wic."
       ],
-      "required_documents": [],
+      "required_documents": [
+        "Proof of income",
+        "Photo ID",
+        "Proof of residency",
+        "Medical card"
+      ],
       "application_deadline": null,
       "urgency_note": null
     },
@@ -368,35 +358,34 @@
       "eligible": true,
       "confidence": "high",
       "estimated_annual_value": 1500,
-      "reasoning": "Household of 4 with 2 school-age children (ages 5 and 8 — both school-aged, though the 5-year-old may just be entering kindergarten). Income limit for free meals is 130% FPL ($42,900 for HH of 4) and reduced-price is 185% FPL ($61,050 for HH of 4). At $48,000, the household exceeds free meal threshold but falls below reduced-price threshold. Children qualify for reduced-price school meals ($0.40/lunch vs $2.75). Note: Oregon has a statewide Universal School Meals program — as of 2023-24 school year, all Oregon K-12 students receive free breakfast and lunch regardless of income. So both children likely receive free meals regardless. Estimated annual value: 2 children × 180 school days × $2.75/meal × 2 meals = ~$1,980; under Universal Meals the benefit is effectively the full meal cost. Using $1,500 as conservative estimate.",
+      "reasoning": "Free and reduced school meals require children under 18 and income at or below 185% FPL. For a household of 4, 185% FPL = $61,050. Household income of $48,000 is under this threshold. The household has two children ages 5 and 8 who are school-age (the 5-year-old may be in kindergarten, the 8-year-old likely in elementary school). Both qualify. Using the program's median estimate of $1,500/year for two children.",
       "requirements": [
+        {
+          "key": "income",
+          "met": "yes",
+          "detail": "Household income $48,000 is under 185% FPL ($61,050) for a household of 4 — qualifies for free or reduced-price meals."
+        },
         {
           "key": "household",
           "met": "yes",
-          "detail": "Household has two children ages 5 and 8 who are school-age and attending or entering school."
+          "detail": "Two children ages 5 and 8 — both are school-age (under 18) and enrolled or will be enrolled in school."
         },
         {
           "key": "residency",
           "met": "yes",
-          "detail": "Oregon resident — qualifies for Oregon's Universal School Meals program."
-        },
-        {
-          "key": "income",
-          "met": "yes",
-          "detail": "$48,000 income for HH of 4 is below 185% FPL reduced-price threshold of $61,050; Oregon Universal Meals covers all students regardless of income."
+          "detail": "Oregon residency confirmed (ZIP 97218)."
         }
       ],
       "next_steps": [
-        "Complete the school's meal application at enrollment — even under Oregon Universal Meals, submitting an income form helps the school receive federal reimbursement",
-        "Contact each child's school directly to confirm enrollment in the meal program",
-        "Ask the school about summer meal programs (Summer Food Service Program) during school breaks",
-        "For the 5-year-old entering kindergarten, confirm school enrollment and request Spanish-language support"
+        "Contact your children's school office and request a Free and Reduced Price Meal application at the start of the school year.",
+        "Submit the application online through the school district's portal or return a paper form to the school.",
+        "Reapply each school year — eligibility runs July 1 through June 30."
       ],
       "required_documents": [
-        "Household income information",
-        "Child's school enrollment confirmation"
+        "Household income information (pay stubs or benefit letters)",
+        "Children's school enrollment confirmation"
       ],
-      "application_deadline": "Submit at the start of each school year (July 1 – June 30 cycle)",
+      "application_deadline": "Apply at the start of each school year (July 1–June 30 cycle)",
       "urgency_note": null
     },
     {
@@ -404,64 +393,69 @@
       "eligible": false,
       "confidence": "high",
       "estimated_annual_value": 0,
-      "reasoning": "The household has not received an eviction notice (received_eviction_notice: false). While the household did experience a >10% rent increase, the Multnomah County Eviction Prevention program (STRA) is triggered by an eviction notice or imminent homelessness risk, not a rent increase alone. The rent increase situation is better addressed through the Portland Mandatory Renter Relocation Assistance program. No eviction notice = this program's event trigger is not met.",
+      "reasoning": "Multnomah County Eviction Prevention requires a triggering event of an eviction notice or notice of non-payment. This household has NOT received an eviction notice (received_eviction_notice=false). Despite the rent increase, no eviction notice has been served. Income ($48,000) is under 80% AMI ($102,650 for 4 persons) and the household rents in Multnomah County. However, the program is event-triggered and the event has not occurred.",
       "requirements": [
         {
-          "key": "residency",
-          "met": "yes",
-          "detail": "ZIP 97218 is within Multnomah County — residency requirement met."
-        },
-        {
-          "key": "status",
-          "met": "yes",
-          "detail": "Household is renting — renter requirement met."
+          "key": "event",
+          "met": "no",
+          "detail": "Program requires an eviction notice or notice of non-payment — household has not received one."
         },
         {
           "key": "income",
           "met": "yes",
-          "detail": "$48,000 annual income for HH of 4 is below 80% AMI limit of $102,650."
+          "detail": "Household income $48,000 is under 80% AMI ($102,650) for a household of 4 in the Portland MSA."
         },
         {
-          "key": "event",
-          "met": "no",
-          "detail": "No eviction notice received. The STRA program requires an eviction notice or imminent homelessness situation as a triggering event."
+          "key": "residency",
+          "met": "yes",
+          "detail": "ZIP 97218 is in Multnomah County — residency requirement met."
+        },
+        {
+          "key": "status",
+          "met": "yes",
+          "detail": "Household is a renter as required."
         }
       ],
       "next_steps": [
-        "If you do receive an eviction notice in the future, call 211 immediately to access STRA assistance."
+        "If you receive an eviction notice in the future, call 211 immediately — this program can provide emergency rent assistance within 3–14 days.",
+        "Keep this resource bookmarked: multco.us/info/eviction-prevention-and-energy-bill-assistance"
       ],
-      "required_documents": [],
+      "required_documents": [
+        "Eviction notice (if applicable in the future)",
+        "Lease agreement",
+        "Proof of income",
+        "Photo ID"
+      ],
       "application_deadline": null,
-      "urgency_note": null
+      "urgency_note": "If you receive an eviction notice, call 211 the same day — processing can take 3–14 days and funds are limited."
     },
     {
       "program_id": "cep-weatherization",
       "eligible": true,
       "confidence": "medium",
-      "estimated_annual_value": 2000,
-      "reasoning": "Household of 4, annual income $48,000. CEP uses 80% AMI: limit for HH of 4 is $102,650. $48,000 is well below this. Household resides in Portland (ZIP 97218). However, the flagship free home repair/weatherization program prioritizes homeowners 55+ or with a disability — this household rents and has no disability or senior. CEP also offers renter energy efficiency services and workshops. Estimated value as a renter is lower (~$2,000 in weatherization improvements vs $5,000-$15,000 for homeowners). Still worth applying for renter-focused programs.",
+      "estimated_annual_value": 5000,
+      "reasoning": "Community Energy Project Weatherization uses 50%–80% AMI as the income ceiling. At 80% AMI for a household of 4 = $102,650. Household income $48,000 is well under this threshold. ZIP 97218 is within Portland city limits. However, the flagship free home repair/weatherization program requires owning and occupying the home AND being 55+ and/or having a disability. This household rents and has no senior/disability. CEP also offers renter-focused programs including education and referrals. Eligibility for the full weatherization is uncertain as a renter, but CEP serves renters through some programs. Marking medium confidence.",
       "requirements": [
         {
           "key": "income",
           "met": "yes",
-          "detail": "Annual income $48,000 is well below the 80% AMI limit of $102,650 for household of 4."
+          "detail": "Household income $48,000 is under 80% AMI ($102,650) for a household of 4 in the Portland MSA."
         },
         {
           "key": "residency",
           "met": "yes",
-          "detail": "ZIP 97218 is within Portland city limits — Portland residency requirement met."
+          "detail": "ZIP 97218 is within Portland city limits — program requirement met."
         },
         {
           "key": "status",
           "met": "unknown",
-          "detail": "Primary programs prioritize homeowners 55+ or with a disability. As a renter without disability, access may be limited to renter-specific weatherization services."
+          "detail": "The flagship free weatherization program requires homeownership plus age 55+ or disability. This household rents — full weatherization eligibility is uncertain, but renter-accessible services may be available."
         }
       ],
       "next_steps": [
-        "Call Community Energy Project at 503-284-6827 to ask about renter weatherization services available in your area",
-        "Visit communityenergyproject.org for information on renter programs and free energy workshops",
-        "Ask your landlord to apply for weatherization improvements — CEP works with landlords too",
-        "Inquire about free energy efficiency supplies (LED bulbs, weatherstripping) available to renters"
+        "Call CEP at 503-284-6827 to ask specifically which services are available to renters in your situation.",
+        "Inquire about energy education, referrals, and any renter-accessible weatherization assistance CEP offers.",
+        "If your landlord is willing to participate, some weatherization programs can serve rental properties."
       ],
       "required_documents": [
         "Proof of income",
@@ -476,21 +470,21 @@
       "eligible": false,
       "confidence": "high",
       "estimated_annual_value": 0,
-      "reasoning": "This program requires the applicant to be age 62+ OR have a qualifying disability, AND be a homeowner. This household has no senior (has_senior_in_household: false), no disability (has_disability: false), and rents rather than owns. All three disqualifying factors are present.",
+      "reasoning": "Senior and Disabled Property Tax Deferral requires the applicant to be age 62+ or have a qualifying disability, AND be a homeowner. This household has no senior member (has_senior_in_household=false), no disability (has_disability=false), and rents (housing_status=rent). Fails on multiple requirements.",
       "requirements": [
         {
           "key": "age",
           "met": "no",
-          "detail": "No household member is age 62 or older — age requirement not met."
+          "detail": "Program requires household member to be age 62 or older — no senior in household reported."
         },
         {
           "key": "status",
           "met": "no",
-          "detail": "Household rents rather than owns — homeownership requirement not met."
+          "detail": "Program requires homeownership — household rents."
         }
       ],
       "next_steps": [
-        "This program is not applicable for your household at this time."
+        "This program is not applicable to your household. Keep in mind for the future if you purchase a home and reach age 62."
       ],
       "required_documents": [],
       "application_deadline": null,
@@ -500,36 +494,35 @@
       "program_id": "transportation-wallet",
       "eligible": true,
       "confidence": "medium",
-      "estimated_annual_value": 308,
-      "reasoning": "Household of 4, annual income $48,000. Income limit is 200% FPL for HH of 4 = $66,000. $48,000 < $66,000 — income requirement met. Portland resident (ZIP 97218). The Access for All Transportation Wallet provides up to $308/year in transportation credits. However, access requires referral through a participating community-based organization — not a direct application. With primary language Spanish, there are several Spanish-speaking CBOs in Portland that participate.",
+      "estimated_annual_value": 100,
+      "reasoning": "Portland Transportation Wallet (Access for All) requires income at or below 200% FPL and Portland residency. For a household of 4, 200% FPL = $66,000. Household income $48,000 qualifies. ZIP 97218 is in Portland. However, this program requires a referral from a participating community-based organization — not a self-service application. Worth pursuing through a local community organization, especially given the household's primary language is Spanish (many CBOs serving Spanish-speaking communities are Access for All referral partners). Estimated annual value is the minimum $100 wallet credit.",
       "requirements": [
         {
           "key": "income",
           "met": "yes",
-          "detail": "Annual income $48,000 is below 200% FPL limit of $66,000 for household of 4."
+          "detail": "Household income $48,000 is under 200% FPL ($66,000) for a household of 4."
         },
         {
           "key": "residency",
           "met": "yes",
-          "detail": "ZIP 97218 is within Portland city limits — Portland residency requirement met."
+          "detail": "ZIP 97218 is within Portland city limits — program requirement met."
         },
         {
           "key": "enrollment",
           "met": "unknown",
-          "detail": "Program requires referral through a participating community-based organization — not available as a direct application."
+          "detail": "Program requires referral by a participating community-based organization — not yet obtained."
         }
       ],
       "next_steps": [
-        "Call 311 or visit portland.gov/transportation/wallet/access-all for a list of participating community organizations that can provide a referral",
-        "Contact a Spanish-speaking community organization in Portland such as Hacienda CDC or Bienestar for referral assistance",
-        "Gather proof of Portland residency and income or SNAP/OHP enrollment before contacting a CBO",
-        "Available once per calendar year — apply in January/February for best availability"
+        "Call 311 or visit portland.gov/transportation/wallet/access-all to find participating CBOs that serve Spanish-speaking families in NE Portland.",
+        "Ask at local community organizations (e.g., Hacienda CDC, Latino Network, IRCO) if they are Access for All referral partners.",
+        "Reapply each calendar year as the wallet resets annually."
       ],
       "required_documents": [
         "Proof of Portland residency",
-        "Proof of income OR enrollment in qualifying benefit program"
+        "Proof of income OR enrollment in qualifying program"
       ],
-      "application_deadline": "Available once per calendar year — no fixed annual deadline",
+      "application_deadline": "Once per calendar year",
       "urgency_note": null
     },
     {
@@ -537,35 +530,35 @@
       "eligible": true,
       "confidence": "high",
       "estimated_annual_value": 9000,
-      "reasoning": "Household of 4, annual income $48,000. IH program uses 80% AMI: limit for HH of 4 is $102,650. $48,000 is well below this. Household is a renter in Portland (ZIP 97218). IH units are set aside at 60% and 80% AMI in new large residential buildings. At $48,000 (about 37% AMI for HH of 4), this household would qualify for both 60% and 80% AMI tiers. Estimated savings: market rent for a 2BR in Portland ~$1,800-$2,000/month; IH unit at 60% AMI capped at ~$1,200/month = savings of ~$600-$800/month = ~$9,000/year.",
+      "reasoning": "Portland Inclusionary Housing uses 80% AMI as the income ceiling. For a household of 4 at 80% AMI = $102,650. Household income $48,000 is well under this limit (also under the 60% AMI tier of $76,980). ZIP 97218 is in Portland. The household rents. This could provide access to below-market rent units, with savings estimated at $9,000/year (median). The household should apply to building waitlists directly via the Portland Housing Bureau's IH units list.",
       "requirements": [
         {
           "key": "income",
           "met": "yes",
-          "detail": "Annual income $48,000 is below 80% AMI limit of $102,650 for household of 4 — qualifies for both 60% and 80% AMI IH tiers."
-        },
-        {
-          "key": "status",
-          "met": "yes",
-          "detail": "Household is a renter — renter requirement met."
+          "detail": "Household income $48,000 is under 80% AMI ($102,650) for a household of 4 — also qualifies at the 60% AMI tier ($76,980)."
         },
         {
           "key": "residency",
           "met": "yes",
-          "detail": "Current Portland resident (ZIP 97218) — Portland jurisdiction requirement met."
+          "detail": "ZIP 97218 is within Portland city limits — program requirement met."
+        },
+        {
+          "key": "status",
+          "met": "yes",
+          "detail": "Household is a renter as required."
         }
       ],
       "next_steps": [
-        "Visit portland.gov/phb/inclusionary-housing to view the current list of buildings with IH units available",
-        "Apply directly to individual building waitlists — there is no central IH application portal",
-        "Call Portland Housing Bureau at 503-823-9042 to request a list of buildings with Spanish-language staff",
-        "Prepare rental history, proof of income, and photo ID for individual building applications"
+        "Visit portland.gov/phb/inclusionary-housing to view the current list of buildings with IH units.",
+        "Apply directly to the waitlist of any building with available IH units — there is no central portal.",
+        "Call Portland Housing Bureau at 503-823-9042 for guidance and Spanish-language assistance.",
+        "Gather proof of income, photo ID, and rental history to have ready for applications."
       ],
       "required_documents": [
         "Proof of income",
         "Photo ID",
-        "Rental history (prior landlord references)",
-        "Credit report or authorization for credit check"
+        "Rental history",
+        "Credit information"
       ],
       "application_deadline": null,
       "urgency_note": null
@@ -573,60 +566,54 @@
     {
       "program_id": "sun-service-system",
       "eligible": true,
-      "confidence": "medium",
+      "confidence": "high",
       "estimated_annual_value": 3000,
-      "reasoning": "Household has two school-age children (ages 5 and 8) in Multnomah County (ZIP 97218). SUN Community Schools offer free after-school programs, enrichment, and family support services at partner schools. The 8-year-old likely attends an elementary school; ZIP 97218 (Cully/airport area) has several SUN schools nearby including Rigler Elementary. The 5-year-old entering kindergarten may also access SUN services. No income test — open to all families with children at or near SUN schools. Estimated value $3,000/year in after-school programming and family services.",
+      "reasoning": "SUN Community Schools serve children under 18 in Multnomah County with after-school programs, enrichment, food access, health services, and more. This household has two children ages 5 and 8 — both qualify. ZIP 97218 (Cully/NE Portland area) is in Multnomah County and is served by SUN schools. No income test applies. This is a high-value hidden gem especially for a family with school-age children. The 8-year-old in particular can benefit immediately from after-school programming.",
       "requirements": [
         {
           "key": "household",
           "met": "yes",
-          "detail": "Household has children ages 5 and 8 who are school-age — household composition requirement met."
+          "detail": "Two children ages 5 and 8 — both are under 18 and qualify for SUN Community Schools programs."
         },
         {
           "key": "residency",
           "met": "yes",
-          "detail": "ZIP 97218 is within Multnomah County — county residency requirement met."
-        },
-        {
-          "key": "enrollment",
-          "met": "unknown",
-          "detail": "Child must attend or live near a SUN Community School. ZIP 97218 has nearby SUN schools (e.g., Rigler Elementary) but school assignment must be confirmed."
+          "detail": "ZIP 97218 is in Multnomah County — residency requirement met."
         }
       ],
       "next_steps": [
-        "Call 503-988-6295 or visit multco.us/programs/sun-community-schools to find the nearest SUN school to ZIP 97218",
-        "Ask the children's school at enrollment whether it is a SUN site — registration for after-school programs is done in person",
-        "SUN programs often have Spanish-speaking staff — request Spanish-language communication at enrollment",
-        "Programs include after-school tutoring, meals, and family resource connections"
+        "Contact your children's school to ask if it is a SUN Community School or call 503-988-6295.",
+        "Visit multco.us/programs/sun-community-schools to find the nearest SUN site for your ZIP code.",
+        "Enroll children in after-school programs, tutoring, and enrichment activities — most are same-day enrollment.",
+        "Ask about food resources, health services, and adult education available through SUN."
       ],
       "required_documents": [
         "Child's school enrollment confirmation",
         "Photo ID"
       ],
       "application_deadline": null,
-      "urgency_note": "Enroll children in SUN before the school year starts for best program access and meal benefits."
+      "urgency_note": null
     },
     {
       "program_id": "advsd",
       "eligible": true,
       "confidence": "high",
       "estimated_annual_value": 0,
-      "reasoning": "The ADRC helpline is open to all Multnomah County residents of all ages, incomes, and abilities — no eligibility restrictions. While the direct-service OAA programs prioritize adults 60+, the helpline itself is universally accessible and can help connect this family to additional resources, especially given the LPR status and Spanish language needs. Estimated direct cash value $0 but the connection value to other programs may be significant.",
+      "reasoning": "The ADRC Helpline is open to all Multnomah County residents of any age, income, or ability as an information and referral service. While direct OAA-funded services prioritize seniors 60+, adults with disabilities, and veterans, the helpline itself is universally accessible. This household (primary language Spanish) could benefit from navigation assistance connecting to other programs. Estimated annual value is $0 as this is an information/referral service, not a direct benefit, though it can unlock significant value by connecting the family to additional programs.",
       "requirements": [
         {
           "key": "residency",
           "met": "yes",
-          "detail": "ZIP 97218 is within Multnomah County — the only requirement for ADRC helpline access."
+          "detail": "ZIP 97218 is in Multnomah County — the ADRC serves all Multnomah County residents."
         }
       ],
       "next_steps": [
-        "Call ADRC at 503-988-3646 — Spanish interpretation is available",
-        "Ask the ADRC about additional programs for immigrant families and LPR households",
-        "ADRC can help navigate the full benefit system and provide referrals to housing, health, and food resources",
-        "Request a community health worker or navigator who speaks Spanish for ongoing support"
+        "Call the ADRC Helpline at 503-988-3646 and ask for a Spanish-speaking navigator.",
+        "Use ADRC to identify additional local programs and services this household may have missed."
       ],
       "required_documents": [
-        "No documents required to call the helpline"
+        "Photo ID",
+        "Insurance cards if seeking healthcare navigation"
       ],
       "application_deadline": null,
       "urgency_note": null
@@ -636,12 +623,17 @@
       "eligible": false,
       "confidence": "high",
       "estimated_annual_value": 0,
-      "reasoning": "This program requires the applicant to be a veteran with a service-connected disability OR a surviving spouse of a veteran. The intake data shows is_veteran: false and is not a homeowner. Neither requirement is met.",
+      "reasoning": "Oregon Veterans Property Tax Exemption requires the applicant to be a veteran with a service-connected disability AND be a homeowner. This household is not a veteran (is_veteran=false) and rents (housing_status=rent). Ineligible on both counts.",
       "requirements": [
         {
           "key": "status",
           "met": "no",
-          "detail": "Household member is not a veteran — veteran status requirement not met."
+          "detail": "Program requires veteran status — household member is not a veteran."
+        },
+        {
+          "key": "status",
+          "met": "no",
+          "detail": "Program requires homeownership — household rents."
         }
       ],
       "next_steps": [
@@ -653,31 +645,30 @@
     },
     {
       "program_id": "lifeline",
-      "eligible": true,
-      "confidence": "high",
-      "estimated_annual_value": 111,
-      "reasoning": "Household of 4, annual income $48,000. Lifeline income limit is 135% FPL for HH of 4 = $44,550. $48,000 exceeds the income limit. However, categorical eligibility applies: enrollment in SNAP, Medicaid/OHP, SSI, or other qualifying programs satisfies the income test. This household is likely eligible for OHP (children certainly), and if approved for SNAP under BBCE, that also qualifies. Categorical eligibility via OHP children's coverage makes Lifeline accessible. Estimated value: $9.25/month × 12 = $111/year on non-Tribal lands.",
+      "eligible": false,
+      "confidence": "medium",
+      "estimated_annual_value": 0,
+      "reasoning": "Lifeline requires income at or below 135% FPL OR enrollment in a qualifying program. For a household of 4, 135% FPL = $44,550. Household income of $48,000 slightly exceeds this threshold. However, if the household qualifies for and enrolls in OHP (Oregon Health Plan / Medicaid), that categorical enrollment would qualify them for Lifeline automatically — no separate income test. Since OHP eligibility appears met, Lifeline should follow. Annual value: $9.25/month × 12 = $111/year on non-Tribal lands.",
       "requirements": [
         {
           "key": "income",
-          "met": "unknown",
-          "detail": "$48,000 exceeds the 135% FPL income limit of $44,550 for HH of 4, but categorical eligibility through OHP or SNAP enrollment satisfies this requirement — dependent on those approvals."
+          "met": "no",
+          "detail": "Household income $48,000 slightly exceeds 135% FPL ($44,550) for a household of 4 on the income test alone."
         },
         {
           "key": "enrollment",
           "met": "unknown",
-          "detail": "Categorical eligibility via enrollment in OHP (children's coverage), SNAP (if approved), or other qualifying programs would satisfy the income requirement."
+          "detail": "Enrollment in OHP/Medicaid would qualify categorically — OHP eligibility is likely, making Lifeline accessible via categorical enrollment."
         }
       ],
       "next_steps": [
-        "Apply for Lifeline at usac.org/lifeline after receiving OHP or SNAP approval — use the benefit letter as proof of categorical eligibility",
-        "Call 1-800-234-9473 for Lifeline application assistance",
-        "One Lifeline benefit per household — both phone and internet services may be discounted",
-        "Look for participating Lifeline providers in Oregon that offer Spanish-language customer service"
+        "Apply for OHP first — once enrolled, use your OHP enrollment letter to apply for Lifeline at usac.org/lifeline.",
+        "Call 1-800-234-9473 to apply for Lifeline by phone or visit usac.org/lifeline.",
+        "Renew Lifeline annually."
       ],
       "required_documents": [
         "Photo ID",
-        "OHP or SNAP benefit letter (for categorical eligibility)"
+        "OHP/Medicaid enrollment letter (if using categorical eligibility)"
       ],
       "application_deadline": null,
       "urgency_note": null
@@ -687,21 +678,21 @@
       "eligible": false,
       "confidence": "high",
       "estimated_annual_value": 0,
-      "reasoning": "Multnomah County Preschool for All serves children who are age 3 or 4 on or before September 1 of the preschool year. The household's children are ages 5 and 8 — both have aged out of the 3-4 year age window. No income test, but the age requirement is an absolute bar. Eligible=false.",
+      "reasoning": "Multnomah County Preschool for All is for children who are 3 or 4 years old by September 1 of the preschool year. The children in this household are ages 5 and 8 — neither meets the age requirement. Ineligible.",
       "requirements": [
         {
           "key": "household",
           "met": "no",
-          "detail": "Children are ages 5 and 8 — both exceed the maximum age of 4 (must be 3 or 4 by September 1). Neither child qualifies for Preschool for All."
+          "detail": "Program requires a child aged 3 or 4 by September 1 of the preschool year. Children in this household are ages 5 and 8 — both are too old."
         },
         {
           "key": "residency",
           "met": "yes",
-          "detail": "Multnomah County resident (ZIP 97218) — residency requirement met."
+          "detail": "ZIP 97218 is in Multnomah County — residency requirement met."
         }
       ],
       "next_steps": [
-        "Preschool for All is not available for children ages 5 and 8. Consider SUN Community Schools for after-school programming."
+        "This program is not applicable to your household's current children. If a younger child (age 3–4) joins the household in the future, apply during the spring lottery window at pfa.multco.us."
       ],
       "required_documents": [],
       "application_deadline": null,
@@ -712,128 +703,131 @@
       "eligible": true,
       "confidence": "high",
       "estimated_annual_value": 864,
-      "reasoning": "Household resident in Portland/Multnomah County (ZIP 97218). Income $48,000 for HH of 4 is below 200% FPL ($66,000). Adult earner is employed part-time (age assumed 18-64). Oregon resident. LPR status — no citizenship requirement for TriMet Low-Income Fare. Categorical eligibility if approved for OHP or SNAP. Estimated savings: monthly pass reduced from $100 to $28 = $72/month savings × 12 = $864/year per eligible adult. If 1 adult commuter uses transit regularly.",
+      "reasoning": "TriMet Low-Income Fare requires income at or below 200% FPL and age 18–64. For a household of 4, 200% FPL = $66,000. Household income $48,000 qualifies. The employed adult(s) in this household are likely between 18 and 64. ZIP 97218 is in the TriMet service district. If the household uses transit, the monthly pass discount from $100 to $28 saves $72/month = $864/year. This is a significant savings for a commuting household. No citizenship requirement.",
       "requirements": [
         {
           "key": "income",
           "met": "yes",
-          "detail": "Annual income $48,000 is below 200% FPL limit of $66,000 for household of 4."
+          "detail": "Household income $48,000 is under 200% FPL ($66,000) for a household of 4."
+        },
+        {
+          "key": "age",
+          "met": "unknown",
+          "detail": "Program requires the applicant to be age 18–64 — assumed met for employed adult but not explicitly confirmed in intake data."
         },
         {
           "key": "residency",
           "met": "yes",
-          "detail": "Oregon resident (ZIP 97218) — Oregon residency requirement met."
-        },
-        {
-          "key": "age",
-          "met": "yes",
-          "detail": "Working-age adult (employed, assumed 18-64) meets the age 18-64 requirement. (Seniors 65+ qualify separately.)"
+          "detail": "ZIP 97218 is in the TriMet service district and Oregon — residency requirement met."
         }
       ],
       "next_steps": [
-        "Apply online at trimet.org/income for a personalized Honored Citizen Hop card",
-        "If approved for OHP or SNAP, use the benefit letter to qualify automatically without income documents",
-        "Visit the TriMet Customer Service Center (701 SW 6th Ave) in person for same-day processing if needed",
-        "Use the reduced-fare card for all TriMet buses and MAX light rail trips"
+        "Apply online at trimet.org/income or in person at TriMet's customer service center (call 503-962-2455).",
+        "Use your OHP enrollment letter or proof of income to verify eligibility.",
+        "Once approved, receive a personalized Honored Citizen Hop card for discounted fares.",
+        "Renew annually."
       ],
       "required_documents": [
         "Valid photo ID",
-        "Proof of income (pay stubs or tax return) OR qualifying program benefit letter (OHP, SNAP, WIC, etc.)"
+        "Proof of income (pay stubs, 1040) OR qualifying program enrollment letter (OHP, SNAP, WIC)"
       ],
       "application_deadline": null,
       "urgency_note": null
     },
     {
       "program_id": "double-up-food-bucks",
-      "eligible": true,
+      "eligible": false,
       "confidence": "high",
       "estimated_annual_value": 0,
-      "reasoning": "Double Up Food Bucks requires current SNAP/EBT-food enrollment as the sole eligibility gate. This household has not yet been confirmed as a SNAP recipient — they are applying. Once SNAP is approved, this household would immediately become eligible for Double Up Food Bucks. Setting eligible=false now but flagging as a near-certain future benefit once SNAP is approved.",
+      "reasoning": "Double Up Food Bucks requires current SNAP/EBT-food enrollment (Oregon Trail Card). This household does not appear to qualify for SNAP (income exceeds the gross income limit at 130% FPL for a family of 4). Without SNAP enrollment, Double Up Food Bucks is not accessible.",
       "requirements": [
         {
           "key": "enrollment",
-          "met": "unknown",
-          "detail": "Requires active Oregon Trail Card (SNAP/EBT-food) enrollment. Household is not yet confirmed as a SNAP recipient — pending SNAP application."
-        }
-      ],
-      "next_steps": [
-        "Once your SNAP/Oregon Trail Card is approved, use it at participating Portland farmers markets and grocery stores to double your produce purchasing power (up to $20/day match)",
-        "Find participating locations at doubleuporegon.org",
-        "No separate application needed — just use your Oregon Trail Card at participating locations",
-        "Northeast Portland has several participating farmers markets and grocery stores near ZIP 97218"
-      ],
-      "required_documents": [
-        "Oregon Trail Card (SNAP/EBT-food) — issued upon SNAP approval"
-      ],
-      "application_deadline": null,
-      "urgency_note": "Apply for SNAP first — Double Up Food Bucks activates automatically upon SNAP enrollment."
-    },
-    {
-      "program_id": "oregon-tanf",
-      "eligible": false,
-      "confidence": "medium",
-      "estimated_annual_value": 0,
-      "reasoning": "TANF requires countable income at or below the monthly payment standard. For HH of 4, the max TANF payment standard is $621/month ($7,452/year). The household's annual income of $48,000 ($4,000/month) far exceeds this limit even after applying the 20% earned income disregard ($3,200/month net countable). $3,200/month is well above the $621/month payment standard for HH of 4. Income is far too high for TANF cash assistance.",
-      "requirements": [
-        {
-          "key": "income",
           "met": "no",
-          "detail": "Monthly income of $4,000 ($3,200 after 20% earned income disregard) far exceeds the TANF payment standard of $621/month for household of 4."
-        },
-        {
-          "key": "household",
-          "met": "yes",
-          "detail": "Household has two dependent children (ages 5 and 8) under 18 — household composition requirement met."
+          "detail": "Must be a current SNAP/EBT-food recipient. This household does not qualify for SNAP based on income ($48,000 exceeding the $42,900 gross limit for a household of 4)."
         },
         {
           "key": "residency",
           "met": "yes",
-          "detail": "Oregon resident — residency requirement met."
+          "detail": "Oregon residency confirmed (ZIP 97218)."
+        }
+      ],
+      "next_steps": [
+        "If SNAP eligibility changes (income drops or household size increases), enroll in SNAP and then use your Oregon Trail Card at participating farmers markets for dollar-for-dollar produce matching up to $20/day."
+      ],
+      "required_documents": [
+        "Oregon Trail Card (SNAP/EBT-food)"
+      ],
+      "application_deadline": null,
+      "urgency_note": null
+    },
+    {
+      "program_id": "oregon-tanf",
+      "eligible": false,
+      "confidence": "high",
+      "estimated_annual_value": 0,
+      "reasoning": "TANF requires countable income at or below the monthly payment standard for the household size. For a household of 4, the TANF payment standard is $621/month ($7,452/year). This household earns $48,000/year ($4,000/month), which far exceeds the TANF income threshold. Ineligible.",
+      "requirements": [
+        {
+          "key": "income",
+          "met": "no",
+          "detail": "Household monthly income of approximately $4,000 far exceeds the TANF payment standard of $621/month for a household of 4."
+        },
+        {
+          "key": "household",
+          "met": "yes",
+          "detail": "Household has two dependent children under 18 (ages 5 and 8) — categorical household requirement met."
+        },
+        {
+          "key": "residency",
+          "met": "yes",
+          "detail": "Oregon residency confirmed (ZIP 97218)."
         },
         {
           "key": "citizenship",
           "met": "yes",
-          "detail": "LPR status meets TANF citizenship requirement (qualified noncitizens eligible without 5-year wait)."
+          "detail": "LPR status qualifies (qualified noncitizens including LPRs are eligible with no 5-year waiting period for Oregon TANF)."
         }
       ],
       "next_steps": [
-        "TANF cash assistance is not available at this income level. Focus on SNAP, OHP, and ERDC for immediate support."
+        "TANF is not applicable at current income levels. If income drops significantly or employment ends, apply immediately at benefits.oregon.gov."
       ],
-      "required_documents": [],
+      "required_documents": [
+        "Photo ID",
+        "Proof of income",
+        "Children's birth certificates",
+        "Immigration documents"
+      ],
       "application_deadline": null,
       "urgency_note": null
     }
   ],
-  "total_estimated_annual_value": 52811,
-  "federal_only_value": 33039,
-  "pdx_specific_value": 19772,
+  "total_estimated_annual_value": 45764,
+  "federal_only_value": 23200,
+  "pdx_specific_value": 22564,
   "priority_application_order": [
     "pdx-renter-relocation",
-    "ohp",
-    "snap",
     "erdc",
+    "ohp",
     "liheap-energy-trust",
+    "sun-service-system",
     "pge-iqbd",
+    "pdx-water-fa",
+    "nw-natural-bill-discount",
+    "school-meals",
     "inclusionary-housing",
     "trimet-low-income-fare",
-    "school-meals",
-    "sun-service-system",
-    "nw-natural-bill-discount",
-    "pdx-water-fa",
-    "oregon-eitc",
-    "lifeline",
     "cep-weatherization",
-    "double-up-food-bucks",
-    "transportation-wallet",
-    "advsd"
+    "lifeline",
+    "transportation-wallet"
   ],
   "warnings": [
-    "URGENT — RENT INCREASE ACTION REQUIRED: Your 12% rent increase triggers Portland Mandatory Renter Relocation Assistance (up to $4,200 one-time payment). You MUST send a written demand letter to your landlord within 45 days of the rent increase notice or you permanently forfeit this right. Call 503-823-1303 immediately for a template letter in Spanish.",
-    "LIHEAP energy assistance funds are limited and typically exhausted mid-year. Apply as early as possible in the program year (October–May).",
-    "Children (ages 5 and 8) are strong candidates for free SUN Community Schools after-school programming at neighborhood schools near ZIP 97218 — enroll before the school year begins.",
-    "Once SNAP is approved, Double Up Food Bucks activates automatically and doubles your produce purchasing power at Portland farmers markets and grocery stores — no additional application needed.",
-    "This household's LPR status opens access to most Oregon and federal programs without restriction. Keep immigration documents current as LPR status is verified at application for SNAP and TANF.",
-    "Primary language Spanish: all major programs (SNAP, OHP, ERDC, ODHS) offer Spanish-language applications and interpreters — always request 'Español' when calling."
+    "URGENT — RENTER RELOCATION ASSISTANCE: Your 12% rent increase triggers Portland's Mandatory Renter Relocation Assistance. You must send a written demand to your landlord within 45 days of the rent increase notice or you forfeit this right. Call 503-823-1303 NOW for help.",
+    "ERDC CHILDCARE SUBSIDY: Apply for ERDC immediately — there is an active waitlist and your two children (ages 5 and 8) qualify for significant childcare subsidies at your income level.",
+    "SCHOOL-AGE CHILDREN: Your children (ages 5 and 8) may be eligible for SUN Community Schools after-school programs at their school — contact the school directly or call 503-988-6295.",
+    "SNAP: This household's gross income of $48,000 exceeds the 130% FPL gross income test ($42,900) for a family of 4. However, SNAP net income after deductions (earned income deduction, shelter deduction) may bring you under the net income limit — consult a benefits counselor at 211 to verify.",
+    "LIHEAP ENERGY FUNDS ARE LIMITED: Apply for LIHEAP energy assistance as soon as the program opens each year — funding runs out quickly.",
+    "SPANISH-LANGUAGE SERVICES: This household's primary language is Spanish. OHP (1-800-273-0557), ODHS (211), and Portland Rental Services (503-823-1303) all offer Spanish-language assistance. IRCO and Hacienda CDC in NE Portland also provide bilingual benefits navigation."
   ],
-  "caseworker_notes": "Household of 4 (2 adults, 2 children ages 5 and 8), LPR status, part-time employed, renting in Cully neighborhood (ZIP 97218, Portland). Annual income $48,000. Most urgent action: the 12% rent increase triggers a $4,200 Portland Renter Relocation Assistance right that expires 45 days from the notice date — this should be the first phone call. Second priority: OHP for children (virtually certain to qualify at 305% FPL) and SNAP under Oregon BBCE (income $48K < 185% FPL $60,945 for HH of 4). ERDC childcare subsidy is potentially high-value ($8K-$18K/year) for the 5-year-old entering school — check waitlist status. Note: SNAP gross income ($48K) exceeds the standard 130% FPL threshold ($42,900) but qualifies under Oregon's broad-based categorical eligibility at 185% FPL. SNAP net benefit will be modest (~$94-$150/month) after earned income deductions. Oregon EITC eligibility is borderline at $48K — depends on filing status and whether income is split between two earners. Recommend free VITA tax prep. Inclusionary Housing represents the largest potential long-term value ($9,000/year in rent savings) but depends on availability and waitlist timing. TriMet Low-Income Fare ($864/year savings) is quick to apply online and highly accessible. All utility discounts (PGE IQBD, NW Natural, Portland Water) are confirmed eligible based on 60% SMI/$60% AMI thresholds well above $48K. CEP Weatherization is available but limited for renters vs. homeowners. Total estimated household benefit if all programs are accessed: ~$52,813/year including the one-time renter relocation payment."
+  "caseworker_notes": "Household of 4 (2 adults, children ages 5 and 8), LPR status, employed part-time, annual income $48,000, renting in Portland ZIP 97218 (Cully/NE Portland — confirmed Portland city limits). Key flags: (1) 12% rent increase triggers Mandatory Renter Relocation Assistance — this is time-sensitive and should be the first action item. (2) SNAP eligibility is marginal — gross income slightly exceeds the 130% FPL limit but net income after SNAP deductions (20% earned income disregard, standard deduction, possible shelter deduction) may bring them under the net income test of 100% FPL ($2,750/month net for a family of 4). A formal SNAP prescreening with actual deductions is strongly recommended. (3) ERDC childcare for the 8-year-old (and potentially the 5-year-old if in after-school care) could be highly valuable — confirm waitlist status. (4) The 5-year-old may be starting kindergarten; school meals and SUN schools should be pursued immediately. (5) Part-time employment suggests potential income volatility — TANF and SNAP eligibility should be re-checked if hours or income changes. (6) OHP is the highest-confidence immediate healthcare win — apply immediately as it covers the entire household including undocumented members under Healthier Oregon (though this household is LPR). Primary language Spanish — ensure referrals include bilingual organizations."
 }

@@ -139,7 +139,8 @@ Hard rules:
        - Short discrete lists (e.g. Lifeline $9.25 / $34.25 Tribal)
        - Prose stating specific tiers (e.g. "Tier I discount is 50% for qualifying low-income customers; Tier II discount is 80% for extremely low-income customers" → two rows)
        - Per-unit-size amounts even when written prose (e.g. "$2,900 studio / $3,300 1-bedroom / $4,200 2-bedroom / $4,500 3-bedroom" → four rows)
-     Set null only when the page truly has no specific amounts (only ranges, prose like "may receive up to", or no dollar information). Every row's value must be a single number. In provenance, include a "benefit_schedule" entry with { "quote": "<short verbatim text proving one of the rows or the schedule's caption>", "source_url": "<URL>" } when populated, or { "reason": "..." } when null.
+     Set null only when the page truly has no specific amounts (only ranges, prose like "may receive up to", or no dollar information). Every row's value must be a single number.
+     Set "kind" to what the numbers mean: "benefit" when the household RECEIVES the amount (allotments, grants, credits, discounts); "copay" when the household PAYS it toward the service (child care copays, sliding-scale fees); "assessed_value_exemption" when it is home value exempt from property tax rather than cash saved. In provenance, include a "benefit_schedule" entry with { "quote": "<short verbatim text proving one of the rows or the schedule's caption>", "source_url": "<URL>" } when populated, or { "reason": "..." } when null.
 
 Source URLs (referenced by source_url in provenance):
 ${sourceUrlList}
@@ -155,6 +156,7 @@ Output format (one JSON object, no prose, no markdown fences):
     "benefit_schedule": {
       "description": "<short label, e.g. Max monthly SNAP allotment by household size, FY 2026>",
       "unit": "usd_monthly" | "usd_annual" | "usd_one_time" | "percent_discount",
+      "kind": "benefit" | "copay" | "assessed_value_exemption",
       "amounts": [
         { "condition": "<e.g. Household of 1, Tribal lands, Tier I (<=60% MFI)>", "value": <num> }
       ]
@@ -428,9 +430,9 @@ function writeReport(outcomes: ProgramOutcome[], programs: ScrapedProgram[]): st
       if (value === undefined || value === null) {
         valueCell = '—';
       } else if (field === 'benefit_schedule' && typeof value === 'object') {
-        const v = value as { description?: string; unit?: string; amounts?: unknown[] };
+        const v = value as { description?: string; unit?: string; kind?: string; amounts?: unknown[] };
         const rowCount = Array.isArray(v.amounts) ? v.amounts.length : 0;
-        valueCell = `${v.description ?? '?'} (${rowCount} rows, ${v.unit ?? '?'})`;
+        valueCell = `${v.description ?? '?'} (${rowCount} rows, ${v.unit ?? '?'}, ${v.kind ?? 'benefit'})`;
       } else {
         valueCell = JSON.stringify(value);
       }

@@ -46,7 +46,11 @@ export function buildJudgePrompt(
     '',
     `== PROGRAM: ${program.name} (${program.id}) ==`,
     JSON.stringify(
-      { eligibility: program.eligibility, estimated_annual_value: program.estimated_annual_value },
+      {
+        eligibility: program.eligibility,
+        estimated_annual_value: program.estimated_annual_value,
+        benefit_schedule: program.benefit_schedule,
+      },
       null,
       2,
     ),

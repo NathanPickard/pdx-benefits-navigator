@@ -28,16 +28,11 @@ export interface Program {
   /**
    * Optional verified benefit schedule extracted from official sources.
    * Present when a page publishes amounts as a table (by household size,
-   * by tier, by location) or a small set of discrete amounts. When present,
-   * this is the authoritative ground truth — the seed-derived
-   * estimated_annual_value range is a coarser hint that should be used as
-   * fallback only.
+   * by tier, by location) or a small set of discrete amounts. When it holds
+   * benefit amounts (`kind` absent or 'benefit'), it is the authoritative
+   * ground truth and the estimated_annual_value range is a coarser fallback.
    */
-  benefit_schedule?: {
-    description: string;
-    unit: 'usd_monthly' | 'usd_annual' | 'usd_one_time' | 'percent_discount';
-    amounts: Array<{ condition: string; value: number }>;
-  };
+  benefit_schedule?: BenefitSchedule;
 
   eligibility: {
     income_max_pct_fpl?: number;
@@ -91,6 +86,22 @@ export interface Program {
   renewal_cycle?: string;
   contact_phone?: string;
   contact_org?: string;
+}
+
+/**
+ * What a benefit schedule's numbers mean. Absent means 'benefit'.
+ *   'benefit'                  = what the household receives (SNAP allotment, WIC value)
+ *   'copay'                    = what the household pays toward the service (ERDC)
+ *   'assessed_value_exemption' = home value exempt from property tax, not cash saved
+ * Only 'benefit' rows are dollar estimates; the others are context for the reasoning.
+ */
+export type BenefitScheduleKind = 'benefit' | 'copay' | 'assessed_value_exemption';
+
+export interface BenefitSchedule {
+  description: string;
+  unit: 'usd_monthly' | 'usd_annual' | 'usd_one_time' | 'percent_discount';
+  kind?: BenefitScheduleKind;
+  amounts: Array<{ condition: string; value: number }>;
 }
 
 export interface IntakeData {

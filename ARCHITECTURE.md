@@ -88,7 +88,7 @@ messages.stream(model, system=[PROMPT w/ cache_control ephemeral], user=JSON(int
 ```
 
 Post-processing contract (`lib/eligibility.ts`):
-- `deriveEligibility`: `eligible = requirements.every(r => r.met !== 'no')`; ineligible ⇒ value 0. Requirements are the audit trail; the model's own `eligible` flag is overridden when requirements exist.
+- `deriveEligibility`: `eligible = requirements.every(r => r.met !== 'no')`; ineligible ⇒ value 0. Eligible at $0 ⇒ the program's published median, unless its published range starts at $0 (the model sometimes reports $0 for eligible programs). Requirements are the audit trail; the model's own `eligible` flag is overridden when requirements exist.
 - `recomputeTotals`: total / federal_only (federal+oregon) / pdx_specific (portland+multnomah) are recomputed from matches. Never trust model-supplied totals.
 - `parseJsonObject`: translation path only. Eligibility uses structured output.
 
@@ -130,20 +130,21 @@ scripts/merge-scraped.ts  ──▶  programs.json (runtime artifact; scraped nu
       ▼
 scripts/validate-data.ts  (npm run validate:data, in CI)
    asserts: zod schema on BOTH files · merge did not change curated eligibility policy ·
-            SMI/AMI percentages never stored in income_max_pct_fpl
+            SMI/AMI percentages never stored in income_max_pct_fpl ·
+            benefit-kind schedules overlap the published range (else label kind)
 ```
 
 Edit programs in the seed, run `npm run merge` then `npm run validate:data`, then re-bake fixtures. `data/programs.report.md` records which fields are evidence-verified vs seed-derived.
 
-Program schema essentials (`types/program.ts`): `id`, `jurisdiction` (federal|oregon|multnomah|portland), `hidden_gem`, `urgency`, `estimated_annual_value{min,max,median}`, optional `benefit_schedule` (authoritative when present), `eligibility.*` (income by `income_basis` fpl|smi|ami; boolean status gates; `triggered_by_event`).
+Program schema essentials (`types/program.ts`): `id`, `jurisdiction` (federal|oregon|multnomah|portland), `hidden_gem`, `urgency`, `estimated_annual_value{min,max,median}`, optional `benefit_schedule` (authoritative when its `kind` is `benefit`, the default; `copay` and `assessed_value_exemption` rows are context, not dollar values), `eligibility.*` (income by `income_basis` fpl|smi|ami; boolean status gates; `triggered_by_event`).
 
 ## 6. Eval harness
 
 ```
 npm run eval [-- caseId ...] [-- --runs N]      scripts/eval/run-eval.ts
    cases/     14 ground-truth EvalCase (personas + income-cliff pairs + trap cases)
-   scorers.ts pure: program-set F1, dollar in-range vs programs.json (range, widened by a
-              dollar benefit_schedule only when it overlaps the range), confidence agreement
+   scorers.ts pure: program-set F1, dollar in-range vs the official range (lib/benefitSchedule.ts:
+              published range widened by a benefit-kind dollar schedule), confidence agreement
    judge.ts   LLM judge (Haiku) grades reasoning per match
    report.ts  → evals/REPORT.md scoreboard (+ evals/runs/*.json, gitignored)
 ```

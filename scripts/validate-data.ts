@@ -9,6 +9,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { z } from 'zod';
 import type { Program as ProgramType } from '../types/program';
+import { scheduleRangeProblem } from '../lib/benefitSchedule';
 
 const ROOT = process.cwd();
 const SEED_PATH = path.join(ROOT, 'data', 'programs.seed.json');
@@ -61,6 +62,7 @@ const ProgramSchema = z.object({
     .object({
       description: z.string(),
       unit: z.enum(['usd_monthly', 'usd_annual', 'usd_one_time', 'percent_discount']),
+      kind: z.enum(['benefit', 'copay', 'assessed_value_exemption']).optional(),
       amounts: z.array(z.object({ condition: z.string(), value: z.number().finite() })),
     })
     .optional(),
@@ -139,6 +141,11 @@ function checkInvariants(label: string, programs: ValidatedProgram[]): void {
         fail(p.id, `${label}: jurisdiction='${p.jurisdiction}' but must_reside_in=${JSON.stringify(e.must_reside_in)} omits it`);
 
     // benefit_schedule amounts must be finite single numbers (schema enforces .finite()).
+    // A benefit schedule must overlap the published range; one that doesn't usually
+    // holds copays or assessed values and needs a `kind` label (ADR 0002).
+    const scheduleProblem = scheduleRangeProblem(p);
+    if (scheduleProblem) fail(p.id, `${label}: ${scheduleProblem}`);
+
     // hidden_gem programs must cite a source.
     if (p.hidden_gem && !p.application_url)
       fail(p.id, `${label}: hidden_gem program missing application_url citation`);

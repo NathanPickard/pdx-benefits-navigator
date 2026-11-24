@@ -547,6 +547,7 @@
     "benefit_schedule": {
       "description": "Monthly copay amounts by family size and countable monthly income",
       "unit": "usd_monthly",
+      "kind": "copay",
       "amounts": [
         {
           "condition": "Family of 2, income $0–$1,803.99",
@@ -3168,6 +3169,7 @@
     "benefit_schedule": {
       "description": "Property tax exemption amounts by disability/service status",
       "unit": "usd_annual",
+      "kind": "assessed_value_exemption",
       "amounts": [
         {
           "condition": "Disabled veteran certified by VA/Armed Forces with 40% or more disabilities, or veteran certified by licensed physician as 40% or more disabled (with income limit of 185% FPL), or active duty service members including National Guard and Reserve members",

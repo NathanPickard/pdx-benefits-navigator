@@ -12,11 +12,11 @@ _Avoid_: Benefit (ambiguous with its dollar value), service
 A locally funded program that national screening tools do not check.
 
 **Benefit schedule**:
-A program's published table of exact benefit amounts by household condition, such as SNAP allotments by household size.
+A program's published table of exact amounts by household condition, such as SNAP allotments by household size. Its kind says what the amounts mean: a benefit the household receives (the default), a copay the household pays (ERDC), or an assessed-value exemption (veterans property tax). Only a benefit-kind schedule is a dollar value; the other kinds are context for the reasoning.
 _Avoid_: Official table, benefit table
 
 **Official range**:
-The published minimum and maximum annual dollar value of a program, widened to include its benefit schedule when the schedule is in dollars and overlaps the published range. One definition, used by both the screener and the eval.
+The published minimum and maximum annual dollar value of a program, widened to include its benefit schedule when the schedule is benefit-kind and in dollars. Data validation requires every such schedule to overlap the published range. One definition, used by both the screener and the eval.
 _Avoid_: Estimated annual value (that name is used for both this and the Estimate), accepted range
 
 ## Screening one household

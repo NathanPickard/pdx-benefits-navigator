@@ -6,6 +6,24 @@ const JURISDICTION_BY_ID: Record<string, Program['jurisdiction']> =
     (programs as Program[]).map((p) => [p.id, p.jurisdiction]),
   );
 
+const PUBLISHED_VALUE_BY_ID: Record<string, Program['estimated_annual_value']> =
+  Object.fromEntries(
+    (programs as Program[]).map((p) => [p.id, p.estimated_annual_value]),
+  );
+
+/**
+ * The model sometimes reports $0 for a program it judged eligible (seen with
+ * ERDC, whose copay table includes $0 rows, and Double Up Food Bucks). When the
+ * published range starts above $0, $0 cannot be right, so fall back to the
+ * published median: still grounded in programs.json (hard rule #2).
+ */
+function groundedValue(programId: string, modelValue: number): number {
+  if (modelValue > 0) return modelValue;
+  const published = PUBLISHED_VALUE_BY_ID[programId];
+  if (!published || published.min <= 0) return modelValue;
+  return published.median;
+}
+
 export const ELIGIBILITY_MODEL = 'claude-sonnet-4-6';
 
 export const ELIGIBILITY_SYSTEM_PROMPT = `You are the eligibility engine for PDX Benefits Navigator, helping Portland, Oregon residents identify every benefit program they qualify for.
@@ -89,7 +107,11 @@ ${JSON.stringify(programs, null, 2)}
      - percent_discount → estimate annual discount using the relevant base bill if you can reason about it; otherwise note the discount tier in reasoning and use a conservative midpoint
    Prefer benefit_schedule over the program's coarser "estimated_annual_value" range whenever both are present. If no schedule, fall back to estimated_annual_value, scaled by household composition.
 
-   If eligible=false, set estimated_annual_value to 0.
+   A benefit_schedule's "kind" says what its numbers mean. Absent or "benefit" means the amounts above. Any other kind is NOT the benefit value — never report a row as estimated_annual_value, and never report $0 because a row is $0:
+     - kind "copay" → rows are what the household PAYS toward the service each period (ERDC child care copays). Take the dollar value from estimated_annual_value, scaled by household composition, and name the household's matching copay in reasoning (e.g. "your copay would likely be about $10/month").
+     - kind "assessed_value_exemption" → rows are the home value exempt from property tax, not cash saved. Take the dollar value from estimated_annual_value and explain in reasoning that the exemption lowers the taxable value by the row amount.
+
+   If any requirement has met="no", set estimated_annual_value to 0. Otherwise report a nonzero estimate grounded in the program's estimated_annual_value — never 0 for a program whose requirements are all "yes" or "unknown".
 
 6. PRIORITIZE hyperlocal Portland and Multnomah County programs (hidden_gem: true). These are our differentiator. Always evaluate them — never skip because the user didn't mention housing/utilities/etc.
 
@@ -141,6 +163,8 @@ const INELIGIBILITY_MARKERS =
  * Derive each match's `eligible` from its requirements (the auditable source
  * of truth). A program is eligible unless a requirement is definitively unmet
  * (met === 'no'); 'unknown' requirements do not exclude — they lower confidence.
+ * An eligible match at $0 gets its program's published median when the
+ * published range starts above $0 (see groundedValue).
  * Matches without a requirements array (e.g. pre-rebake fixtures) are left as-is,
  * trusting the model's own `eligible`.
  */
@@ -151,7 +175,9 @@ export function deriveEligibility(output: AnalysisOutput): AnalysisOutput {
     return {
       ...m,
       eligible,
-      estimated_annual_value: eligible ? m.estimated_annual_value : 0,
+      estimated_annual_value: eligible
+        ? groundedValue(m.program_id, m.estimated_annual_value)
+        : 0,
     };
   });
   return { ...output, matches };

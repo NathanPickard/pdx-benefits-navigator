@@ -1,7 +1,8 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { deriveEligibility, recomputeTotals } from '../eligibility.js';
-import type { AnalysisOutput, MatchResult } from '../../types/program.js';
+import type { AnalysisOutput, MatchResult, Program } from '../../types/program.js';
+import programs from '../../data/programs.json';
 
 const mk = (over: Partial<MatchResult>): MatchResult => ({
   program_id: 'x',
@@ -174,4 +175,56 @@ test('recomputeTotals: unknown program_id goes into neither bucket', () => {
   assert.equal(out.total_estimated_annual_value, 100);
   assert.equal(out.federal_only_value, 0);
   assert.equal(out.pdx_specific_value, 0);
+});
+
+// ──── deriveEligibility: zero-value guard ────
+
+const allMet = [{ key: 'income' as const, met: 'yes' as const, detail: 'Within limit' }];
+
+test('deriveEligibility: eligible at $0 falls back to the published median', () => {
+  const out = deriveEligibility(
+    wrap([mk({ program_id: 'erdc', estimated_annual_value: 0, requirements: allMet })]),
+  );
+  // Derived, not hardcoded: a data refresh that moves ERDC's median must not
+  // fail this test.
+  const erdc = (programs as Program[]).find((p) => p.id === 'erdc');
+  assert.ok(erdc, 'erdc must exist in programs.json');
+  assert.ok(erdc.estimated_annual_value.min > 0, 'fixture assumes a range above $0');
+  assert.equal(out.matches[0].eligible, true);
+  assert.equal(out.matches[0].estimated_annual_value, erdc.estimated_annual_value.median);
+});
+
+test('deriveEligibility: keeps $0 when the published range starts at $0', () => {
+  const out = deriveEligibility(
+    wrap([mk({ program_id: 'advsd', estimated_annual_value: 0, requirements: allMet })]),
+  );
+  assert.equal(out.matches[0].estimated_annual_value, 0);
+});
+
+test('deriveEligibility: ineligible stays $0 (no median fallback)', () => {
+  const out = deriveEligibility(
+    wrap([
+      mk({
+        program_id: 'erdc',
+        estimated_annual_value: 0,
+        requirements: [{ key: 'income', met: 'no', detail: 'Over limit' }],
+      }),
+    ]),
+  );
+  assert.equal(out.matches[0].eligible, false);
+  assert.equal(out.matches[0].estimated_annual_value, 0);
+});
+
+test('deriveEligibility: a nonzero model estimate is kept as-is', () => {
+  const out = deriveEligibility(
+    wrap([mk({ program_id: 'erdc', estimated_annual_value: 9000, requirements: allMet })]),
+  );
+  assert.equal(out.matches[0].estimated_annual_value, 9000);
+});
+
+test('deriveEligibility: unknown program id at $0 stays $0', () => {
+  const out = deriveEligibility(
+    wrap([mk({ program_id: 'not-a-program', estimated_annual_value: 0, requirements: allMet })]),
+  );
+  assert.equal(out.matches[0].estimated_annual_value, 0);
 });
