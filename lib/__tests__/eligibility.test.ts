@@ -314,3 +314,29 @@ test('deriveEligibility: zeroing an ineligible match is not an adjustment', () =
   assert.equal(out.estimated_annual_value, 0);
   assert.equal('adjusted_from' in out, false);
 });
+
+// ──── deriveEligibility: $0 with an unknown requirement is the model's caution ────
+
+const enrollmentUnknown = [
+  { key: 'income' as const, met: 'yes' as const, detail: 'Within limit' },
+  { key: 'enrollment' as const, met: 'unknown' as const, detail: 'SNAP enrollment not confirmed' },
+];
+
+test('deriveEligibility: $0 with an unknown requirement stays $0 (no median fallback)', () => {
+  const out = deriveOne({ program_id: 'erdc', estimated_annual_value: 0, requirements: enrollmentUnknown });
+  assert.equal(out.eligible, true);
+  assert.equal(out.estimated_annual_value, 0);
+  assert.equal('adjusted_from' in out, false);
+});
+
+test('deriveEligibility: a negative estimate with an unknown requirement becomes $0', () => {
+  const out = deriveOne({ program_id: 'erdc', estimated_annual_value: -50, requirements: enrollmentUnknown });
+  assert.equal(out.estimated_annual_value, 0);
+  assert.equal(out.adjusted_from, -50);
+});
+
+test('deriveEligibility: a positive estimate with an unknown requirement is still clamped', () => {
+  const [, max] = officialRange(programById('ohp'));
+  const out = deriveOne({ program_id: 'ohp', estimated_annual_value: max * 2, requirements: enrollmentUnknown });
+  assert.equal(out.estimated_annual_value, max);
+});

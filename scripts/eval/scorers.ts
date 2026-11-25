@@ -73,6 +73,11 @@ export function scoreDollars(
     // Score the model's own estimate: deriveEligibility clamps the reported
     // value into the official range and keeps the original in adjusted_from.
     const value = m.adjusted_from ?? m.estimated_annual_value;
+    // $0 on an eligible match with an unknown requirement is the model saying
+    // the benefit waits on an unconfirmed fact; deriveEligibility keeps it.
+    const isPendingZero =
+      value === 0 && (m.requirements ?? []).some((r) => r.met === 'unknown');
+    if (isPendingZero) continue;
     if (value < min || value > max) {
       violations.push({ program_id: m.program_id, value, min, max });
     }

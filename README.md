@@ -112,7 +112,7 @@ Each household was run through the same engine and model as production, and the 
 |---|---|---|---|
 | **María & family** | Household of 4 with 2 kids, part-time at Fred Meyer, renter in Cully, Spanish-speaking, 12% rent increase | $21,200/yr | **$43,764/yr** across 14 programs |
 | **James** | Single, disabled veteran, unemployed, owns home in St. Johns | $13,667/yr | **$22,431/yr** across 14 programs |
-| **Rose** | Senior widow, Social Security only, owns home in Lents, Vietnamese-speaking | $13,367/yr | **$21,987/yr** across 13 programs |
+| **Rose** | Senior widow, Social Security only, owns home in Lents, Vietnamese-speaking | $12,887/yr | **$21,507/yr** across 13 programs |
 <!-- README:TABLE:END -->
 
 The difference comes from the 11 hidden-gem programs: locally funded programs that national screeners don't cover. `npm run sync:readme` writes these numbers from the fixtures in [`data/scenarios/`](data/scenarios/), so they're never typed by hand. Official program ranges come from [`data/programs.seed.json`](data/programs.seed.json).

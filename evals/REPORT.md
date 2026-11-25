@@ -1,9 +1,9 @@
 # Eval Report
 
-- Date: 2026-11-24T03:18:17.585Z
+- Date: 2026-11-24T19:33:07.301Z
 - Eligibility model: claude-sonnet-4-6
 - Judge model: claude-haiku-4-5-20251001
-- Git SHA: d74f1b4
+- Git SHA: 5220c53
 - Runs per case: 1
 - Cases: 14
 
@@ -11,113 +11,123 @@
 
 | case | F1 | precision | recall | $ in-range | conf. agree | reasoning pass | flags |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| maria | 0.95 | 0.91 | 1.00 | 93% | 100% | 80% |  |
+| maria | 0.91 | 0.83 | 1.00 | 81% | 100% | 69% |  |
 | james | 1.00 | 1.00 | 1.00 | 100% | 100% | 93% |  |
-| rose | 1.00 | 1.00 | 1.00 | 100% | — | 69% |  |
-| cliff-snap-under | 1.00 | 1.00 | 1.00 | 100% | 100% | 94% |  |
-| cliff-snap-over | 0.87 | 0.77 | 1.00 | 100% | — | 71% |  |
-| cliff-ohp-under | 1.00 | 1.00 | 1.00 | 100% | — | 91% |  |
-| cliff-ohp-over | 0.92 | 0.86 | 1.00 | 100% | — | 82% |  |
-| zip-gresham | 1.00 | 1.00 | 1.00 | 93% | — | 43% |  |
-| rent-increase-9pct | 1.00 | 1.00 | 1.00 | 100% | — | 76% |  |
-| eviction-notice | 1.00 | 1.00 | 1.00 | 100% | — | 83% |  |
-| veteran-renter | 1.00 | 1.00 | 1.00 | 100% | — | 71% |  |
-| senior-renter | 0.95 | 0.90 | 1.00 | 100% | — | 86% |  |
-| pregnant-household | 0.93 | 0.88 | 1.00 | 100% | — | 92% |  |
-| unhoused | 1.00 | 1.00 | 1.00 | 100% | — | 75% |  |
-| Aggregate | 0.97 | 0.95 | 1.00 | 99% | 100% | 79% |  |
+| rose | 1.00 | 1.00 | 1.00 | 100% | — | 85% |  |
+| cliff-snap-under | 0.96 | 0.92 | 1.00 | 100% | 100% | 88% |  |
+| cliff-snap-over | 0.87 | 0.77 | 1.00 | 100% | — | 59% |  |
+| cliff-ohp-under | 0.88 | 0.78 | 1.00 | 93% | — | 79% |  |
+| cliff-ohp-over | 1.00 | 1.00 | 1.00 | 100% | — | 90% |  |
+| zip-gresham | 1.00 | 1.00 | 1.00 | 77% | — | 46% |  |
+| rent-increase-9pct | 1.00 | 1.00 | 1.00 | 100% | — | 82% |  |
+| eviction-notice | 0.96 | 0.93 | 1.00 | 100% | — | 90% |  |
+| veteran-renter | 0.96 | 0.92 | 1.00 | 100% | — | 67% |  |
+| senior-renter | 1.00 | 1.00 | 1.00 | 100% | — | 69% |  |
+| pregnant-household | — | — | — | — | — | — | pregnant-household: The analysis response was cut off — please try again. |
+| unhoused | — | — | — | — | — | — | unhoused: The analysis response was cut off — please try again. |
+| Aggregate | 0.96 | 0.93 | 1.00 | 96% | 100% | 76% |  |
 
 ## Failures
 
 ### maria
 
 - False positive: oregon-eitc
+- False positive: double-up-food-bucks
 - Dollar violation: ohp: $8000 outside [$3000–$6000]
-- Judge failure: ohp: Estimated annual value of $8,000 contradicts the program's stated range of $3,000–$6,000 (median $4,000).
-- Judge failure: oregon-eitc: The reasoning invokes federal EITC rules and phase-out thresholds, but the program definition specifies only Oregon EIC with an income_max_annual of $30,000; the determination contradicts the stated program ceiling by accepting $48,000 income based on external federal logic not in the program data.
-- Judge failure: school-meals: The reasoning states the household qualifies for reduced-price meals at 145% FPL, but the program's eligibility threshold is 185% FPL with no two-tier structure (free vs. reduced) defined in the program definition—the program only specifies a single income_max_pct_fpl of 185%, not separate free/reduced tiers.
+- Dollar violation: erdc: $0 outside [$8000–$18000]
+- Dollar violation: double-up-food-bucks: $0 outside [$120–$1440]
+- Judge failure: ohp: The reasoning incorrectly states adults at $48,000 are at 145% FPL for a 4-person household, when 138% FPL is $45,540; $48,000 is actually 145.5% FPL and exceeds the adult threshold, yet the determination grants eligibility without explaining how the ineligible adults are covered or whether OHP's 'expanded coverage' extends eligibility to over-138% adults.
+- Judge failure: oregon-eitc: Annual income of $48,000 exceeds the program's stated income_max_annual of $30,000, contradicting the eligibility determination of 'true'.
+- Judge failure: school-meals: Reasoning contradicts program definition: program states income_max_pct_fpl of 185% (single tier), but determination incorrectly invokes two separate thresholds (130% for free, 185% for reduced) that are not in the program definition provided.
+- Judge failure: cep-weatherization: The determination marks the household eligible while acknowledging they fail the program's explicit requirement ('owning and occupying the home') for the flagship weatherization program, then hedges with unverifiable claims about 'other services' not defined in the program specification.
+- Judge failure: double-up-food-bucks: Determination marked 'eligible: true' contradicts reasoning that states 'Without active SNAP enrollment, the household cannot access Double Up Food Bucks' and that SNAP eligibility is uncertain.
 
 ### james
 
-- Judge failure: double-up-food-bucks: The reasoning assumes the applicant is 'highly likely to be approved for SNAP' but provides no factual basis for this assumption; SNAP eligibility is not established by the intake data and is a mandatory prerequisite that cannot be inferred from $0 income alone.
+- Judge failure: double-up-food-bucks: Determination marks applicant eligible for Double Up Food Bucks, but program requires current SNAP/EBT enrollment as the sole eligibility gate; applicant has $0 income and no SNAP status is recorded in intake, so eligibility cannot be affirmed.
 
 ### rose
 
-- Judge failure: ohp: Reasoning states "138% FPL ($22,025)" but 138% of $15,960 (1-person FPL) = $22,025.08, which contradicts the claim that income of $21,600 is "just under that threshold" — it is actually under, making the hedged language about "even if slightly over" unsupported and misleading about the applicant's actual position relative to the stated adult threshold.
-- Judge failure: advsd: Reasoning assumes applicant is 60+ based on 'retired senior' status, but intake contains no age field; retirement alone does not confirm OAA priority eligibility (60+), and the program definition requires age verification for direct services prioritization.
-- Judge failure: lifeline: Income $21,600 exceeds 135% FPL limit of $21,546 for a 1-person household; determination cannot rely on unverified categorical enrollment to override income ineligibility.
-- Judge failure: double-up-food-bucks: The determination assumes SNAP eligibility as a prerequisite but does not verify or confirm that the household actually holds a current SNAP/EBT-food recipient (Oregon Trail Card), which is the sole eligibility gate stated in the program definition.
+- Judge failure: lifeline: Income of $21,600 exceeds the 135% FPL limit of $21,546 for a 1-person household; the reasoning conditionally assumes categorical enrollment (SNAP/OHP) but does not establish that it is documented in the intake.
+- Judge failure: trimet-low-income-fare: Age requirement 18–64 contradicts eligibility for applicant with 'has_senior_in_household: true'; the program's age_max is 64, which excludes seniors 65+, yet the reasoning asserts seniors qualify 'separately' — this contradicts the program definition which does not state an alternate age-waived path for the primary applicant.
 
 ### cliff-snap-under
 
-- Judge failure: lifeline: Determination assumes applicant qualifies for SNAP or OHP without evidence in intake; intake contains no data confirming enrollment in any qualifying program.
+- False positive: oregon-eitc
+- Judge failure: oregon-eitc: Annual income of $35,000 exceeds the program's stated income_max_annual of $30,000, contradicting the eligibility determination of true.
+- Judge failure: school-meals: The reasoning cites 130% FPL free-meals threshold, but the program definition specifies only 185% FPL income_max_pct_fpl with no separate free/reduced tiers defined in the program data provided.
 
 ### cliff-snap-over
 
 - False positive: snap
 - False positive: oregon-eitc
 - False positive: double-up-food-bucks
-- Judge failure: snap: The reasoning contradicts the program's income rule by applying net income logic and deductions that are not stated in the program definition provided, and by marking eligible=true when gross income ($36,000) exceeds the 130% FPL ceiling ($35,516).
-- Judge failure: ohp: The reasoning conflates household-level income limits with individual eligibility; OHP applies separate FPL thresholds by category (adults at 138%, children at 305%), but the determination does not clarify whether the specific household composition meets the actual eligibility rules, and the 138% calculation ($37,702) is not properly derived from the 3-person FPL of $27,320.
-- Judge failure: oregon-eitc: Determination contradicts program definition: program states income_max_annual of $30,000, applicant income is $36,000, yet determination marks eligible as true without acknowledging this exceeds the stated limit.
-- Judge failure: nw-natural-bill-discount: Income $36,000 falls in the Oregon bracket '$18,455 to $36,908' (50% discount), not '$36,909 to $55,362' (30% discount); the threshold is at $36,909, not $36,000.
-- Judge failure: double-up-food-bucks: Determination marked eligible=true but reasoning states 'Currently marking ineligible pending SNAP determination' — the conclusion contradicts the stated reasoning.
+- Judge failure: snap: The determination grants eligibility based on predicted deductions, but the household's gross income ($36,000) exceeds the 130% FPL limit ($35,516); SNAP eligibility requires passing the gross income test first, which this household does not meet.
+- Judge failure: oregon-eitc: Household annual income of $36,000 exceeds the program's stated income_max_annual of $30,000, contradicting eligibility.
+- Judge failure: nw-natural-bill-discount: Reasoning states household income $36,000 falls in '$36,909 to $55,362' bracket (30% discount), but $36,000 is actually in the '$18,455 to $36,908' bracket (50% discount) per the benefit schedule.
+- Judge failure: school-meals: Reasoning cites 130% FPL income limit for free meals, but program definition specifies only 185% FPL with no secondary tier; this 130% threshold is not in the program data provided.
+- Judge failure: cep-weatherization: The determination affirms eligibility as true while simultaneously stating that renter status may limit access to the full program and that the flagship program requires homeownership—this is an internal contradiction that should resolve to ineligible or contingent, not eligible with medium confidence.
+- Judge failure: transportation-wallet: The reasoning states the program provides 'up to $308/year' but the program definition shows max estimated annual value is $308 total (not per year), and the reasoning mischaracterizes this as an annual benefit amount rather than a one-time annual wallet value.
+- Judge failure: double-up-food-bucks: The reasoning assumes the household is 'very likely to qualify for SNAP after deductions' but the program eligibility gate is current SNAP enrollment, not projected eligibility; the intake provides no SNAP status field, and SNAP eligibility cannot be verified from the given data.
 
 ### cliff-ohp-under
 
-- Judge failure: oregon-eitc: Reasoning contradicts program definition: applicant has no children, but Oregon Kids Credit explicitly requires 'children under 6'; Oregon EIC for childless workers typically has income limit ~$18,600, and $21,800 exceeds it, making eligibility determination incorrect.
+- False positive: snap
+- False positive: double-up-food-bucks
+- Dollar violation: double-up-food-bucks: $0 outside [$120–$1440]
+- Judge failure: oregon-eitc: Reasoning references federal EITC eligibility and thresholds ($18,591), which are not part of the Oregon EIC program definition provided, and conflates federal and state programs without establishing Oregon EIC eligibility criteria.
+- Judge failure: pge-iqbd: Reasoning states applicant 'falls in the mid-range of SMI bands' at $21,800 income, but $21,800 is 56.8% of the $38,384 ceiling—the lower end, not mid-range—and the program provides no SMI band thresholds to support a 30–50% discount claim.
+- Judge failure: trimet-low-income-fare: Determination assumes applicant has OHP/Medicaid or SNAP enrollment, but intake contains no such data; eligibility cannot be affirmed without verification of these requirements or direct income comparison to 200% FPL limit.
 
 ### cliff-ohp-over
 
-- False positive: pdx-renter-relocation
-- Judge failure: pdx-renter-relocation: Determination grants eligibility (true) while reasoning explains that the triggering event is absent from intake data, which should preclude eligibility.
-- Judge failure: oregon-eitc: Reasoning attributes federal EITC eligibility rules to Oregon EIC program and relies on federal thresholds (~$19,104) rather than the program's stated income_max_annual of $30,000; applicant's $22,300 income is below the program's $30,000 ceiling, making eligibility determination based on federal rules an affirmative contradiction of the program definition provided.
+- Judge failure: oregon-eitc: The determination concludes eligible=true but the reasoning explains the applicant likely receives $0 or minimal benefit and is phased out of EITC eligibility; this internal contradiction is unresolved.
 
 ### zip-gresham
 
-- Dollar violation: ohp: $16000 outside [$3000–$6000]
-- Judge failure: ohp: Estimated annual value of $16,000 contradicts the program's stated range (min $3,000, max $6,000, median $4,000); the calculation method and result are unsupported by program data.
-- Judge failure: pge-iqbd: Determination states eligible=true but reasoning concludes 'Setting eligible=false' — internal contradiction on the eligibility decision itself.
-- Judge failure: liheap-energy-trust: Reasoning states household resides in Gresham, but zip code 97030 is not listed in the Portland City Limits table and the determination does not establish Oregon residency requirement is met for LIHEAP eligibility.
-- Judge failure: school-meals: The determination invokes a 130% FPL free-meals threshold that is not in the program definition, which specifies only 185% FPL income_max_pct_fpl.
-- Judge failure: sun-service-system: ZIP 97030 (Gresham) is not in the must_reside_in list (multnomah county programs typically require Portland city limits or specific Multnomah subregions); the determination affirms eligibility without confirming the child attends or lives near a SUN school, which is a stated requirement.
-- Judge failure: advsd: ZIP 97030 (Gresham) is not listed in the Portland city limits table and is outside Multnomah County; the program requires residency in Multnomah County, and Gresham is in a separate county.
-- Judge failure: trimet-low-income-fare: ZIP 97030 (Gresham) is not in the program's service area; program requires residence in Multnomah County, and the reference table explicitly lists only specific Portland-area ZIPs as qualifying.
-- Judge failure: double-up-food-bucks: The determination attributes a 130% FPL income test to Double Up Food Bucks Oregon, but the program definition states 'No separate income test — SNAP enrollment is the sole eligibility gate'; income is not a gate for this program.
+- Dollar violation: ohp: $8000 outside [$3000–$6000]
+- Dollar violation: pge-iqbd: $0 outside [$300–$1500]
+- Dollar violation: nw-natural-bill-discount: $0 outside [$200–$700]
+- Judge failure: ohp: Estimated annual value of $6,000 is derived from incorrect logic ($4,000/person × 2 adults = $8,000), contradicts the program's stated range (min $3,000, max $6,000), and misapplies the median value.
+- Judge failure: pge-iqbd: The determination marks eligible=true but then states 'Marking ineligible due to no confirmed PGE service' — these contradict each other. The reasoning conclusion does not match the eligibility determination.
+- Judge failure: school-meals: The reasoning attributes a 130% FPL free-meals threshold to this program, but the program definition specifies only 185% FPL income_max_pct_fpl with no separate free/reduced tiers defined.
+- Judge failure: sun-service-system: ZIP 97030 (Gresham) is in Multnomah County but the program requires residence in Multnomah, and the reference table explicitly states that only specific Portland ZIPs qualify for Portland-jurisdiction programs; 97030 is not listed as a qualifying Portland ZIP code.
+- Judge failure: multco-preschool-for-all: ZIP 97030 (Gresham) is not in Multnomah County; the program requires residency in Multnomah County, and the household does not meet this requirement.
+- Judge failure: trimet-low-income-fare: ZIP code 97030 (Gresham) is not in Multnomah County; program requires residency in Multnomah County, not just TriMet service district.
+- Judge failure: double-up-food-bucks: The determination cites a 130% FPL threshold ($42,900) for SNAP eligibility, but Double Up Food Bucks has no income test — it requires only current SNAP enrollment. The reasoning should not invoke an income calculation at all, as the program definition explicitly states 'No separate income test — SNAP enrollment is the sole eligibility gate.'
 
 ### rent-increase-9pct
 
-- Judge failure: oregon-eitc: Reasoning states the child age 10 does not qualify for Oregon Kids Credit (which requires under 6), yet concludes overall eligibility is true without explaining what remaining benefit the applicant receives.
-- Judge failure: cep-weatherization: Determination marks applicant eligible despite program requirement that flagship weatherization program requires homeownership and occupancy (applicant is a renter).
-- Judge failure: lifeline: The determination assumes the household qualifies for SNAP without verification; intake contains no SNAP enrollment status, only employment and income data.
-- Judge failure: trimet-low-income-fare: Determination assumes applicant age 18–64 without verification, but household includes only a 10-year-old child and no adult age data in intake; program requires applicant to be age 18–64, which cannot be confirmed.
+- Judge failure: oregon-eitc: Reasoning references federal EITC calculations and mechanics not defined in the program data; program definition does not specify Oregon EITC is 9% of federal EITC or state these percentages.
+- Judge failure: school-meals: Reasoning attributes a 130% FPL free-meals threshold to this program, which the program definition does not state; the program only specifies 185% FPL income eligibility with no tiered thresholds.
+- Judge failure: cep-weatherization: The determination affirms eligibility without noting that the program's 'other_requirements' explicitly state the flagship free home repair/weatherization program requires owning and occupying the home and being 55+/disabled; the applicant is a renter without disability or senior status, which contradicts eligibility for that core service.
 
 ### eviction-notice
 
-- Judge failure: pdx-renter-relocation: The reasoning assumes a 2-bedroom unit ($4,200) without evidence in the intake; the benefit schedule requires knowing actual unit size, which is not captured in the household data.
-- Judge failure: cep-weatherization: The reasoning asserts CEP offers weatherization to renters through 'other programs' but the program definition explicitly requires homeownership for the flagship weatherization program and does not define alternate renter-eligible services.
-- Judge failure: double-up-food-bucks: Determination assumes SNAP eligibility without verifying it is actually enrolled; program requires 'current SNAP/EBT-food recipient' status, not prospective eligibility.
+- False positive: oregon-eitc
+- Judge failure: oregon-eitc: Reasoning contradicts program definition: Oregon Kids Credit requires children under 6, applicant's child is age 6, yet determination marks applicant eligible for the program.
+- Judge failure: cep-weatherization: Reasoning attributes a renter-eligible weatherization service to CEP, but the program definition states the flagship program 'requires owning and occupying the home' with no mention of renter services.
 
 ### veteran-renter
 
-- Judge failure: oregon-eitc: Oregon EIC program requires children under 6 for Kids' Credit component; reasoning attributes a 9-12% credit calculation to Oregon EIC that is not stated in the program definition and conflates federal EITC with state EIC eligibility criteria.
-- Judge failure: nw-natural-bill-discount: Benefit schedule applied incorrectly: $18,000 income falls in the first Oregon band ($18,454 or less) for 85% discount, not the second band ($18,455–$36,908) for 50% discount.
-- Judge failure: cep-weatherization: Determination marks applicant eligible but reasoning establishes applicant fails the program's core requirement (must own and occupy home), making eligibility determination contradictory.
-- Judge failure: lifeline: Reasoning attributes a categorical eligibility pathway (SNAP/OHP enrollment) to Lifeline that the program definition does not include; Lifeline's other_requirements list only SNAP, Medicaid, SSI, Federal Public Housing, Veterans Pension, and Tribal programs—OHP is not listed.
+- False positive: multco-eviction-prev
+- Judge failure: oregon-eitc: Reasoning attributes a 9% or 12% calculation rule to Oregon EIC that is not stated in the program definition provided, and the program definition contains no such percentages or reference to federal EITC multipliers.
+- Judge failure: nw-natural-bill-discount: Benefit schedule band applied contradicts household income: $18,000 falls in Oregon band '$18,454 or less' (85% discount), not '$18,455 to $36,908' (50% discount).
+- Judge failure: multco-eviction-prev: Applicant does not meet the triggered_by_event requirement: eviction_notice is false, yet determination marks eligible:true without addressing this disqualifying condition.
+- Judge failure: trimet-low-income-fare: Program requires residence in Multnomah County; zip code 97209 is in Washington County, not Multnomah County.
+- Judge failure: double-up-food-bucks: The reasoning cites a $20,748 SNAP income limit for a 1-person household, which contradicts the 2026 FPL table ($15,960) and is not provided in any reference material given to the auditor.
 
 ### senior-renter
 
-- False positive: multco-eviction-prev
-- Judge failure: multco-eviction-prev: The program definition specifies 'triggered_by_event: eviction_notice' as a requirement, but the household has no eviction notice and the determination is marked eligible anyway; the reasoning attempts to bypass this by invoking an energy-assistance subcomponent, but the program definition does not establish that energy assistance is a separable pathway or that it lacks the eviction trigger.
-- Judge failure: trimet-low-income-fare: Reasoning states applicant is eligible under the 18–64 age requirement, but then contradicts itself by acknowledging the person may be 65+ (ineligible under that rule) and would qualify only via a separate senior program, which is a different eligibility pathway not evaluated here.
+- Judge failure: pge-iqbd: Reasoning states 'SNAP enrollment (if approved) would automatically qualify this household' — this program has no SNAP automatic-qualification rule.
+- Judge failure: nw-natural-bill-discount: Income of $19,000 falls in the Oregon bracket '$18,455 to $36,908' (50% discount), but the reasoning states this bracket applies when income is $18,455 or more; however, the first bracket '$18,454 or less' applies at $19,000, which contradicts the benefit schedule.
+- Judge failure: cep-weatherization: Determination marks applicant eligible despite program requirement that flagship weatherization demands home ownership; applicant is a renter and does not meet stated eligibility.
+- Judge failure: trimet-low-income-fare: The determination assumes the applicant is age 18–64, but the household has a senior (age 65+) and household_size is 1, meaning the applicant IS the senior; seniors 65+ are explicitly outside the age_max of 64 and qualify via a separate pathway, not this program's standard eligibility.
 
 ### pregnant-household
 
-- False positive: oregon-eitc
-- Judge failure: oregon-eitc: Household income of $35,000 exceeds the program's stated income_max_annual of $30,000, making the applicant ineligible.
+- Error: pregnant-household: The analysis response was cut off — please try again.
 
 ### unhoused
 
-- Judge failure: inclusionary-housing: Determination requires applicant to be a renter (must_be_renter: true), but household is currently unhoused and eligibility cannot be affirmed until renter status is established.
-- Judge failure: trimet-low-income-fare: Reasoning assumes applicant age is 18-64 without verification, but intake contains no age field and applicant's actual age is unknown.
-- Judge failure: double-up-food-bucks: The determination marks applicant as eligible (true) but the program requires CURRENT SNAP/EBT enrollment, which the intake does not show; eligibility cannot be affirmed without documented current SNAP enrollment.
+- Error: unhoused: The analysis response was cut off — please try again.

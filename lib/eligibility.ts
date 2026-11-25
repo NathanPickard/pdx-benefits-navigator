@@ -14,19 +14,29 @@ const PROGRAM_BY_ID: Record<string, Program> = Object.fromEntries(
 /**
  * Keep an eligible match's estimate inside its program's official range
  * (hard rule #2: every dollar figure comes from programs.json).
- * - $0 or below: the model sometimes reports $0 for a program it judged
- *   eligible (seen with ERDC, whose copay table has $0 rows, and Double Up Food
- *   Bucks). If the published range starts above $0, use the published median;
+ * - $0 or below with every requirement met: the model sometimes reports $0
+ *   for a program it judged eligible (seen with ERDC, whose copay table has $0
+ *   rows). If the published range starts above $0, use the published median;
  *   otherwise $0 is a legitimate estimate.
+ * - $0 or below with an "unknown" requirement: keep $0. The model uses $0 to
+ *   say the benefit waits on an unconfirmed fact ("not yet enrolled in SNAP",
+ *   "can't confirm a PGE account"); a median there inflates the total for a
+ *   program the household may not get (Double Up Food Bucks in the eval).
  * - Otherwise: clamp into officialRange, the published range widened by any
  *   benefit-kind schedule (seen with OHP at $8,000–$16,000 against $3,000–$6,000).
  * Unknown program ids pass through unchanged.
  */
-function groundedValue(programId: string, modelValue: number): number {
+function groundedValue(
+  programId: string,
+  modelValue: number,
+  allRequirementsMet: boolean,
+): number {
   const program = PROGRAM_BY_ID[programId];
   if (!program) return modelValue;
   const published = program.estimated_annual_value;
-  if (modelValue <= 0) return published.min > 0 ? published.median : 0;
+  if (modelValue <= 0) {
+    return allRequirementsMet && published.min > 0 ? published.median : 0;
+  }
   const [min, max] = officialRange(program);
   return Math.min(Math.max(modelValue, min), max);
 }
@@ -180,7 +190,8 @@ export function deriveEligibility(output: AnalysisOutput): AnalysisOutput {
     if (!m.requirements || m.requirements.length === 0) return m;
     const eligible = m.requirements.every((r) => r.met !== 'no');
     if (!eligible) return { ...m, eligible, estimated_annual_value: 0 };
-    const grounded = groundedValue(m.program_id, m.estimated_annual_value);
+    const allMet = m.requirements.every((r) => r.met === 'yes');
+    const grounded = groundedValue(m.program_id, m.estimated_annual_value, allMet);
     if (grounded === m.estimated_annual_value) return { ...m, eligible };
     return {
       ...m,
