@@ -128,7 +128,7 @@ ${JSON.stringify(programs, null, 2)}
      - kind "copay" → rows are what the household PAYS toward the service each period (ERDC child care copays). Take the dollar value from estimated_annual_value, scaled by household composition, and name the household's matching copay in reasoning (e.g. "your copay would likely be about $10/month").
      - kind "assessed_value_exemption" → rows are the home value exempt from property tax, not cash saved. Take the dollar value from estimated_annual_value and explain in reasoning that the exemption lowers the taxable value by the row amount.
 
-   If any requirement has met="no", set estimated_annual_value to 0. Otherwise report a nonzero estimate grounded in the program's estimated_annual_value — never 0 for a program whose requirements are all "yes" or "unknown".
+   If any requirement has met="no", set estimated_annual_value to 0. If every requirement is "yes", report a nonzero estimate grounded in the program's estimated_annual_value — never 0. If a requirement is "unknown" and the benefit depends on it (for example, the program needs current SNAP enrollment that the intake does not confirm), you may report 0; say in reasoning exactly what must be confirmed first. Otherwise report a nonzero estimate.
 
 6. PRIORITIZE hyperlocal Portland and Multnomah County programs (hidden_gem: true). These are our differentiator. Always evaluate them — never skip because the user didn't mention housing/utilities/etc.
 
@@ -187,10 +187,18 @@ const INELIGIBILITY_MARKERS =
  */
 export function deriveEligibility(output: AnalysisOutput): AnalysisOutput {
   const matches = output.matches.map((m) => {
-    if (!m.requirements || m.requirements.length === 0) return m;
-    const eligible = m.requirements.every((r) => r.met !== 'no');
-    if (!eligible) return { ...m, eligible, estimated_annual_value: 0 };
-    const allMet = m.requirements.every((r) => r.met === 'yes');
+    const requirements = m.requirements ?? [];
+    // No requirements to derive from: keep the model's verdict. "All met" is
+    // false because nothing shows it, so an eligible $0 is not median-filled,
+    // but the estimate is still clamped (hard rule #2).
+    const hasRequirements = requirements.length > 0;
+    const eligible = hasRequirements
+      ? requirements.every((r) => r.met !== 'no')
+      : m.eligible;
+    if (!eligible) {
+      return hasRequirements ? { ...m, eligible, estimated_annual_value: 0 } : m;
+    }
+    const allMet = hasRequirements && requirements.every((r) => r.met === 'yes');
     const grounded = groundedValue(m.program_id, m.estimated_annual_value, allMet);
     if (grounded === m.estimated_annual_value) return { ...m, eligible };
     return {

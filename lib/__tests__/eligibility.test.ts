@@ -340,3 +340,40 @@ test('deriveEligibility: a positive estimate with an unknown requirement is stil
   const out = deriveOne({ program_id: 'ohp', estimated_annual_value: max * 2, requirements: enrollmentUnknown });
   assert.equal(out.estimated_annual_value, max);
 });
+
+// ──── deriveEligibility: matches without requirements are still grounded ────
+
+test('deriveEligibility: an empty requirements array still clamps an eligible estimate', () => {
+  const [, max] = officialRange(programById('ohp'));
+  const out = deriveOne({ program_id: 'ohp', estimated_annual_value: max * 2, requirements: [] });
+  assert.equal(out.eligible, true);
+  assert.equal(out.estimated_annual_value, max);
+  assert.equal(out.adjusted_from, max * 2);
+});
+
+test('deriveEligibility: a missing requirements array still clamps an eligible estimate', () => {
+  const [, max] = officialRange(programById('ohp'));
+  const input = wrap([mk({ program_id: 'ohp', estimated_annual_value: max * 2 })]);
+  delete (input.matches[0] as unknown as Record<string, unknown>).requirements;
+  assert.equal(deriveEligibility(input).matches[0].estimated_annual_value, max);
+});
+
+test('deriveEligibility: without requirements, $0 stays $0 (nothing shows every requirement met)', () => {
+  const out = deriveOne({ program_id: 'erdc', estimated_annual_value: 0, requirements: [] });
+  assert.equal(out.estimated_annual_value, 0);
+});
+
+test('deriveEligibility: without requirements, the model’s ineligible verdict is kept', () => {
+  const out = deriveOne({ program_id: 'ohp', eligible: false, estimated_annual_value: 0, requirements: [] });
+  assert.equal(out.eligible, false);
+  assert.equal(out.estimated_annual_value, 0);
+});
+
+test('deriveEligibility: a small positive estimate with an unknown requirement is raised to the official minimum', () => {
+  // Intended: the official minimum is the smallest real benefit, so a positive
+  // estimate below it is a model error, not caution. Only $0 signals caution.
+  const [min] = officialRange(programById('ohp'));
+  const out = deriveOne({ program_id: 'ohp', estimated_annual_value: 1, requirements: enrollmentUnknown });
+  assert.equal(out.estimated_annual_value, min);
+  assert.equal(out.adjusted_from, 1);
+});
