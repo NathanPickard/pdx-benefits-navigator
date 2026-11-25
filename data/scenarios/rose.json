@@ -658,7 +658,7 @@
       "program_id": "double-up-food-bucks",
       "eligible": true,
       "confidence": "medium",
-      "estimated_annual_value": 480,
+      "estimated_annual_value": 0,
       "reasoning": "Double Up Food Bucks requires current SNAP/EBT enrollment as the sole eligibility gate. The applicant's SNAP eligibility is uncertain (income is marginally above gross income limit without deductions). If the applicant successfully enrolls in SNAP, they would automatically qualify for Double Up Food Bucks. Currently cannot confirm eligibility without SNAP enrollment confirmation.",
       "requirements": [
         {
@@ -712,8 +712,8 @@
       "urgency_note": null
     }
   ],
-  "total_estimated_annual_value": 21987,
-  "federal_only_value": 13367,
+  "total_estimated_annual_value": 21507,
+  "federal_only_value": 12887,
   "pdx_specific_value": 8620,
   "priority_application_order": [
     "advsd",

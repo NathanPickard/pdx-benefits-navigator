@@ -1,27 +1,44 @@
 import programs from '@/data/programs.json';
 import type { AnalysisOutput, Program } from '@/types/program';
+import { officialRange } from './benefitSchedule';
 
 const JURISDICTION_BY_ID: Record<string, Program['jurisdiction']> =
   Object.fromEntries(
     (programs as Program[]).map((p) => [p.id, p.jurisdiction]),
   );
 
-const PUBLISHED_VALUE_BY_ID: Record<string, Program['estimated_annual_value']> =
-  Object.fromEntries(
-    (programs as Program[]).map((p) => [p.id, p.estimated_annual_value]),
-  );
+const PROGRAM_BY_ID: Record<string, Program> = Object.fromEntries(
+  (programs as Program[]).map((p) => [p.id, p]),
+);
 
 /**
- * The model sometimes reports $0 for a program it judged eligible (seen with
- * ERDC, whose copay table includes $0 rows, and Double Up Food Bucks). When the
- * published range starts above $0, $0 cannot be right, so fall back to the
- * published median: still grounded in programs.json (hard rule #2).
+ * Keep an eligible match's estimate inside its program's official range
+ * (hard rule #2: every dollar figure comes from programs.json).
+ * - $0 or below with every requirement met: the model sometimes reports $0
+ *   for a program it judged eligible (seen with ERDC, whose copay table has $0
+ *   rows). If the published range starts above $0, use the published median;
+ *   otherwise $0 is a legitimate estimate.
+ * - $0 or below with an "unknown" requirement: keep $0. The model uses $0 to
+ *   say the benefit waits on an unconfirmed fact ("not yet enrolled in SNAP",
+ *   "can't confirm a PGE account"); a median there inflates the total for a
+ *   program the household may not get (Double Up Food Bucks in the eval).
+ * - Otherwise: clamp into officialRange, the published range widened by any
+ *   benefit-kind schedule (seen with OHP at $8,000–$16,000 against $3,000–$6,000).
+ * Unknown program ids pass through unchanged.
  */
-function groundedValue(programId: string, modelValue: number): number {
-  if (modelValue > 0) return modelValue;
-  const published = PUBLISHED_VALUE_BY_ID[programId];
-  if (!published || published.min <= 0) return modelValue;
-  return published.median;
+function groundedValue(
+  programId: string,
+  modelValue: number,
+  allRequirementsMet: boolean,
+): number {
+  const program = PROGRAM_BY_ID[programId];
+  if (!program) return modelValue;
+  const published = program.estimated_annual_value;
+  if (modelValue <= 0) {
+    return allRequirementsMet && published.min > 0 ? published.median : 0;
+  }
+  const [min, max] = officialRange(program);
+  return Math.min(Math.max(modelValue, min), max);
 }
 
 export const ELIGIBILITY_MODEL = 'claude-sonnet-4-6';
@@ -111,7 +128,7 @@ ${JSON.stringify(programs, null, 2)}
      - kind "copay" → rows are what the household PAYS toward the service each period (ERDC child care copays). Take the dollar value from estimated_annual_value, scaled by household composition, and name the household's matching copay in reasoning (e.g. "your copay would likely be about $10/month").
      - kind "assessed_value_exemption" → rows are the home value exempt from property tax, not cash saved. Take the dollar value from estimated_annual_value and explain in reasoning that the exemption lowers the taxable value by the row amount.
 
-   If any requirement has met="no", set estimated_annual_value to 0. Otherwise report a nonzero estimate grounded in the program's estimated_annual_value — never 0 for a program whose requirements are all "yes" or "unknown".
+   If any requirement has met="no", set estimated_annual_value to 0. If every requirement is "yes", report a nonzero estimate grounded in the program's estimated_annual_value — never 0. If a requirement is "unknown" and the benefit depends on it (for example, the program needs current SNAP enrollment that the intake does not confirm), you may report 0; say in reasoning exactly what must be confirmed first. Otherwise report a nonzero estimate.
 
 6. PRIORITIZE hyperlocal Portland and Multnomah County programs (hidden_gem: true). These are our differentiator. Always evaluate them — never skip because the user didn't mention housing/utilities/etc.
 
@@ -163,21 +180,32 @@ const INELIGIBILITY_MARKERS =
  * Derive each match's `eligible` from its requirements (the auditable source
  * of truth). A program is eligible unless a requirement is definitively unmet
  * (met === 'no'); 'unknown' requirements do not exclude — they lower confidence.
- * An eligible match at $0 gets its program's published median when the
- * published range starts above $0 (see groundedValue).
+ * An eligible match's estimate is kept inside its program's official range
+ * (see groundedValue).
  * Matches without a requirements array (e.g. pre-rebake fixtures) are left as-is,
  * trusting the model's own `eligible`.
  */
 export function deriveEligibility(output: AnalysisOutput): AnalysisOutput {
   const matches = output.matches.map((m) => {
-    if (!m.requirements || m.requirements.length === 0) return m;
-    const eligible = m.requirements.every((r) => r.met !== 'no');
+    const requirements = m.requirements ?? [];
+    // No requirements to derive from: keep the model's verdict. "All met" is
+    // false because nothing shows it, so an eligible $0 is not median-filled,
+    // but the estimate is still clamped (hard rule #2).
+    const hasRequirements = requirements.length > 0;
+    const eligible = hasRequirements
+      ? requirements.every((r) => r.met !== 'no')
+      : m.eligible;
+    if (!eligible) {
+      return hasRequirements ? { ...m, eligible, estimated_annual_value: 0 } : m;
+    }
+    const allMet = hasRequirements && requirements.every((r) => r.met === 'yes');
+    const grounded = groundedValue(m.program_id, m.estimated_annual_value, allMet);
+    if (grounded === m.estimated_annual_value) return { ...m, eligible };
     return {
       ...m,
       eligible,
-      estimated_annual_value: eligible
-        ? groundedValue(m.program_id, m.estimated_annual_value)
-        : 0,
+      estimated_annual_value: grounded,
+      adjusted_from: m.estimated_annual_value,
     };
   });
   return { ...output, matches };

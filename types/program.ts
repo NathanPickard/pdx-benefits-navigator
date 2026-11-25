@@ -149,6 +149,12 @@ export interface MatchResult {
   eligible: boolean;
   confidence: 'high' | 'medium' | 'low';
   estimated_annual_value: number;
+  /**
+   * The model's own estimate, set only when deriveEligibility moved it into the
+   * program's official range. Code-only: not in MatchSchema, so the model never
+   * emits it and the browser validators drop it. The eval scores this value.
+   */
+  adjusted_from?: number;
   reasoning: string;
   requirements?: EligibilityRequirement[];
   next_steps: string[];

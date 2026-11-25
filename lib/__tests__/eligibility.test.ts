@@ -1,6 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { deriveEligibility, recomputeTotals } from '../eligibility.js';
+import { officialRange } from '../benefitSchedule.js';
 import type { AnalysisOutput, MatchResult, Program } from '../../types/program.js';
 import programs from '../../data/programs.json';
 
@@ -227,4 +228,152 @@ test('deriveEligibility: unknown program id at $0 stays $0', () => {
     wrap([mk({ program_id: 'not-a-program', estimated_annual_value: 0, requirements: allMet })]),
   );
   assert.equal(out.matches[0].estimated_annual_value, 0);
+});
+
+// ──── deriveEligibility: official-range clamp (hard rule #2) ────
+
+function programById(id: string): Program {
+  const program = (programs as Program[]).find((p) => p.id === id);
+  assert.ok(program, `${id} must exist in programs.json`);
+  return program;
+}
+
+const deriveOne = (over: Partial<MatchResult>) =>
+  deriveEligibility(wrap([mk({ requirements: allMet, ...over })])).matches[0];
+
+test('deriveEligibility: an eligible estimate above the official range is clamped to the max', () => {
+  const [, max] = officialRange(programById('ohp'));
+  const out = deriveOne({ program_id: 'ohp', estimated_annual_value: max * 2 });
+  assert.equal(out.estimated_annual_value, max);
+});
+
+test('deriveEligibility: an eligible estimate below the official range is raised to the min', () => {
+  const [min] = officialRange(programById('ohp'));
+  assert.ok(min > 1, 'test needs an OHP official minimum above $1');
+  const out = deriveOne({ program_id: 'ohp', estimated_annual_value: 1 });
+  assert.equal(out.estimated_annual_value, min);
+});
+
+test('deriveEligibility: an estimate inside the official range is unchanged', () => {
+  const [min, max] = officialRange(programById('ohp'));
+  const inside = Math.round((min + max) / 2);
+  const out = deriveOne({ program_id: 'ohp', estimated_annual_value: inside });
+  assert.equal(out.estimated_annual_value, inside);
+});
+
+test('deriveEligibility: the clamp uses the schedule-widened official range', () => {
+  const snap = programById('snap');
+  const [, max] = officialRange(snap);
+  assert.ok(max > snap.estimated_annual_value.max, 'test needs a SNAP schedule above the published max');
+  const out = deriveOne({ program_id: 'snap', estimated_annual_value: max });
+  assert.equal(out.estimated_annual_value, max);
+});
+
+test('deriveEligibility: a negative estimate is treated as $0', () => {
+  const advsd = programById('advsd');
+  assert.equal(advsd.estimated_annual_value.min, 0, 'test needs a range starting at $0');
+  const out = deriveOne({ program_id: 'advsd', estimated_annual_value: -500 });
+  assert.equal(out.estimated_annual_value, 0);
+});
+
+test('deriveEligibility: a negative estimate falls back to the median when the range starts above $0', () => {
+  const erdc = programById('erdc');
+  const out = deriveOne({ program_id: 'erdc', estimated_annual_value: -1 });
+  assert.equal(out.estimated_annual_value, erdc.estimated_annual_value.median);
+});
+
+test('deriveEligibility: an unknown program id is not clamped', () => {
+  const out = deriveOne({ program_id: 'not-a-program', estimated_annual_value: 999_999 });
+  assert.equal(out.estimated_annual_value, 999_999);
+});
+
+// ──── deriveEligibility: adjusted_from records the model's value ────
+
+test('deriveEligibility: a clamped estimate records the model value in adjusted_from', () => {
+  const [, max] = officialRange(programById('ohp'));
+  const out = deriveOne({ program_id: 'ohp', estimated_annual_value: max * 2 });
+  assert.equal(out.estimated_annual_value, max);
+  assert.equal(out.adjusted_from, max * 2);
+});
+
+test('deriveEligibility: the $0 median fallback records adjusted_from = 0', () => {
+  const out = deriveOne({ program_id: 'erdc', estimated_annual_value: 0 });
+  assert.equal(out.adjusted_from, 0);
+});
+
+test('deriveEligibility: an unchanged estimate has no adjusted_from', () => {
+  const [min, max] = officialRange(programById('ohp'));
+  const out = deriveOne({ program_id: 'ohp', estimated_annual_value: Math.round((min + max) / 2) });
+  assert.equal('adjusted_from' in out, false);
+});
+
+test('deriveEligibility: zeroing an ineligible match is not an adjustment', () => {
+  const out = deriveEligibility(
+    wrap([mk({ program_id: 'ohp', estimated_annual_value: 4000, requirements: [{ key: 'income', met: 'no', detail: 'Over limit' }] })]),
+  ).matches[0];
+  assert.equal(out.estimated_annual_value, 0);
+  assert.equal('adjusted_from' in out, false);
+});
+
+// ──── deriveEligibility: $0 with an unknown requirement is the model's caution ────
+
+const enrollmentUnknown = [
+  { key: 'income' as const, met: 'yes' as const, detail: 'Within limit' },
+  { key: 'enrollment' as const, met: 'unknown' as const, detail: 'SNAP enrollment not confirmed' },
+];
+
+test('deriveEligibility: $0 with an unknown requirement stays $0 (no median fallback)', () => {
+  const out = deriveOne({ program_id: 'erdc', estimated_annual_value: 0, requirements: enrollmentUnknown });
+  assert.equal(out.eligible, true);
+  assert.equal(out.estimated_annual_value, 0);
+  assert.equal('adjusted_from' in out, false);
+});
+
+test('deriveEligibility: a negative estimate with an unknown requirement becomes $0', () => {
+  const out = deriveOne({ program_id: 'erdc', estimated_annual_value: -50, requirements: enrollmentUnknown });
+  assert.equal(out.estimated_annual_value, 0);
+  assert.equal(out.adjusted_from, -50);
+});
+
+test('deriveEligibility: a positive estimate with an unknown requirement is still clamped', () => {
+  const [, max] = officialRange(programById('ohp'));
+  const out = deriveOne({ program_id: 'ohp', estimated_annual_value: max * 2, requirements: enrollmentUnknown });
+  assert.equal(out.estimated_annual_value, max);
+});
+
+// ──── deriveEligibility: matches without requirements are still grounded ────
+
+test('deriveEligibility: an empty requirements array still clamps an eligible estimate', () => {
+  const [, max] = officialRange(programById('ohp'));
+  const out = deriveOne({ program_id: 'ohp', estimated_annual_value: max * 2, requirements: [] });
+  assert.equal(out.eligible, true);
+  assert.equal(out.estimated_annual_value, max);
+  assert.equal(out.adjusted_from, max * 2);
+});
+
+test('deriveEligibility: a missing requirements array still clamps an eligible estimate', () => {
+  const [, max] = officialRange(programById('ohp'));
+  const input = wrap([mk({ program_id: 'ohp', estimated_annual_value: max * 2 })]);
+  delete (input.matches[0] as unknown as Record<string, unknown>).requirements;
+  assert.equal(deriveEligibility(input).matches[0].estimated_annual_value, max);
+});
+
+test('deriveEligibility: without requirements, $0 stays $0 (nothing shows every requirement met)', () => {
+  const out = deriveOne({ program_id: 'erdc', estimated_annual_value: 0, requirements: [] });
+  assert.equal(out.estimated_annual_value, 0);
+});
+
+test('deriveEligibility: without requirements, the model’s ineligible verdict is kept', () => {
+  const out = deriveOne({ program_id: 'ohp', eligible: false, estimated_annual_value: 0, requirements: [] });
+  assert.equal(out.eligible, false);
+  assert.equal(out.estimated_annual_value, 0);
+});
+
+test('deriveEligibility: a small positive estimate with an unknown requirement is raised to the official minimum', () => {
+  // Intended: the official minimum is the smallest real benefit, so a positive
+  // estimate below it is a model error, not caution. Only $0 signals caution.
+  const [min] = officialRange(programById('ohp'));
+  const out = deriveOne({ program_id: 'ohp', estimated_annual_value: 1, requirements: enrollmentUnknown });
+  assert.equal(out.estimated_annual_value, min);
+  assert.equal(out.adjusted_from, 1);
 });

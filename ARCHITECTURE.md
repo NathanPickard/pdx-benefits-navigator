@@ -88,7 +88,7 @@ messages.stream(model, system=[PROMPT w/ cache_control ephemeral], user=JSON(int
 ```
 
 Post-processing contract (`lib/eligibility.ts`):
-- `deriveEligibility`: `eligible = requirements.every(r => r.met !== 'no')`; ineligible ⇒ value 0. Eligible at $0 ⇒ the program's published median, unless its published range starts at $0 (the model sometimes reports $0 for eligible programs). Requirements are the audit trail; the model's own `eligible` flag is overridden when requirements exist.
+- `deriveEligibility`: `eligible = requirements.every(r => r.met !== 'no')`; ineligible ⇒ value 0. Eligible ⇒ the value is kept inside `officialRange` (published range widened by any benefit-kind schedule); an eligible value at or below $0 becomes the published median only when every requirement is "yes" and the published range starts above $0; with an "unknown" requirement it stays $0 (the model's "waits on an unconfirmed fact"). A changed value keeps the model's original in `adjusted_from` (code-only, not in `MatchSchema`), which the eval's dollar scorer reads. Requirements are the audit trail; the model's own `eligible` flag is overridden when requirements exist. Without requirements the model's verdict stands, but an eligible value is still clamped.
 - `recomputeTotals`: total / federal_only (federal+oregon) / pdx_specific (portland+multnomah) are recomputed from matches. Never trust model-supplied totals.
 - `parseJsonObject`: translation path only. Eligibility uses structured output.
 

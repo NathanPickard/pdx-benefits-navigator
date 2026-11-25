@@ -197,3 +197,34 @@ test('scoreConfidence: no declarations means vacuous pass', () => {
   assert.equal(s.checked, 0);
   assert.equal(s.agreementRate, 1);
 });
+
+test('scoreDollars: scores the model value in adjusted_from, not the clamped value', () => {
+  const out = output([{ program_id: 'a', estimated_annual_value: 1000, adjusted_from: 5000 }]);
+  const score = scoreDollars(out, PROGRAMS);
+  assert.equal(score.inRangeRate, 0);
+  assert.deepEqual(score.violations, [{ program_id: 'a', value: 5000, min: 100, max: 1000 }]);
+});
+
+test('scoreDollars: an eligible $0 with an unknown requirement is not a violation', () => {
+  const out = output([
+    {
+      program_id: 'a',
+      estimated_annual_value: 0,
+      requirements: [{ key: 'enrollment', met: 'unknown', detail: 'Not confirmed' }],
+    },
+  ]);
+  const score = scoreDollars(out, PROGRAMS);
+  assert.equal(score.inRangeRate, 1);
+  assert.deepEqual(score.violations, []);
+});
+
+test('scoreDollars: an eligible $0 with every requirement met is still a violation', () => {
+  const out = output([
+    {
+      program_id: 'a',
+      estimated_annual_value: 0,
+      requirements: [{ key: 'income', met: 'yes', detail: 'Within limit' }],
+    },
+  ]);
+  assert.equal(scoreDollars(out, PROGRAMS).violations.length, 1);
+});
